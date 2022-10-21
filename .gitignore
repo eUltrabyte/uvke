@@ -1,0 +1,15 @@
+.vs/
+.vscode/
+.clion/
+.idea/
+
+Build/
+build/
+Bin/
+bin/
+Out/
+out/
+Output/
+output/
+cmake-debug-build/
+cmake-release-build/
