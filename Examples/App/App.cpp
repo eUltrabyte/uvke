@@ -3,7 +3,9 @@
 static int init = uvke::priv::Init();
 
 auto main(int argc, char** argv) -> int {
-    std::cout << "\x1b[31mTest\n";
+    UVKE_LOG("test");
+    UVKE_TRACE();
+    UVKE_FATAL("test");
 
     glfwInit();
 

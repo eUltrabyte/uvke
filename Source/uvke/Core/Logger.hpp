@@ -4,6 +4,14 @@
 
 #include "../uvke.hpp"
 
+namespace uvke {
+    enum UVKE_API Severity {
+        Debug,
+        Trace,
+        Fatal,
+    };
 
+    extern void Log(std::string_view message, Severity severity = Severity::Debug);
+};
 
 #endif
