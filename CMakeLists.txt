@@ -13,6 +13,8 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Platform.cpp
     Source/uvke/Core/Logger.hpp
     Source/uvke/Core/Logger.cpp
+    Source/uvke/Core/Window.hpp
+    Source/uvke/Core/Window.cpp
 )
 
 set(UVKE_UTILS_SOURCE

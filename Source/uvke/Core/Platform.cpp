@@ -17,6 +17,7 @@ namespace uvke {
 
         int Deinit() {
             glfwTerminate();
+            std::cin.get();
             return 1;
         }
     };

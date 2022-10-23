@@ -24,4 +24,6 @@
 #include "Utils/Vec3.hpp"
 #include "Utils/Vec4.hpp"
 
+#include "Core/Window.hpp"
+
 #endif

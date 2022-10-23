@@ -10,10 +10,11 @@ auto main(int argc, char** argv) -> int {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "uvke App", nullptr, nullptr);
+    uvke::Window window(uvke::WindowProps("uvke test", { 1280, 720 }, uvke::Style::Default));
 
-    for(; !glfwWindowShouldClose(window) ;) {
-        glfwPollEvents();
+    while(window.IsOpen()) {
+
+        window.Update();
     }
 
     return uvke::priv::Deinit();
