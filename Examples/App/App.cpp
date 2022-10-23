@@ -7,8 +7,6 @@ auto main(int argc, char** argv) -> int {
     UVKE_TRACE();
     UVKE_FATAL("test");
 
-    glfwInit();
-
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
@@ -18,5 +16,5 @@ auto main(int argc, char** argv) -> int {
         glfwPollEvents();
     }
 
-    return 0;
+    return uvke::priv::Deinit();
 }

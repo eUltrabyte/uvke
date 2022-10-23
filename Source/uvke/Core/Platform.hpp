@@ -4,6 +4,9 @@
 
 #include "../uvkepch.hpp"
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 #ifdef UVKE_SHARED_LIBRARY
     #ifdef UVKE_SHARED_BUILD
         #ifdef _MSC_VER
@@ -29,6 +32,7 @@
 namespace uvke {
     namespace priv {
         extern int UVKE_API Init();
+        extern int UVKE_API Deinit();
     };
 };
 

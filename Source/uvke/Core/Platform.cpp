@@ -11,6 +11,12 @@ namespace uvke {
                 SetConsoleMode(handle, mode);
             #endif
 
+            glfwInit();
+            return 1;
+        }
+
+        int Deinit() {
+            glfwTerminate();
             return 1;
         }
     };

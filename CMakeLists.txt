@@ -8,13 +8,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 find_package(glfw3 REQUIRED FATAL_ERROR)
 find_package(Vulkan REQUIRED FATAL_ERROR)
 
-set(UVKE_SOURCE
-    Source/uvke/uvke.hpp
-    Source/uvke/uvke.cpp
+set(UVKE_CORE_SOURCE
     Source/uvke/Core/Platform.hpp
     Source/uvke/Core/Platform.cpp
     Source/uvke/Core/Logger.hpp
     Source/uvke/Core/Logger.cpp
+)
+
+set(UVKE_UTILS_SOURCE
+    Source/uvke/Utils/Vec2.hpp
+    Source/uvke/Utils/Vec3.hpp
+    Source/uvke/Utils/Vec4.hpp
+)
+
+set(UVKE_SOURCE
+    Source/uvke/uvke.hpp
+    Source/uvke/uvke.cpp
+    ${UVKE_CORE_SOURCE}
+    ${UVKE_UTILS_SOURCE}
 )
 
 option(UVKE_SHARED_LIBRARY "uvke build using shared libraries" OFF)

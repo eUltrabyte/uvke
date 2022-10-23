@@ -4,9 +4,6 @@
 
 #include "uvkepch.hpp"
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include "Core/Platform.hpp"
 #include "Core/Logger.hpp"
 
@@ -22,5 +19,9 @@
 
 #define UVKE_BYTE(x) (1 << x)
 #define UVKE_ASSERT(x) if(!x) { UVKE_TRACE(); }
+
+#include "Utils/Vec2.hpp"
+#include "Utils/Vec3.hpp"
+#include "Utils/Vec4.hpp"
 
 #endif
