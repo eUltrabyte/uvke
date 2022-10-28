@@ -21,6 +21,8 @@ set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Vec2.hpp
     Source/uvke/Utils/Vec3.hpp
     Source/uvke/Utils/Vec4.hpp
+    Source/uvke/Utils/Clock.hpp
+    Source/uvke/Utils/Clock.cpp
 )
 
 set(UVKE_SOURCE

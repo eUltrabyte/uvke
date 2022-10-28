@@ -23,6 +23,7 @@
 #include "Utils/Vec2.hpp"
 #include "Utils/Vec3.hpp"
 #include "Utils/Vec4.hpp"
+#include "Utils/Clock.hpp"
 
 #include "Core/Window.hpp"
 

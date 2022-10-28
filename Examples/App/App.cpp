@@ -7,8 +7,14 @@ auto main(int argc, char** argv) -> int {
     UVKE_TRACE();
     UVKE_FATAL("test");
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    /* VkApplicationInfo appInfo { };
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pNext = nullptr;
+    appInfo.applicationVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
+    appInfo.pApplicationName = "uvke";
+    appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
+    appInfo.pEngineName = "uvke";
+    appInfo.apiVersion = uvke::GetSupportedVulkan(); */
 
     uvke::Window window(uvke::WindowProps("uvke test", { 1280, 720 }, uvke::Style::Default));
 

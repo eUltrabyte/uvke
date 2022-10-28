@@ -34,6 +34,8 @@ namespace uvke {
         extern int UVKE_API Init();
         extern int UVKE_API Deinit();
     };
+    
+    extern unsigned int UVKE_API GetSupportedVulkan();
 };
 
 #endif
