@@ -8,10 +8,13 @@ namespace uvke {
     class UVKE_API Clock {
     public:
         Clock();
-        virtual ~Clock();
+        virtual ~Clock() = default;
+
+        virtual void Restart();
+        virtual void Sleep(unsigned int time);
 
         virtual std::chrono::time_point<std::chrono::steady_clock> GetStart();
-        virtual std::chrono::time_point<std::chrono::steady_clock> GetTime();
+        virtual std::time_t GetTime();
 
     private:
         std::chrono::time_point<std::chrono::steady_clock> m_start;

@@ -1,9 +1,15 @@
 #include "Window.hpp"
 
 namespace uvke {
+    namespace priv {
+        void glfwErrorCallback(int error, const char* description) { UVKE_LOG("glfw error - " + std::to_string(error) + " - " + description); }
+    };
+
     Window::Window(const WindowProps& windowProps)
         : m_windowProps(std::make_shared<WindowProps>(windowProps)) {
         std::string temporaryTitle = "";
+
+        glfwSetErrorCallback(priv::glfwErrorCallback);
 
         if(windowProps.style == Style::None) {
             glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
@@ -20,11 +26,9 @@ namespace uvke {
         }
 
         m_window = glfwCreateWindow(windowProps.size.x, windowProps.size.y, temporaryTitle.c_str(), nullptr, nullptr);
-        UVKE_ASSERT(m_window);
 
         int count = 0;
         GLFWmonitor** monitors = glfwGetMonitors(&count);
-        UVKE_ASSERT(monitors);
 
         if(windowProps.style & Style::Fullscreen) {
             glfwSetWindowMonitor(m_window, monitors[0], 0, 0, windowProps.size.x, windowProps.size.y, 60);

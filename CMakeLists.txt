@@ -5,6 +5,8 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
+include_directories(Thirdparty)
+
 find_package(glfw3 REQUIRED FATAL_ERROR)
 find_package(Vulkan REQUIRED FATAL_ERROR)
 

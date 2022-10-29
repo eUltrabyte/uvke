@@ -7,6 +7,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <stb/stb_image.h>
+
 #ifdef UVKE_SHARED_LIBRARY
     #ifdef UVKE_SHARED_BUILD
         #ifdef _MSC_VER
