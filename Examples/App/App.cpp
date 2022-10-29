@@ -3,10 +3,6 @@
 static int init = uvke::priv::Init();
 
 auto main(int argc, char** argv) -> int {
-    UVKE_LOG("test");
-    UVKE_TRACE();
-    UVKE_FATAL("test");
-
     VkApplicationInfo appInfo { };
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pNext = nullptr;

@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 include_directories(Thirdparty)
 
-find_package(glfw3 REQUIRED FATAL_ERROR)
-find_package(Vulkan REQUIRED FATAL_ERROR)
+find_package(glfw3 REQUIRED)
+find_package(Vulkan REQUIRED)
 
 set(UVKE_CORE_SOURCE
     Source/uvke/Core/Platform.hpp
