@@ -10,9 +10,11 @@ uvke ( Ultrabyte Vulkan Engine ) is open source vulkan based rendering ( and may
 It's Hukan deputy but prepared for 2d and more flexible.
 
 ### Libraries
-[glfw](https://github.com/glfw/glfw) - an open source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
+[glfw](https://github.com/glfw/glfw) - Open source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
 
 [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) - Vulkan is a new generation graphics and compute API that provides high-efficiency, cross-platform access to modern graphics processing units, which are used in a wide variety of devices from PCs and consoles to mobile phones and embedded platforms.
+
+[stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) - Image loading/decoding from file/memory: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
 
 ### Installation
 ```bash

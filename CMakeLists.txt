@@ -5,6 +5,8 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
+include_directories(Thirdparty)
+
 find_package(glfw3 REQUIRED FATAL_ERROR)
 find_package(Vulkan REQUIRED FATAL_ERROR)
 
@@ -13,12 +15,16 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Platform.cpp
     Source/uvke/Core/Logger.hpp
     Source/uvke/Core/Logger.cpp
+    Source/uvke/Core/Window.hpp
+    Source/uvke/Core/Window.cpp
 )
 
 set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Vec2.hpp
     Source/uvke/Utils/Vec3.hpp
     Source/uvke/Utils/Vec4.hpp
+    Source/uvke/Utils/Clock.hpp
+    Source/uvke/Utils/Clock.cpp
 )
 
 set(UVKE_SOURCE
