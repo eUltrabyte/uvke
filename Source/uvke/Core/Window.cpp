@@ -39,6 +39,10 @@ namespace uvke {
         glfwDestroyWindow(m_window);
     }
 
+    void Window::CreateSurface(VkInstance instance, VkSurfaceKHR* surface) {
+        glfwCreateWindowSurface(instance, m_window, nullptr, surface);
+    }
+
     void Window::Update() {
         glfwPollEvents();
     }

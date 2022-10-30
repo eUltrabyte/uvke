@@ -62,7 +62,12 @@ auto main(int argc, char** argv) -> int {
         UVKE_LOG("GPU #" + std::to_string(i) + " - " + physicalDevicesProperties.at(i).deviceName);
     }
 
+    std::vector<const char*> deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+
     VkDevice device;
+    VkQueue queue;
     {
         float deviceQueuePriorities[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
         VkDeviceQueueCreateInfo deviceQueueCreateInfo { };
@@ -81,19 +86,25 @@ auto main(int argc, char** argv) -> int {
         deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
         deviceCreateInfo.enabledLayerCount = 0;
         deviceCreateInfo.ppEnabledLayerNames = nullptr;
-        deviceCreateInfo.enabledExtensionCount = 0;
-        deviceCreateInfo.ppEnabledExtensionNames = nullptr;
+        deviceCreateInfo.enabledExtensionCount = deviceExtensions.size();
+        deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
         deviceCreateInfo.pEnabledFeatures = &physicalDevicesFeatures.at(0);
 
         UVKE_ASSERT(vkCreateDevice(physicalDevices.at(0), &deviceCreateInfo, nullptr, &device));
+
+        vkGetDeviceQueue(device, 0, 0, &queue);
     }
 
     uvke::Window window(uvke::WindowProps("uvke test", { 1280, 720 }, uvke::Style::Default));
+
+    VkSurfaceKHR surface;
+    window.CreateSurface(instance, &surface);
 
     while(window.IsOpen()) {
         window.Update();
     }
 
+    vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyDevice(device, nullptr);
     vkDestroyInstance(instance, nullptr);
     return uvke::priv::Deinit();
