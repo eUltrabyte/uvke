@@ -2,6 +2,7 @@
 .vscode/
 .clion/
 .idea/
+.fleet/
 
 Build/
 build/
@@ -11,5 +12,5 @@ Out/
 out/
 Output/
 output/
-cmake-debug-build/
-cmake-release-build/
+cmake-build-debug/
+cmake-build-release/

@@ -19,6 +19,11 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Window.cpp
 )
 
+set(UVKE_GRAPHICS_SOURCE
+    Source/uvke/Graphics/Renderer.hpp
+    Source/uvke/Graphics/Renderer.cpp
+)
+
 set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Vec2.hpp
     Source/uvke/Utils/Vec3.hpp
@@ -31,6 +36,7 @@ set(UVKE_SOURCE
     Source/uvke/uvke.hpp
     Source/uvke/uvke.cpp
     ${UVKE_CORE_SOURCE}
+    ${UVKE_GRAPHICS_SOURCE}
     ${UVKE_UTILS_SOURCE}
 )
 
