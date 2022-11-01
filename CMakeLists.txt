@@ -4,6 +4,7 @@ project(uvke)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 include_directories(Thirdparty)
 
