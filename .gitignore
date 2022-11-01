@@ -3,6 +3,7 @@
 .clion/
 .idea/
 .fleet/
+.cache/
 
 Build/
 build/
