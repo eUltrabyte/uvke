@@ -27,6 +27,8 @@ namespace uvke {
         Window(const WindowProps& windowProps = WindowProps());
         virtual ~Window();
 
+        virtual void CreateSurface(VkInstance instance, VkSurfaceKHR* surface);
+
         virtual void Update();
     
         virtual bool IsOpen();

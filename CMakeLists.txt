@@ -4,11 +4,12 @@ project(uvke)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 include_directories(Thirdparty)
 
-find_package(glfw3 REQUIRED FATAL_ERROR)
-find_package(Vulkan REQUIRED FATAL_ERROR)
+find_package(glfw3 REQUIRED)
+find_package(Vulkan REQUIRED)
 
 set(UVKE_CORE_SOURCE
     Source/uvke/Core/Platform.hpp
@@ -17,6 +18,11 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Logger.cpp
     Source/uvke/Core/Window.hpp
     Source/uvke/Core/Window.cpp
+)
+
+set(UVKE_GRAPHICS_SOURCE
+    Source/uvke/Graphics/Renderer.hpp
+    Source/uvke/Graphics/Renderer.cpp
 )
 
 set(UVKE_UTILS_SOURCE
@@ -31,6 +37,7 @@ set(UVKE_SOURCE
     Source/uvke/uvke.hpp
     Source/uvke/uvke.cpp
     ${UVKE_CORE_SOURCE}
+    ${UVKE_GRAPHICS_SOURCE}
     ${UVKE_UTILS_SOURCE}
 )
 

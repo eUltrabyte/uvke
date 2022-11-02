@@ -6,13 +6,13 @@
 [![Pull Requests](https://img.shields.io/github/issues-pr/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke/pulls)
 [![Forks](https://img.shields.io/github/forks/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke)
 
-uvke ( Ultrabyte Vulkan Engine ) is open source vulkan based rendering ( and maybe game ) engine written in C++20.
-It's Hukan deputy but prepared for 2d and more flexible.
+#### uvke ( Ultrabyte Vulkan Engine ) is open source vulkan based rendering ( and maybe game ) engine written in C++20.
+##### It's Hukan deputy but prepared for 2d and more flexible.
 
 ### Libraries
 [glfw](https://github.com/glfw/glfw) - Open source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
 
-[Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) - Vulkan is a new generation graphics and compute API that provides high-efficiency, cross-platform access to modern graphics processing units, which are used in a wide variety of devices from PCs and consoles to mobile phones and embedded platforms.
+[Vulkan SDK](https://lunarg.com/vulkan-sdk/) - Vulkan is a new generation graphics and compute API that provides high-efficiency, cross-platform access to modern graphics processing units, which are used in a wide variety of devices from PCs and consoles to mobile phones and embedded platforms.
 
 [stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) - Image loading/decoding from file/memory: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
 
@@ -21,4 +21,14 @@ It's Hukan deputy but prepared for 2d and more flexible.
 git clone https://github.com/eUltrabyte/uvke.git
 mkdir Build && cd Build
 cmake ..
+```
+
+### Bugs
+Bugs are reported to [issue tracker](https://github.com/eUltrabyte/uvke/issues)
+#### Report template look like this
+```
+Operating System:
+GPU:
+Branch:
+Short description:
 ```
