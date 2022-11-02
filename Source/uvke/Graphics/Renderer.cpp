@@ -46,19 +46,12 @@ namespace uvke {
             UVKE_ASSERT(vkCreateInstance(&instanceCreateInfo, nullptr, &m_instance));
         }
 
-        std::vector<VkPhysicalDevice> physicalDevices;
-        {
-            unsigned int physicalDevicesCount = 0;
-            vkEnumeratePhysicalDevices(m_instance, &physicalDevicesCount, nullptr);
-            physicalDevices = std::vector<VkPhysicalDevice>(physicalDevicesCount);
-            vkEnumeratePhysicalDevices(m_instance, &physicalDevicesCount, physicalDevices.data());
-        }
-
-        m_physicalDevice = GetSuitablePhysicalDevice(physicalDevices);
-        VkPhysicalDeviceFeatures physicalDeviceFeatures { };
-        vkGetPhysicalDeviceFeatures(m_physicalDevice, &physicalDeviceFeatures);
+        m_physicalDevice = GetSuitablePhysicalDevice();
 
         {
+            VkPhysicalDeviceFeatures physicalDeviceFeatures { };
+            vkGetPhysicalDeviceFeatures(m_physicalDevice, &physicalDeviceFeatures);
+
             float deviceQueuePriorities[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
             std::vector<const char*> deviceExtensions = {
@@ -86,11 +79,20 @@ namespace uvke {
             deviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
 
             UVKE_ASSERT(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device));
-
-            vkGetDeviceQueue(m_device, 0, 0, &m_queue);
         }
 
         window.CreateSurface(m_instance, &m_surface);
+
+        {
+            unsigned int queueFamilyIndex = GetQueueFamily();
+            vkGetDeviceQueue(m_device, queueFamilyIndex, 0, &m_queue);
+
+            VkBool32 presentSupport = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, queueFamilyIndex, m_surface, &presentSupport);
+            UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "true" : "false"));
+        }
+
+        
     }
 
     Renderer::~Renderer() {

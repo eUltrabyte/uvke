@@ -13,7 +13,15 @@ namespace uvke {
         
     
     private:
-        VkPhysicalDevice GetSuitablePhysicalDevice(std::span<VkPhysicalDevice> physicalDevices) {
+        VkPhysicalDevice GetSuitablePhysicalDevice() {
+            std::vector<VkPhysicalDevice> physicalDevices;
+            {
+                unsigned int physicalDevicesCount = 0;
+                vkEnumeratePhysicalDevices(m_instance, &physicalDevicesCount, nullptr);
+                physicalDevices = std::vector<VkPhysicalDevice>(physicalDevicesCount);
+                vkEnumeratePhysicalDevices(m_instance, &physicalDevicesCount, physicalDevices.data());
+            }
+
             std::vector<VkPhysicalDeviceProperties> physicalDevicesProperties(physicalDevices.size());
             std::vector<VkPhysicalDeviceFeatures> physicalDevicesFeatures(physicalDevices.size());
 
@@ -26,6 +34,24 @@ namespace uvke {
                     return physicalDevices[i];
                 }
             }
+        }
+
+        unsigned int GetQueueFamily() {
+            std::vector<VkQueueFamilyProperties> queueFamilyProperties;
+            {
+                unsigned int queueFamilyPropertiesCount = 0;
+                vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyPropertiesCount, nullptr);
+                queueFamilyProperties = std::vector<VkQueueFamilyProperties>(queueFamilyPropertiesCount);
+                vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyPropertiesCount, queueFamilyProperties.data());
+            }
+
+            for(auto i = 0; i < queueFamilyProperties.size(); ++i) {
+                if(queueFamilyProperties.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                    return i;
+                }
+            }
+
+            UVKE_ASSERT(-1);
         }
 
         VkInstance m_instance;
