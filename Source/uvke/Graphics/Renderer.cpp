@@ -92,10 +92,50 @@ namespace uvke {
             UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "true" : "false"));
         }
 
-        
+        m_surfaceFormat = GetSurfaceFormat();
+        m_presentMode = GetPresentMode();
+        m_extent = GetSwapExtent(window);
+
+        UVKE_LOG("Format - " + std::to_string(m_surfaceFormat.format));
+        UVKE_LOG("Present Mode - " + std::to_string(m_presentMode));
+        UVKE_LOG("Extent - " + std::to_string(m_extent.width) + "/" + std::to_string(m_extent.height));
+
+        {
+            VkSwapchainCreateInfoKHR swapchainCreateInfo { };
+            swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+            swapchainCreateInfo.pNext = nullptr;
+            swapchainCreateInfo.flags = 0;
+            swapchainCreateInfo.surface = m_surface;
+            swapchainCreateInfo.minImageCount = m_swapchainImageCount;
+            swapchainCreateInfo.imageFormat = m_surfaceFormat.format;
+            swapchainCreateInfo.imageColorSpace = m_surfaceFormat.colorSpace;
+            swapchainCreateInfo.imageExtent = m_extent;
+            swapchainCreateInfo.imageArrayLayers = 1;
+            swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+            // TODO SUPPORT FOR MORE QUEUES
+            swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            swapchainCreateInfo.queueFamilyIndexCount = 0;
+            swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+            swapchainCreateInfo.preTransform = m_swapchainPreTransform;
+            swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+            swapchainCreateInfo.presentMode = m_presentMode;
+            swapchainCreateInfo.clipped = VK_TRUE;
+            swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+
+            UVKE_ASSERT(vkCreateSwapchainKHR(m_device, &swapchainCreateInfo, nullptr, &m_swapchain));
+        }
+
+        std::vector<VkImage> swapchainImages;
+        {
+            unsigned int swapchainImageCount = 0;
+            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, nullptr);
+            swapchainImages = std::vector<VkImage>(swapchainImageCount);
+            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, swapchainImages.data());
+        }
     }
 
     Renderer::~Renderer() {
+        vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
         vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
         vkDestroyDevice(m_device, nullptr);
         vkDestroyInstance(m_instance, nullptr);

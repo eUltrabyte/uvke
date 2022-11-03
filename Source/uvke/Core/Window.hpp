@@ -34,6 +34,7 @@ namespace uvke {
         virtual bool IsOpen();
     
         virtual std::shared_ptr<WindowProps> GetWindowProps();
+        virtual GLFWwindow* GetWindow();
     
     private:
         std::shared_ptr<WindowProps> m_windowProps;

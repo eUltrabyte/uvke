@@ -54,4 +54,8 @@ namespace uvke {
     std::shared_ptr<WindowProps> Window::GetWindowProps() {
         return m_windowProps;
     }
+
+    GLFWwindow* Window::GetWindow() {
+        return m_window;
+    }
 };
