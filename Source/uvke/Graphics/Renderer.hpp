@@ -128,6 +128,8 @@ namespace uvke {
         VkSurfaceTransformFlagBitsKHR m_swapchainPreTransform;
         unsigned int m_swapchainImageCount;
         VkSwapchainKHR m_swapchain;
+        std::vector<VkImage> m_swapchainImages;
+        std::vector<VkImageView> m_swapchainImageViews;
 
     };
 };

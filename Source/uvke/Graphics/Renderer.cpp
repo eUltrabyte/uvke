@@ -125,16 +125,45 @@ namespace uvke {
             UVKE_ASSERT(vkCreateSwapchainKHR(m_device, &swapchainCreateInfo, nullptr, &m_swapchain));
         }
 
-        std::vector<VkImage> swapchainImages;
         {
             unsigned int swapchainImageCount = 0;
             vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, nullptr);
-            swapchainImages = std::vector<VkImage>(swapchainImageCount);
-            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, swapchainImages.data());
+            m_swapchainImages = std::vector<VkImage>(swapchainImageCount);
+            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, m_swapchainImages.data());
         }
+
+        {
+            m_swapchainImageViews = std::vector<VkImageView>(m_swapchainImages.size());
+
+            for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
+                VkImageViewCreateInfo imageViewCreateInfo { };
+                imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+                imageViewCreateInfo.pNext = nullptr;
+                imageViewCreateInfo.flags = 0;
+                imageViewCreateInfo.image = m_swapchainImages[i];
+                imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+                imageViewCreateInfo.format = m_surfaceFormat.format;
+                imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
+                imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+                imageViewCreateInfo.subresourceRange.levelCount = 1;
+                imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+                imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+                UVKE_ASSERT(vkCreateImageView(m_device, &imageViewCreateInfo, nullptr, &m_swapchainImageViews[i]));
+            }
+        }
+
+        auto vertexCode = File::Load("vert.spv");
+        auto fragCode = File::Load("frag.spv");
+        UVKE_LOG("Shaders Loaded");
     }
 
     Renderer::~Renderer() {
+        for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
+            vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
+        }
+
         vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
         vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
         vkDestroyDevice(m_device, nullptr);

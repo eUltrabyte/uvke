@@ -31,6 +31,8 @@ set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Vec4.hpp
     Source/uvke/Utils/Clock.hpp
     Source/uvke/Utils/Clock.cpp
+    Source/uvke/Utils/File.hpp
+    Source/uvke/Utils/File.cpp
 )
 
 set(UVKE_SOURCE
@@ -60,5 +62,6 @@ target_precompile_headers(${PROJECT_NAME} PUBLIC Source/uvke/uvkepch.hpp Source/
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw Vulkan::Vulkan)
+file(COPY Resource/ DESTINATION Resource/)
 
 add_subdirectory(Examples/App)

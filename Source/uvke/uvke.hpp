@@ -24,6 +24,7 @@
 #include "Utils/Vec3.hpp"
 #include "Utils/Vec4.hpp"
 #include "Utils/Clock.hpp"
+#include "Utils/File.hpp"
 
 #include "Core/Window.hpp"
 
