@@ -11,6 +11,3 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE ../../Source)
 target_link_libraries(${PROJECT_NAME} PRIVATE uvke)
-
-file(COPY ../../Resource/vert.spv DESTINATION .)
-file(COPY ../../Resource/frag.spv DESTINATION .)

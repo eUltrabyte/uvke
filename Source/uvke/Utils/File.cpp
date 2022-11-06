@@ -12,10 +12,11 @@ namespace uvke {
             file.close();
         } else {
             UVKE_ASSERT(-1);
+            m_data = std::vector<char>(0);
         }
     }
 
-    std::span<char> File::Load(std::string_view filename) {
+    std::vector<char> File::Load(std::string_view filename) {
         std::ifstream file(filename.data(), std::ios::ate | std::ios::binary);
 
         if(file.is_open()) {
@@ -27,10 +28,11 @@ namespace uvke {
             return data;
         } else {
             UVKE_ASSERT(-1);
+            return std::vector<char>(0);
         }
     }
 
-    std::span<char> File::GetData() {
+    std::vector<char> File::GetData() {
         return m_data;
     }
 };

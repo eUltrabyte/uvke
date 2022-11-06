@@ -3,6 +3,7 @@
 #define UVKE_RENDERER_HEADER
 
 #include "../uvke.hpp"
+#include "Shader.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {

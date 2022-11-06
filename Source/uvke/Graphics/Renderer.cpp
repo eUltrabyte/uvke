@@ -154,8 +154,7 @@ namespace uvke {
             }
         }
 
-        auto vertexCode = File::Load("vert.spv");
-        auto fragCode = File::Load("frag.spv");
+        Shader shader(m_device, File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
         UVKE_LOG("Shaders Loaded");
     }
 

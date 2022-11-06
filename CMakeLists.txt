@@ -21,6 +21,8 @@ set(UVKE_CORE_SOURCE
 )
 
 set(UVKE_GRAPHICS_SOURCE
+    Source/uvke/Graphics/Shader.hpp
+    Source/uvke/Graphics/Shader.cpp
     Source/uvke/Graphics/Renderer.hpp
     Source/uvke/Graphics/Renderer.cpp
 )
@@ -43,6 +45,26 @@ set(UVKE_SOURCE
     ${UVKE_UTILS_SOURCE}
 )
 
+if(WIN32)
+    set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe")
+else()
+    set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/bin/glslangValidator")
+endif()
+
+file(GLOB_RECURSE GLSL_SOURCE_FILES
+    "Resource/*.frag"
+    "Resource/*.vert"
+)
+
+foreach(GLSL ${GLSL_SOURCE_FILES})
+    get_filename_component(FILE_NAME ${GLSL} NAME)
+    set(SPIRV "${PROJECT_BINARY_DIR}/Resource/${FILE_NAME}.spv")
+    add_custom_command(OUTPUT ${SPIRV} COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV} DEPENDS ${GLSL})
+    list(APPEND SPIRV_BINARY_FILES ${SPIRV})
+endforeach(GLSL)
+
+add_custom_target(uvke-Shaders DEPENDS ${SPIRV_BINARY_FILES})
+
 option(UVKE_SHARED_LIBRARY "uvke build using shared libraries" OFF)
 option(UVKE_SHARED_BUILD "uvke build shared libraries files" OFF)
 
@@ -58,10 +80,14 @@ else()
     add_library(${PROJECT_NAME} STATIC ${UVKE_SOURCE})
 endif()
 
+add_dependencies(uvke uvke-Shaders)
+
 target_precompile_headers(${PROJECT_NAME} PUBLIC Source/uvke/uvkepch.hpp Source/uvke/uvkepch.cpp)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw Vulkan::Vulkan)
+
 file(COPY Resource/ DESTINATION Resource/)
+file(COPY ${CMAKE_CURRENT_BINARY_DIR}/Resource/ DESTINATION Examples/App/Resource/)
 
 add_subdirectory(Examples/App)

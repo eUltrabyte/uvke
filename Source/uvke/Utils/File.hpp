@@ -11,9 +11,9 @@ namespace uvke {
         File(std::string_view filename);
         virtual ~File() = default;
 
-        static std::span<char> Load(std::string_view filename);
+        static std::vector<char> Load(std::string_view filename);
 
-        virtual std::span<char> GetData();
+        virtual std::vector<char> GetData();
 
     private:
         std::vector<char> m_data;
