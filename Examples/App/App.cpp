@@ -9,6 +9,7 @@ auto main(int argc, char** argv) -> int {
 	
     while(window.IsOpen()) {
         window.Update();
+        renderer.Render();
     }
 
     return uvke::priv::Deinit();
