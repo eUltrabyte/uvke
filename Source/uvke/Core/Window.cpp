@@ -44,6 +44,11 @@ namespace uvke {
     }
 
     void Window::Update() {
+        vec2i size(0, 0);
+        glfwGetFramebufferSize(m_window, &size.x, &size.y);
+        if(m_windowProps->size.x != size.x || m_windowProps->size.y != size.y) {
+            m_windowProps->size = size;
+        }
         glfwPollEvents();
     }
 

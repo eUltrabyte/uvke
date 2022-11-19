@@ -1,7 +1,8 @@
 #include "Renderer.hpp"
 
 namespace uvke {
-    Renderer::Renderer(Window& window) {
+    Renderer::Renderer(Window& window)
+        : m_window(window), m_framebufferRecreated(false) {
         {
             VkApplicationInfo appInfo { };
             appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -81,7 +82,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device));
         }
 
-        window.CreateSurface(m_instance, &m_surface);
+        m_window.CreateSurface(m_instance, &m_surface);
 
         {
             unsigned int queueFamilyIndex = GetQueueFamily();
@@ -94,7 +95,7 @@ namespace uvke {
 
         m_surfaceFormat = GetSurfaceFormat();
         m_presentMode = GetPresentMode();
-        m_extent = GetSwapExtent(window);
+        m_extent = GetSwapExtent();
 
         UVKE_LOG("Format - " + std::to_string(m_surfaceFormat.format));
         UVKE_LOG("Present Mode - " + std::to_string(m_presentMode));
@@ -352,9 +353,11 @@ namespace uvke {
             commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
             commandPoolCreateInfo.pNext = nullptr;
             commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            commandPoolCreateInfo.queueFamilyIndex = 0;
+            commandPoolCreateInfo.queueFamilyIndex = GetQueueFamily();
 
             UVKE_ASSERT(vkCreateCommandPool(m_device, &commandPoolCreateInfo, nullptr, &m_commandPool));
+
+            UVKE_LOG("Queue Family - " + std::to_string(GetQueueFamily()));
         }
 
         {
@@ -416,41 +419,52 @@ namespace uvke {
 
     void Renderer::Render() {
         vkQueueWaitIdle(m_queue);
+
+        unsigned int index = 0;
+        VkResult result = vkAcquireNextImageKHR(m_device, m_swapchain, std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
+        if(result == VK_ERROR_OUT_OF_DATE_KHR) {
+            RecreateSwapchain();
+        } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+            UVKE_FATAL("Swapchain Acquire Image Error");
+        }
+        
+        // TODO SUPPORT FOR MORE FENCES AND IMAGES IN FLIGHT
         vkWaitForFences(m_device, 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
         vkResetFences(m_device, 1, &m_fence);
-
-        unsigned int index;
-        vkAcquireNextImageKHR(m_device, m_swapchain, std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
 
         vkResetCommandBuffer(m_commandBuffer, 0);
         RecordCommandBuffer(m_commandBuffer, index);
         
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        VkSemaphore waitSemaphores[] = { m_availableSemaphore };
+        submitInfo.pNext = nullptr;
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
         submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitSemaphores = &m_availableSemaphore;
         submitInfo.pWaitDstStageMask = waitStages;
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &m_commandBuffer;
-
-        VkSemaphore signalSemaphores[] = { m_finishedSemaphore };
         submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
+        submitInfo.pSignalSemaphores = &m_finishedSemaphore;
 
         UVKE_ASSERT(vkQueueSubmit(m_queue, 1, &submitInfo, m_fence));
 
         VkPresentInfoKHR presentInfo { };
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        presentInfo.pNext = nullptr;
         presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
-        
-        VkSwapchainKHR swapchains[] = { m_swapchain };
+        presentInfo.pWaitSemaphores = &m_finishedSemaphore;
         presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapchains;
+        presentInfo.pSwapchains = &m_swapchain;
         presentInfo.pImageIndices = &index;
+        presentInfo.pResults = nullptr;
 
-        vkQueuePresentKHR(m_queue, &presentInfo);
+        result = vkQueuePresentKHR(m_queue, &presentInfo);
+        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferRecreated) {
+            m_framebufferRecreated = false;
+            RecreateSwapchain();
+        } else if(result != VK_SUCCESS) {
+            UVKE_FATAL("Framebuffer Recreation Error");
+        }
     }
 };
