@@ -12,7 +12,7 @@ namespace uvke {
         virtual ~Renderer();
 
         virtual void Render();
-    
+
     private:
         VkPhysicalDevice GetSuitablePhysicalDevice() {
             std::vector<VkPhysicalDevice> physicalDevices;
@@ -93,7 +93,7 @@ namespace uvke {
             return VK_PRESENT_MODE_FIFO_KHR;
         }
 
-        VkExtent2D GetSwapExtent(Window& window) {
+        VkExtent2D GetSwapExtent() {
             VkSurfaceCapabilitiesKHR surfaceCapabilities;
             vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &surfaceCapabilities);
 
@@ -104,16 +104,13 @@ namespace uvke {
                 m_swapchainImageCount = surfaceCapabilities.maxImageCount;
             }
             
-            if(surfaceCapabilities.currentExtent.width != std::numeric_limits<unsigned int>::infinity()) {
+            if(surfaceCapabilities.currentExtent.width != std::numeric_limits<unsigned int>::infinity() || surfaceCapabilities.currentExtent.height != std::numeric_limits<unsigned int>::infinity()) {
                 return surfaceCapabilities.currentExtent;
             } else {
-                vec2i size(0, 0);
-                glfwGetFramebufferSize(window.GetWindow(), &size.x, &size.y);
-
-                VkExtent2D fixedExtent = { static_cast<unsigned int>(size.x), static_cast<unsigned int>(size.y) };
+                m_window.Update();
+                VkExtent2D fixedExtent = { static_cast<unsigned int>(m_window.GetWindowProps()->size.x), static_cast<unsigned int>(m_window.GetWindowProps()->size.y) };
                 fixedExtent.width = std::clamp(fixedExtent.width, surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width);
                 fixedExtent.height = std::clamp(fixedExtent.height, surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height);
-
                 return fixedExtent;
             }
         }
@@ -165,9 +162,114 @@ namespace uvke {
             UVKE_ASSERT(vkEndCommandBuffer(commandBuffer));
         }
 
+        void RecreateSwapchain() {
+            m_window.Update();
+            vec2i size(m_window.GetWindowProps()->size.x, m_window.GetWindowProps()->size.y);
+            for(; size.x == 0 || size.y == 0 ;) {
+                m_window.Update();
+                size = vec2i(m_window.GetWindowProps()->size.x, m_window.GetWindowProps()->size.y);
+                m_extent = GetSwapExtent();
+                glfwWaitEvents();
+            }
+
+            if(size.x != 0 || size.y != 0) {
+                m_extent = GetSwapExtent();
+            }
+
+            vkDeviceWaitIdle(m_device);
+
+            for(auto i = 0; i < m_framebuffers.size(); ++i) {
+                vkDestroyFramebuffer(m_device, m_framebuffers[i], nullptr);
+            }
+
+            for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
+                vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
+            }
+
+            vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+
+            {
+                VkSwapchainCreateInfoKHR swapchainCreateInfo { };
+                swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+                swapchainCreateInfo.pNext = nullptr;
+                swapchainCreateInfo.flags = 0;
+                swapchainCreateInfo.surface = m_surface;
+                swapchainCreateInfo.minImageCount = m_swapchainImageCount;
+                swapchainCreateInfo.imageFormat = m_surfaceFormat.format;
+                swapchainCreateInfo.imageColorSpace = m_surfaceFormat.colorSpace;
+                swapchainCreateInfo.imageExtent = m_extent;
+                swapchainCreateInfo.imageArrayLayers = 1;
+                swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+                // TODO SUPPORT FOR MORE QUEUES
+                swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+                swapchainCreateInfo.queueFamilyIndexCount = 0;
+                swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+                swapchainCreateInfo.preTransform = m_swapchainPreTransform;
+                swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+                swapchainCreateInfo.presentMode = m_presentMode;
+                swapchainCreateInfo.clipped = VK_TRUE;
+                swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+
+                UVKE_ASSERT(vkCreateSwapchainKHR(m_device, &swapchainCreateInfo, nullptr, &m_swapchain));
+            }
+
+            
+            {
+                unsigned int swapchainImageCount = 0;
+                vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, nullptr);
+                m_swapchainImages = std::vector<VkImage>(swapchainImageCount);
+                vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, m_swapchainImages.data());
+            }
+
+
+            {
+                m_swapchainImageViews = std::vector<VkImageView>(m_swapchainImages.size());
+
+                for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
+                    VkImageViewCreateInfo imageViewCreateInfo { };
+                    imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+                    imageViewCreateInfo.pNext = nullptr;
+                    imageViewCreateInfo.flags = 0;
+                    imageViewCreateInfo.image = m_swapchainImages[i];
+                    imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+                    imageViewCreateInfo.format = m_surfaceFormat.format;
+                    imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
+                    imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                    imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+                    imageViewCreateInfo.subresourceRange.levelCount = 1;
+                    imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+                    imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+                    UVKE_ASSERT(vkCreateImageView(m_device, &imageViewCreateInfo, nullptr, &m_swapchainImageViews[i]));
+                }
+            }
+
+            {
+                m_framebuffers = std::vector<VkFramebuffer>(m_swapchainImageViews.size());
+
+                for(auto i = 0; i < m_framebuffers.size(); ++i) {
+                    VkImageView imageView[] = { m_swapchainImageViews[i] };
+
+                    VkFramebufferCreateInfo framebufferCreateInfo { };
+                    framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+                    framebufferCreateInfo.pNext = nullptr;
+                    framebufferCreateInfo.flags = 0;
+                    framebufferCreateInfo.renderPass = m_renderPass;
+                    framebufferCreateInfo.attachmentCount = 1;
+                    framebufferCreateInfo.pAttachments = imageView;
+                    framebufferCreateInfo.width = m_extent.width;
+                    framebufferCreateInfo.height = m_extent.height;
+                    framebufferCreateInfo.layers = 1;
+
+                    UVKE_ASSERT(vkCreateFramebuffer(m_device, &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
+                }
+            }
+        }
+
         VkInstance m_instance;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
+        Window& m_window;
         VkQueue m_queue;
         VkSurfaceKHR m_surface;
         VkSurfaceFormatKHR m_surfaceFormat;
@@ -187,6 +289,7 @@ namespace uvke {
         VkSemaphore m_availableSemaphore;
         VkSemaphore m_finishedSemaphore;
         VkFence m_fence;
+        bool m_framebufferRecreated;
 
     };
 };
