@@ -20,6 +20,7 @@
 #define UVKE_BYTE(x) (1 << x)
 #define UVKE_ASSERT(x) if(x <= -1) { UVKE_TRACE(); }
 
+#include "Utils/Utils.hpp"
 #include "Utils/Vec2.hpp"
 #include "Utils/Vec3.hpp"
 #include "Utils/Vec4.hpp"

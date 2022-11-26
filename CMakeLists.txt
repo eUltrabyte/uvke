@@ -35,6 +35,7 @@ set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Clock.cpp
     Source/uvke/Utils/File.hpp
     Source/uvke/Utils/File.cpp
+    Source/uvke/Utils/Utils.hpp
 )
 
 set(UVKE_SOURCE
