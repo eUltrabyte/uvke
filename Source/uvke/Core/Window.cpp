@@ -49,6 +49,7 @@ namespace uvke {
         if(m_windowProps->size.x != size.x || m_windowProps->size.y != size.y) {
             m_windowProps->size = size;
         }
+        
         glfwPollEvents();
     }
 

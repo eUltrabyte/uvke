@@ -90,7 +90,7 @@ namespace uvke {
 
             VkBool32 presentSupport = false;
             vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, queueFamilyIndex, m_surface, &presentSupport);
-            UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "true" : "false"));
+            UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
         }
 
         m_surfaceFormat = GetSurfaceFormat();
