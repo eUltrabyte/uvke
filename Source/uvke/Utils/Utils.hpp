@@ -7,13 +7,13 @@ namespace uvke {
 
     template<typename T>
     float Abs(T value) {
-        static_assert(std::is_arithmetic_v<T>, "uvke abs type is not arithmetic as required");
+        static_assert(std::is_arithmetic_v<T>, "uvke Abs Type Is Not Arithmetic As Expected");
         return value < 0 ? -value : value;
     }
 
     template<typename T>
     float Rsqrt(T value) {
-        static_assert(std::is_arithmetic_v<T>, "uvke rsqrt type is not arithmetic as required");
+        static_assert(std::is_arithmetic_v<T>, "uvke Rsqrt Type Is Not Arithmetic As Expected");
         float y = value;
         long x = *(long*)&y;
         x = 0x5f3759df - (x >> 1);
@@ -24,13 +24,13 @@ namespace uvke {
 
     template<typename T>
     float Sqrt(T value) {
-        static_assert(std::is_arithmetic_v<T>, "uvke sqrt type is not arithmetic as required");
+        static_assert(std::is_arithmetic_v<T>, "uvke Sqrt Type Is Not Arithmetic As Expected");
         return 1.0f / Rsqrt<T>(value);
     }
 
     template<typename T>
     float Sin(T value) {
-        static_assert(std::is_arithmetic_v<T>, "uvke sin type is not arithmetic as required");
+        static_assert(std::is_arithmetic_v<T>, "uvke Sin Type Is Not Arithmetic As Expected");
         float current = value;
         float accurency = 1.0f;
         float factor = 1.0f;
@@ -48,7 +48,7 @@ namespace uvke {
 
     template<typename T>
     float Cos(T value) {
-        static_assert(std::is_arithmetic_v<T>, "uvke cos type is not arithmetic as required");
+        static_assert(std::is_arithmetic_v<T>, "uvke Cos Type Is Not Arithmetic As Expected");
         float current = 1.0f;
         float accurency = 1.0f;
 
@@ -62,13 +62,13 @@ namespace uvke {
 
     template<typename T>
     float Tan(T value) {
-        static_assert(std::is_arithmetic_v<T>, "uvke tan type is not arithmetic as required");
+        static_assert(std::is_arithmetic_v<T>, "uvke Tan Type Is Not Arithmetic As Expected");
         return Sin(value) / Cos(value);
     }
 
     template<typename T>
     float Cot(T value) {
-        static_assert(std::is_arithmetic_v<T>, "uvke cot type is not arithmetic as required");
+        static_assert(std::is_arithmetic_v<T>, "uvke Cot Type Is Not Arithmetic As Expected");
         float current = PI - value;
         return Sin(current) / Cos(current);
     }

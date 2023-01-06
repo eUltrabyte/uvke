@@ -2,7 +2,7 @@
 
 namespace uvke {
     namespace priv {
-        void glfwErrorCallback(int error, const char* description) { UVKE_LOG("glfw error - " + std::to_string(error) + " - " + description); }
+        void glfwErrorCallback(int error, const char* description) { UVKE_LOG("GLFW Error - " + std::to_string(error) + " - " + description); }
     };
 
     Window::Window(const WindowProps& windowProps)

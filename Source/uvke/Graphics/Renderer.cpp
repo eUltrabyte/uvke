@@ -48,12 +48,16 @@ namespace uvke {
         }
 
         m_physicalDevice = GetSuitablePhysicalDevice();
+        unsigned int queueFamilyIndex = GetQueueFamily();
 
         {
             VkPhysicalDeviceFeatures physicalDeviceFeatures { };
             vkGetPhysicalDeviceFeatures(m_physicalDevice, &physicalDeviceFeatures);
 
-            float deviceQueuePriorities[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            std::vector<float> deviceQueuePriorities(4);
+            for(auto i = 0; i < deviceQueuePriorities.size(); ++i) {
+                deviceQueuePriorities[i] = 1.0f;
+            }
 
             std::vector<const char*> deviceExtensions = {
                 VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -63,9 +67,9 @@ namespace uvke {
             deviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
             deviceQueueCreateInfo.pNext = nullptr;
             deviceQueueCreateInfo.flags = 0;
-            deviceQueueCreateInfo.queueFamilyIndex = 0;
-            deviceQueueCreateInfo.queueCount = 1;
-            deviceQueueCreateInfo.pQueuePriorities = deviceQueuePriorities;
+            deviceQueueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+            deviceQueueCreateInfo.queueCount = deviceQueuePriorities.size();
+            deviceQueueCreateInfo.pQueuePriorities = deviceQueuePriorities.data();
 
             VkDeviceCreateInfo deviceCreateInfo { };
             deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -85,8 +89,9 @@ namespace uvke {
         m_window.CreateSurface(m_instance, &m_surface);
 
         {
-            unsigned int queueFamilyIndex = GetQueueFamily();
             vkGetDeviceQueue(m_device, queueFamilyIndex, 0, &m_queue);
+
+            UVKE_LOG("Queue Family Index - " + std::to_string(queueFamilyIndex));
 
             VkBool32 presentSupport = false;
             vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, queueFamilyIndex, m_surface, &presentSupport);
@@ -173,14 +178,16 @@ namespace uvke {
             pipelineDynamicStateCreateInfo.dynamicStateCount = dynamicStates.size();
             pipelineDynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
 
+            m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device);
+
             VkPipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo { };
             pipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
             pipelineVertexInputStateCreateInfo.pNext = nullptr;
             pipelineVertexInputStateCreateInfo.flags = 0;
-            pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = 0;
-            pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr;
-            pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount = 0;
-            pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions = nullptr;
+            pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
+            pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = &m_vertexBuffer->GetVertexInputBindingDescription();
+            pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount = m_vertexBuffer->GetVertexInputAttributeDescription().size();
+            pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions = m_vertexBuffer->GetVertexInputAttributeDescription().data();
 
             VkPipelineInputAssemblyStateCreateInfo pipelineInputAssemblyStateCreateInfo { };
             pipelineInputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -353,11 +360,9 @@ namespace uvke {
             commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
             commandPoolCreateInfo.pNext = nullptr;
             commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            commandPoolCreateInfo.queueFamilyIndex = GetQueueFamily();
+            commandPoolCreateInfo.queueFamilyIndex = queueFamilyIndex;
 
             UVKE_ASSERT(vkCreateCommandPool(m_device, &commandPoolCreateInfo, nullptr, &m_commandPool));
-
-            UVKE_LOG("Queue Family - " + std::to_string(GetQueueFamily()));
         }
 
         {
@@ -406,6 +411,9 @@ namespace uvke {
 
         vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+
+        m_vertexBuffer->~VertexBuffer();
+        delete m_vertexBuffer;
 
         for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
             vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
