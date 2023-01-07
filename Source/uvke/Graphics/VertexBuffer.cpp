@@ -4,9 +4,9 @@ namespace uvke {
     VertexBuffer::VertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device)
         : m_physicalDevice(physicalDevice), m_device(device) {
         m_vertices = std::vector<Vertex> {
-            {{ 0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
-            {{ 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }},
-            {{ -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }},
+            {{ 0.0f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
+            {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
+            {{ -0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
         };
 
         m_vertexInputBindingDescription = { };
@@ -17,12 +17,12 @@ namespace uvke {
         m_vertexInputAttributeDescription = { };
         m_vertexInputAttributeDescription[0].binding = 0;
         m_vertexInputAttributeDescription[0].location = 0;
-        m_vertexInputAttributeDescription[0].format = VK_FORMAT_R32G32_SFLOAT;
+        m_vertexInputAttributeDescription[0].format = VK_FORMAT_R32G32B32_SFLOAT;
         m_vertexInputAttributeDescription[0].offset = offsetof(Vertex, Vertex::position);
 
         m_vertexInputAttributeDescription[1].binding = 0;
         m_vertexInputAttributeDescription[1].location = 1;
-        m_vertexInputAttributeDescription[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        m_vertexInputAttributeDescription[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
         m_vertexInputAttributeDescription[1].offset = offsetof(Vertex, Vertex::color);
 
         VkBufferCreateInfo bufferCreateInfo = { };

@@ -7,8 +7,8 @@
 
 namespace uvke {
     struct Vertex {
-        vec2f position;
-        vec3f color;
+        vec3f position;
+        vec4f color;
     };
 
     class UVKE_API VertexBuffer {

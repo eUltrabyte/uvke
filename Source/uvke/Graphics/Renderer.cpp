@@ -412,7 +412,6 @@ namespace uvke {
         vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
 
-        m_vertexBuffer->~VertexBuffer();
         delete m_vertexBuffer;
 
         for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
