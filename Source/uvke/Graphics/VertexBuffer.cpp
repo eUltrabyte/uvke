@@ -29,8 +29,8 @@ namespace uvke {
         bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         bufferCreateInfo.pNext = nullptr;
         bufferCreateInfo.flags = 0;
-        bufferCreateInfo.size = sizeof(m_vertices[0]) * m_vertices.size();
-        bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        bufferCreateInfo.size = sizeof(Vertex) * m_vertices.size();
+        bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         bufferCreateInfo.queueFamilyIndexCount = 0;
         bufferCreateInfo.pQueueFamilyIndices = nullptr;
@@ -62,11 +62,6 @@ namespace uvke {
         UVKE_ASSERT(vkAllocateMemory(m_device, &memoryAllocateInfo, nullptr, &m_bufferMemory));
 
         vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
-
-        void* rawData;
-        vkMapMemory(m_device, m_bufferMemory, 0, bufferCreateInfo.size, 0, &rawData);
-        std::memcpy(rawData, m_vertices.data(), bufferCreateInfo.size);
-        vkUnmapMemory(m_device, m_bufferMemory);
     }
 
     VertexBuffer::~VertexBuffer() {
@@ -89,6 +84,10 @@ namespace uvke {
     
     std::array<VkVertexInputAttributeDescription, 2>& VertexBuffer::GetVertexInputAttributeDescription() {
         return m_vertexInputAttributeDescription;
+    }
+
+    unsigned int VertexBuffer::GetSize() {
+        return sizeof(Vertex) * m_vertices.size();
     }
 
     VkBuffer& VertexBuffer::GetBuffer() {

@@ -21,6 +21,7 @@ namespace uvke {
         virtual std::vector<Vertex>& GetVertices();
         virtual VkVertexInputBindingDescription& GetVertexInputBindingDescription();
         virtual std::array<VkVertexInputAttributeDescription, 2>& GetVertexInputAttributeDescription();
+        virtual unsigned int GetSize();
         virtual VkBuffer& GetBuffer();
 
     private:

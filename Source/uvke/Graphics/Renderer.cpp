@@ -365,6 +365,13 @@ namespace uvke {
             UVKE_ASSERT(vkCreateCommandPool(m_device, &commandPoolCreateInfo, nullptr, &m_commandPool));
         }
 
+        m_stagingBuffer = new StagingBuffer(m_physicalDevice, m_device, m_vertexBuffer->GetSize());
+
+        m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
+        m_stagingBuffer->Copy(m_commandPool, m_queue, m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
+
+        delete m_stagingBuffer;
+
         {
             VkCommandBufferAllocateInfo commandBufferAllocateInfo { };
             commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;

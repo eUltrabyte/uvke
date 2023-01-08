@@ -3,6 +3,7 @@
 #define UVKE_RENDERER_HEADER
 
 #include "../uvke.hpp"
+#include "StagingBuffer.hpp"
 #include "VertexBuffer.hpp"
 
 namespace uvke {
@@ -281,6 +282,7 @@ namespace uvke {
         VkSwapchainKHR m_swapchain;
         std::vector<VkImage> m_swapchainImages;
         std::vector<VkImageView> m_swapchainImageViews;
+        StagingBuffer* m_stagingBuffer;
         VertexBuffer* m_vertexBuffer;
         VkRenderPass m_renderPass;
         VkPipelineLayout m_pipelineLayout;
