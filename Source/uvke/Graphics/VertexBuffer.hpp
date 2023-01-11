@@ -13,7 +13,7 @@ namespace uvke {
 
     class UVKE_API VertexBuffer {
     public:
-        VertexBuffer(VkPhysicalDevice physicalDevice = nullptr, VkDevice device = nullptr);
+        VertexBuffer(VkPhysicalDevice physicalDevice = nullptr, VkDevice device = nullptr, std::vector<Vertex> vertices = std::vector<Vertex>(0));
         virtual ~VertexBuffer();
 
         virtual void Bind(VkCommandBuffer commandBuffer);

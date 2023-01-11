@@ -163,6 +163,17 @@ namespace uvke {
         Shader shader(m_device, File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
         UVKE_LOG("Shaders Loaded");
 
+        m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device, std::vector<Vertex> {
+            {{ -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
+            {{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
+            {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
+            {{ -0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }},
+        } );
+
+        m_indexBuffer = new IndexBuffer(m_physicalDevice, m_device, std::vector<unsigned int> {
+            0, 1, 2, 2, 3, 0,
+        } );
+
         {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *shader.GetVertexShaderStageCreateInfo(), *shader.GetFragmentShaderStageCreateInfo() };
 
@@ -177,8 +188,6 @@ namespace uvke {
             pipelineDynamicStateCreateInfo.flags = 0;
             pipelineDynamicStateCreateInfo.dynamicStateCount = dynamicStates.size();
             pipelineDynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
-
-            m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device);
 
             VkPipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo { };
             pipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -372,6 +381,13 @@ namespace uvke {
 
         delete m_stagingBuffer;
 
+        m_stagingBuffer = new StagingBuffer(m_physicalDevice, m_device, m_indexBuffer->GetSize());
+
+        m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
+        m_stagingBuffer->Copy(m_commandPool, m_queue, m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
+
+        delete m_stagingBuffer;
+
         {
             VkCommandBufferAllocateInfo commandBufferAllocateInfo { };
             commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -419,6 +435,7 @@ namespace uvke {
         vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
 
+        delete m_indexBuffer;
         delete m_vertexBuffer;
 
         for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {

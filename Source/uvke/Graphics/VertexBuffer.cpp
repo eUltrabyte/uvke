@@ -1,14 +1,8 @@
 #include "VertexBuffer.hpp"
 
 namespace uvke {
-    VertexBuffer::VertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device)
-        : m_physicalDevice(physicalDevice), m_device(device) {
-        m_vertices = std::vector<Vertex> {
-            {{ 0.0f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
-            {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
-            {{ -0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
-        };
-
+    VertexBuffer::VertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, std::vector<Vertex> vertices)
+        : m_physicalDevice(physicalDevice), m_device(device), m_vertices(vertices) {
         m_vertexInputBindingDescription = { };
         m_vertexInputBindingDescription.binding = 0;
         m_vertexInputBindingDescription.stride = sizeof(Vertex);

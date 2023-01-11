@@ -5,6 +5,7 @@
 #include "../uvke.hpp"
 #include "StagingBuffer.hpp"
 #include "VertexBuffer.hpp"
+#include "IndexBuffer.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
@@ -157,8 +158,10 @@ namespace uvke {
             vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
             m_vertexBuffer->Bind(commandBuffer);
+            m_indexBuffer->Bind(commandBuffer);
 
-            vkCmdDraw(commandBuffer, m_vertexBuffer->GetVertices().size(), 1, 0, 0);
+            // vkCmdDraw(commandBuffer, m_vertexBuffer->GetVertices().size(), 1, 0, 0);
+            vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
 
             vkCmdEndRenderPass(commandBuffer);
 
@@ -284,6 +287,7 @@ namespace uvke {
         std::vector<VkImageView> m_swapchainImageViews;
         StagingBuffer* m_stagingBuffer;
         VertexBuffer* m_vertexBuffer;
+        IndexBuffer* m_indexBuffer;
         VkRenderPass m_renderPass;
         VkPipelineLayout m_pipelineLayout;
         VkPipeline m_pipeline;
