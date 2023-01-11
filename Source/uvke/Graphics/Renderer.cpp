@@ -48,12 +48,16 @@ namespace uvke {
         }
 
         m_physicalDevice = GetSuitablePhysicalDevice();
+        unsigned int queueFamilyIndex = GetQueueFamily();
 
         {
             VkPhysicalDeviceFeatures physicalDeviceFeatures { };
             vkGetPhysicalDeviceFeatures(m_physicalDevice, &physicalDeviceFeatures);
 
-            float deviceQueuePriorities[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            std::vector<float> deviceQueuePriorities(4);
+            for(auto i = 0; i < deviceQueuePriorities.size(); ++i) {
+                deviceQueuePriorities[i] = 1.0f;
+            }
 
             std::vector<const char*> deviceExtensions = {
                 VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -63,9 +67,9 @@ namespace uvke {
             deviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
             deviceQueueCreateInfo.pNext = nullptr;
             deviceQueueCreateInfo.flags = 0;
-            deviceQueueCreateInfo.queueFamilyIndex = 0;
-            deviceQueueCreateInfo.queueCount = 1;
-            deviceQueueCreateInfo.pQueuePriorities = deviceQueuePriorities;
+            deviceQueueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+            deviceQueueCreateInfo.queueCount = deviceQueuePriorities.size();
+            deviceQueueCreateInfo.pQueuePriorities = deviceQueuePriorities.data();
 
             VkDeviceCreateInfo deviceCreateInfo { };
             deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -85,12 +89,13 @@ namespace uvke {
         m_window.CreateSurface(m_instance, &m_surface);
 
         {
-            unsigned int queueFamilyIndex = GetQueueFamily();
             vkGetDeviceQueue(m_device, queueFamilyIndex, 0, &m_queue);
+
+            UVKE_LOG("Queue Family Index - " + std::to_string(queueFamilyIndex));
 
             VkBool32 presentSupport = false;
             vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, queueFamilyIndex, m_surface, &presentSupport);
-            UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "true" : "false"));
+            UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
         }
 
         m_surfaceFormat = GetSurfaceFormat();
@@ -158,6 +163,17 @@ namespace uvke {
         Shader shader(m_device, File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
         UVKE_LOG("Shaders Loaded");
 
+        m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device, std::vector<Vertex> {
+            {{ -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
+            {{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
+            {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
+            {{ -0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }},
+        } );
+
+        m_indexBuffer = new IndexBuffer(m_physicalDevice, m_device, std::vector<unsigned int> {
+            0, 1, 2, 2, 3, 0,
+        } );
+
         {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *shader.GetVertexShaderStageCreateInfo(), *shader.GetFragmentShaderStageCreateInfo() };
 
@@ -177,10 +193,10 @@ namespace uvke {
             pipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
             pipelineVertexInputStateCreateInfo.pNext = nullptr;
             pipelineVertexInputStateCreateInfo.flags = 0;
-            pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = 0;
-            pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr;
-            pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount = 0;
-            pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions = nullptr;
+            pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
+            pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = &m_vertexBuffer->GetVertexInputBindingDescription();
+            pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount = m_vertexBuffer->GetVertexInputAttributeDescription().size();
+            pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions = m_vertexBuffer->GetVertexInputAttributeDescription().data();
 
             VkPipelineInputAssemblyStateCreateInfo pipelineInputAssemblyStateCreateInfo { };
             pipelineInputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -353,12 +369,24 @@ namespace uvke {
             commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
             commandPoolCreateInfo.pNext = nullptr;
             commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            commandPoolCreateInfo.queueFamilyIndex = GetQueueFamily();
+            commandPoolCreateInfo.queueFamilyIndex = queueFamilyIndex;
 
             UVKE_ASSERT(vkCreateCommandPool(m_device, &commandPoolCreateInfo, nullptr, &m_commandPool));
-
-            UVKE_LOG("Queue Family - " + std::to_string(GetQueueFamily()));
         }
+
+        m_stagingBuffer = new StagingBuffer(m_physicalDevice, m_device, m_vertexBuffer->GetSize());
+
+        m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
+        m_stagingBuffer->Copy(m_commandPool, m_queue, m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
+
+        delete m_stagingBuffer;
+
+        m_stagingBuffer = new StagingBuffer(m_physicalDevice, m_device, m_indexBuffer->GetSize());
+
+        m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
+        m_stagingBuffer->Copy(m_commandPool, m_queue, m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
+
+        delete m_stagingBuffer;
 
         {
             VkCommandBufferAllocateInfo commandBufferAllocateInfo { };
@@ -406,6 +434,9 @@ namespace uvke {
 
         vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+
+        delete m_indexBuffer;
+        delete m_vertexBuffer;
 
         for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
             vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);

@@ -3,7 +3,9 @@
 #define UVKE_RENDERER_HEADER
 
 #include "../uvke.hpp"
-#include "Shader.hpp"
+#include "StagingBuffer.hpp"
+#include "VertexBuffer.hpp"
+#include "IndexBuffer.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
@@ -155,7 +157,11 @@ namespace uvke {
 
             vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-            vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+            m_vertexBuffer->Bind(commandBuffer);
+            m_indexBuffer->Bind(commandBuffer);
+
+            // vkCmdDraw(commandBuffer, m_vertexBuffer->GetVertices().size(), 1, 0, 0);
+            vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
 
             vkCmdEndRenderPass(commandBuffer);
 
@@ -164,6 +170,7 @@ namespace uvke {
 
         void RecreateSwapchain() {
             m_window.Update();
+
             vec2i size(m_window.GetWindowProps()->size.x, m_window.GetWindowProps()->size.y);
             for(; size.x == 0 || size.y == 0 ;) {
                 m_window.Update();
@@ -248,15 +255,13 @@ namespace uvke {
                 m_framebuffers = std::vector<VkFramebuffer>(m_swapchainImageViews.size());
 
                 for(auto i = 0; i < m_framebuffers.size(); ++i) {
-                    VkImageView imageView[] = { m_swapchainImageViews[i] };
-
                     VkFramebufferCreateInfo framebufferCreateInfo { };
                     framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
                     framebufferCreateInfo.pNext = nullptr;
                     framebufferCreateInfo.flags = 0;
                     framebufferCreateInfo.renderPass = m_renderPass;
                     framebufferCreateInfo.attachmentCount = 1;
-                    framebufferCreateInfo.pAttachments = imageView;
+                    framebufferCreateInfo.pAttachments = &m_swapchainImageViews[i];
                     framebufferCreateInfo.width = m_extent.width;
                     framebufferCreateInfo.height = m_extent.height;
                     framebufferCreateInfo.layers = 1;
@@ -280,6 +285,9 @@ namespace uvke {
         VkSwapchainKHR m_swapchain;
         std::vector<VkImage> m_swapchainImages;
         std::vector<VkImageView> m_swapchainImageViews;
+        StagingBuffer* m_stagingBuffer;
+        VertexBuffer* m_vertexBuffer;
+        IndexBuffer* m_indexBuffer;
         VkRenderPass m_renderPass;
         VkPipelineLayout m_pipelineLayout;
         VkPipeline m_pipeline;

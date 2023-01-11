@@ -25,6 +25,12 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Shader.cpp
     Source/uvke/Graphics/Renderer.hpp
     Source/uvke/Graphics/Renderer.cpp
+    Source/uvke/Graphics/StagingBuffer.hpp
+    Source/uvke/Graphics/StagingBuffer.cpp
+    Source/uvke/Graphics/VertexBuffer.hpp
+    Source/uvke/Graphics/VertexBuffer.cpp
+    Source/uvke/Graphics/IndexBuffer.hpp
+    Source/uvke/Graphics/IndexBuffer.cpp
 )
 
 set(UVKE_UTILS_SOURCE

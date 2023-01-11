@@ -19,7 +19,7 @@ namespace uvke {
         vec2u size;
         unsigned style;
 
-        WindowProps(std::string_view a = "uvke window", const vec2u& b = vec2u(1280, 720), unsigned c = Style::Default) : title(a), size(b), style(c) {  }
+        WindowProps(std::string_view a = "uvke Window", const vec2u& b = vec2u(1280, 720), unsigned c = Style::Default) : title(a), size(b), style(c) {  }
     };
 
     class UVKE_API Window {
