@@ -4,6 +4,7 @@
 
 namespace uvke {
     static const double PI = 3.14159265359;
+    static const float ACCURENCY = 0.00000001f;
 
     template<typename T>
     float Abs(T value) {
@@ -36,7 +37,7 @@ namespace uvke {
         float factor = 1.0f;
         float power = value;
 
-        for(int i = 1; Abs<float>(accurency) > 0.00000001f && i < 100; ++i) {
+        for(int i = 1; Abs<float>(accurency) > ACCURENCY && i < 100; ++i) {
             factor *= ((2 * i) * (2 * i + 1));
             power *= -1 * value * value;
             accurency = power / factor;
@@ -52,7 +53,7 @@ namespace uvke {
         float current = 1.0f;
         float accurency = 1.0f;
 
-        for(int i = 1; Abs<float>(accurency / current) > 0.00000001f && i < 100; ++i) {
+        for(int i = 1; Abs<float>(accurency / current) > ACCURENCY && i < 100; ++i) {
             accurency = (-accurency * value * value) / ((2 * i - 1) * (2 * i));
             current += accurency;
         }

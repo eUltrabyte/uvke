@@ -16,9 +16,11 @@ namespace uvke {
         virtual unsigned int GetSize();
         virtual VkBuffer& GetBuffer();
 
-    private:
+    protected:
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
+
+    private:
         std::vector<unsigned int> m_indices;
         VkBuffer m_buffer;
         VkDeviceMemory m_bufferMemory;

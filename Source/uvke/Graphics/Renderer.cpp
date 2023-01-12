@@ -498,4 +498,12 @@ namespace uvke {
             UVKE_FATAL("Framebuffer Recreation Error");
         }
     }
+
+    VkInstance& Renderer::GetInstance() {
+        return m_instance;
+    }
+    
+    VkDevice& Renderer::GetDevice() {
+        return m_device;
+    }
 };

@@ -15,6 +15,9 @@ namespace uvke {
 
         virtual void Render();
 
+        virtual VkInstance& GetInstance();
+        virtual VkDevice& GetDevice();
+
     private:
         VkPhysicalDevice GetSuitablePhysicalDevice() {
             std::vector<VkPhysicalDevice> physicalDevices;
