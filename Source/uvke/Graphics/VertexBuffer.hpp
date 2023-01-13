@@ -3,7 +3,6 @@
 #define UVKE_VERTEX_BUFFER_HEADER
 
 #include "../uvke.hpp"
-#include "Shader.hpp"
 
 namespace uvke {
     struct Vertex {

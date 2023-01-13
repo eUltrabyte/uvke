@@ -7,13 +7,13 @@ namespace uvke {
     static const float ACCURENCY = 0.00000001f;
 
     template<typename T>
-    float Abs(T value) {
+    constexpr float Abs(T value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Abs Type Is Not Arithmetic As Expected");
         return value < 0 ? -value : value;
     }
 
     template<typename T>
-    float Rsqrt(T value) {
+    constexpr float Rsqrt(T value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Rsqrt Type Is Not Arithmetic As Expected");
         float y = value;
         long x = *(long*)&y;
@@ -24,13 +24,13 @@ namespace uvke {
     }
 
     template<typename T>
-    float Sqrt(T value) {
+    constexpr float Sqrt(T value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Sqrt Type Is Not Arithmetic As Expected");
         return 1.0f / Rsqrt<T>(value);
     }
 
     template<typename T>
-    float Sin(T value) {
+    constexpr float Sin(T value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Sin Type Is Not Arithmetic As Expected");
         float current = value;
         float accurency = 1.0f;
@@ -48,7 +48,7 @@ namespace uvke {
     }
 
     template<typename T>
-    float Cos(T value) {
+    constexpr float Cos(T value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Cos Type Is Not Arithmetic As Expected");
         float current = 1.0f;
         float accurency = 1.0f;
@@ -62,16 +62,26 @@ namespace uvke {
     }
 
     template<typename T>
-    float Tan(T value) {
+    constexpr float Tan(T value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Tan Type Is Not Arithmetic As Expected");
         return Sin(value) / Cos(value);
     }
 
     template<typename T>
-    float Cot(T value) {
+    constexpr float Cot(T value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Cot Type Is Not Arithmetic As Expected");
         float current = PI - value;
         return Sin(current) / Cos(current);
+    }
+
+    template<typename T>
+    constexpr float Radians(T degrees) {
+        return degrees / 180.0f * PI;
+    }
+
+    template<typename T>
+    constexpr float Degrees(T radians) {
+        return radians * 180.0f / PI;
     }
 };
 

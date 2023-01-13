@@ -6,6 +6,7 @@
 #include "StagingBuffer.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
+#include "UniformBuffer.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {

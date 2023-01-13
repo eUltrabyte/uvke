@@ -11,3 +11,5 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE ../../Source)
 target_link_libraries(${PROJECT_NAME} PRIVATE uvke)
+
+file(COPY ../../Resource/ DESTINATION Resource/)
