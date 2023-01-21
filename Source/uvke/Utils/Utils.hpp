@@ -7,13 +7,13 @@ namespace uvke {
     static const float ACCURENCY = 0.00000001f;
 
     template<typename T>
-    constexpr float Abs(T value) {
+    constexpr float Abs(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Abs Type Is Not Arithmetic As Expected");
         return value < 0 ? -value : value;
     }
 
     template<typename T>
-    constexpr float Rsqrt(T value) {
+    constexpr float Rsqrt(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Rsqrt Type Is Not Arithmetic As Expected");
         float y = value;
         long x = *(long*)&y;
@@ -24,13 +24,13 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr float Sqrt(T value) {
+    constexpr float Sqrt(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Sqrt Type Is Not Arithmetic As Expected");
         return 1.0f / Rsqrt<T>(value);
     }
 
     template<typename T>
-    constexpr float Sin(T value) {
+    constexpr float Sin(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Sin Type Is Not Arithmetic As Expected");
         float current = value;
         float accurency = 1.0f;
@@ -48,7 +48,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr float Cos(T value) {
+    constexpr float Cos(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Cos Type Is Not Arithmetic As Expected");
         float current = 1.0f;
         float accurency = 1.0f;
@@ -62,26 +62,31 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr float Tan(T value) {
+    constexpr float Tan(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Tan Type Is Not Arithmetic As Expected");
         return Sin(value) / Cos(value);
     }
 
     template<typename T>
-    constexpr float Cot(T value) {
+    constexpr float Cot(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Cot Type Is Not Arithmetic As Expected");
         float current = PI - value;
         return Sin(current) / Cos(current);
     }
 
     template<typename T>
-    constexpr float Radians(T degrees) {
+    constexpr float Radians(const T& degrees) {
         return degrees / 180.0f * PI;
     }
 
     template<typename T>
-    constexpr float Degrees(T radians) {
+    constexpr float Degrees(const T& radians) {
         return radians * 180.0f / PI;
+    }
+
+    template<typename T>
+    constexpr float Lerp(const T& x, const T& y, const T& fraction) {
+        return x + (y - x) * fraction;
     }
 };
 

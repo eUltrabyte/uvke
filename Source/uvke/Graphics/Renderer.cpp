@@ -163,15 +163,25 @@ namespace uvke {
         Shader shader(m_device, File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
         UVKE_LOG("Shaders Loaded");
 
-        m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device, std::vector<Vertex> {
+        /* m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device, std::vector<Vertex> {
             {{ -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
             {{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
             {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
-            {{ -0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f }},
+            {{ -0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }},
         } );
 
         m_indexBuffer = new IndexBuffer(m_physicalDevice, m_device, std::vector<unsigned int> {
             0, 1, 2, 2, 3, 0,
+        } ); */
+
+        m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device, std::vector<Vertex> {
+            {{ -0.5f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
+            {{ 0.0f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
+            {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
+        } );
+
+        m_indexBuffer = new IndexBuffer(m_physicalDevice, m_device, std::vector<unsigned int> {
+            0, 1, 2,
         } );
 
         {
