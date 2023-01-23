@@ -206,27 +206,29 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr mat4x4<T> Perspective(const T& fov, const T& aspect, const T& nearZ, const T& farZ) {
+    constexpr mat4x4<T> Perspective(const T& fov, const T& aspect, const T& zNear, const T& zFar) {
         T half = 1 / Tan<T>(fov);
 
         mat4x4<T> result;
         result.data[0][0] = 1 / aspect * half;
         result.data[1][1] = -(1 / half);
-        result.data[2][2] = farZ / (farZ - nearZ);
+        result.data[2][2] = zFar / (zFar - zNear);
         result.data[2][3] = 1;
-        result.data[3][2] = -(2 * farZ * nearZ) / (farZ - nearZ);
+        result.data[3][2] = -(2 * zFar * zNear) / (zFar - zNear);
         return result;
     }
 
     template<typename T>
-    constexpr mat4x4<T> Ortho(const T& left, const T& right, const T& bottom, const T& top, const T& nearZ, const T& farZ) {
+    constexpr mat4x4<T> Ortho(const T& left, const T& right, const T& bottom, const T& top, const T& zNear, const T& zFar) {
         mat4x4<T> result;
-        result.data[0][0] = 2.0f / (right - left);
-        result.data[1][1] = 2.0f / (top - bottom);
-        result.data[2][2] = -2.0f / (farZ - nearZ);
+        result.data[0][0] = 2 / (right - left);
+        result.data[1][1] = 2 / (bottom - top);
+        result.data[2][2] = 1 / (zNear - zFar);
         result.data[3][0] = -(right + left) / (right - left);
-        result.data[3][1] = -(top + bottom) / (top - bottom);
-        result.data[3][2] = -(farZ + nearZ) / (farZ - nearZ);
+        result.data[3][1] = -(bottom + top) / (bottom - top);
+        result.data[3][2] = zNear / (zNear - zFar);
+        result.data[3][3] = 1;
+
         return result;
     }
 
@@ -289,6 +291,17 @@ namespace uvke {
         result.data[3][3] = 1.0f;
 
         result *= matrix;
+        return result;
+    }
+
+    template<typename T>
+    constexpr mat4x4<T> Translate(const mat4x4<T>& matrix, const vec3<T>& translation) {
+        mat4x4<T> result = matrix;
+        result.data[3][0] = matrix.data[0][0] * translation.x + matrix.data[1][0] * translation.y + matrix.data[2][0] * translation.z + matrix.data[3][0];
+        result.data[3][1] = matrix.data[0][1] * translation.x + matrix.data[1][1] * translation.y + matrix.data[2][1] * translation.z + matrix.data[3][1];
+        result.data[3][2] = matrix.data[0][2] * translation.x + matrix.data[1][2] * translation.y + matrix.data[2][2] * translation.z + matrix.data[3][2];
+        result.data[3][3] = matrix.data[0][3] * translation.x + matrix.data[1][3] * translation.y + matrix.data[2][3] * translation.z + matrix.data[3][3];
+
         return result;
     }
 

@@ -3,8 +3,10 @@
 #define UVKE_UTILS_HEADER
 
 namespace uvke {
-    static const double PI = 3.14159265359;
-    static const float ACCURENCY = 0.00000001f;
+    namespace priv {
+        static const float PI = 3.141592653f;
+        static const float ACCURENCY = 0.00000001f;
+    };
 
     template<typename T>
     constexpr float Abs(const T& value) {
@@ -37,7 +39,7 @@ namespace uvke {
         float factor = 1.0f;
         float power = value;
 
-        for(int i = 1; Abs<float>(accurency) > ACCURENCY && i < 100; ++i) {
+        for(int i = 1; Abs<float>(accurency) > priv::ACCURENCY && i < 100; ++i) {
             factor *= ((2 * i) * (2 * i + 1));
             power *= -1 * value * value;
             accurency = power / factor;
@@ -53,7 +55,7 @@ namespace uvke {
         float current = 1.0f;
         float accurency = 1.0f;
 
-        for(int i = 1; Abs<float>(accurency / current) > ACCURENCY && i < 100; ++i) {
+        for(int i = 1; Abs<float>(accurency / current) > priv::ACCURENCY && i < 100; ++i) {
             accurency = (-accurency * value * value) / ((2 * i - 1) * (2 * i));
             current += accurency;
         }
@@ -70,20 +72,20 @@ namespace uvke {
     template<typename T>
     constexpr float Cot(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Cot Type Is Not Arithmetic As Expected");
-        float current = PI - value;
+        float current = priv::PI - value;
         return Sin(current) / Cos(current);
     }
 
     template<typename T>
     constexpr float Radians(const T& degrees) {
         static_assert(std::is_arithmetic_v<T>, "uvke Radians Type Is Not Arithmetic As Expected");
-        return degrees / 180.0f * PI;
+        return degrees / 180.0f * priv::PI;
     }
 
     template<typename T>
     constexpr float Degrees(const T& radians) {
         static_assert(std::is_arithmetic_v<T>, "uvke Degrees Type Is Not Arithmetic As Expected");
-        return radians * 180.0f / PI;
+        return radians * 180.0f / priv::PI;
     }
 
     template<typename T>
