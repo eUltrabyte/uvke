@@ -164,6 +164,8 @@ namespace uvke {
             m_vertexBuffer->Bind(commandBuffer);
             m_indexBuffer->Bind(commandBuffer);
 
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_uniformBuffer->GetDescriptorSet(), 0, nullptr);
+
             // vkCmdDraw(commandBuffer, m_vertexBuffer->GetVertices().size(), 1, 0, 0);
             vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
 
@@ -292,6 +294,7 @@ namespace uvke {
         StagingBuffer* m_stagingBuffer;
         VertexBuffer* m_vertexBuffer;
         IndexBuffer* m_indexBuffer;
+        UniformBuffer* m_uniformBuffer;
         VkRenderPass m_renderPass;
         VkPipelineLayout m_pipelineLayout;
         VkPipeline m_pipeline;
@@ -302,6 +305,7 @@ namespace uvke {
         VkSemaphore m_finishedSemaphore;
         VkFence m_fence;
         bool m_framebufferRecreated;
+        Clock m_clock;
 
     };
 };

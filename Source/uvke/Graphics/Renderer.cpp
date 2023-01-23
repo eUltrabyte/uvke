@@ -1,4 +1,5 @@
 #include "Renderer.hpp"
+#include "UniformBuffer.hpp"
 
 namespace uvke {
     Renderer::Renderer(Window& window)
@@ -184,6 +185,8 @@ namespace uvke {
             0, 1, 2,
         } );
 
+        m_uniformBuffer = new UniformBuffer(m_physicalDevice, m_device);
+
         {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *shader.GetVertexShaderStageCreateInfo(), *shader.GetFragmentShaderStageCreateInfo() };
 
@@ -244,7 +247,7 @@ namespace uvke {
             pipelineRasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
             pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
             pipelineRasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE;
             pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
@@ -320,8 +323,8 @@ namespace uvke {
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
             pipelineLayoutCreateInfo.pNext = nullptr;
             pipelineLayoutCreateInfo.flags = 0;
-            pipelineLayoutCreateInfo.setLayoutCount = 0;
-            pipelineLayoutCreateInfo.pSetLayouts = nullptr;
+            pipelineLayoutCreateInfo.setLayoutCount = 1;
+            pipelineLayoutCreateInfo.pSetLayouts = &m_uniformBuffer->GetDescriptorSetLayout();
             pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
             pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 
@@ -445,6 +448,7 @@ namespace uvke {
         vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
 
+        delete m_uniformBuffer;
         delete m_indexBuffer;
         delete m_vertexBuffer;
 
@@ -469,6 +473,19 @@ namespace uvke {
             UVKE_FATAL("Swapchain Acquire Image Error");
         }
         
+        UniformBufferObject ubo { };
+        ubo.model = Identity<float>();
+        ubo.model = Scale<float>(ubo.model, vec3f(2.0f, 2.0f, 2.0f));
+        ubo.model = Rotate<float>(ubo.model, vec3f(0.0f, 0.0f, 1.0f), std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::steady_clock::now() - m_clock.GetStart()).count() * Radians(90.0f) * 4);
+
+        ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
+        
+        // ubo.projection = Ortho<float>(0.0f, m_window.GetWindowProps()->size.x, m_window.GetWindowProps()->size.y, 0.0f, 0.1f, 1000.0f);
+        ubo.projection = Perspective<float>(Radians(45.0f), (m_window.GetWindowProps()->size.x / m_window.GetWindowProps()->size.y), 0.1f, 1000.0f);
+        ubo.projection.data[1][1] *= -1;
+
+        m_uniformBuffer->Update(ubo);
+
         // TODO SUPPORT FOR MORE FENCES AND IMAGES IN FLIGHT
         vkWaitForFences(m_device, 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
         vkResetFences(m_device, 1, &m_fence);
@@ -506,6 +523,10 @@ namespace uvke {
             RecreateSwapchain();
         } else if(result != VK_SUCCESS) {
             UVKE_FATAL("Framebuffer Recreation Error");
+        }
+
+        if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
+            m_clock.Restart();
         }
     }
 

@@ -14,11 +14,28 @@ namespace uvke {
 
     class UVKE_API UniformBuffer {
     public:
+        UniformBuffer(VkPhysicalDevice physicalDevice = nullptr, VkDevice device = nullptr);
+        virtual ~UniformBuffer();
+
+        virtual void Update(const UniformBufferObject& ubo);
+
+        virtual VkDescriptorSetLayout& GetDescriptorSetLayout();
+        virtual VkDescriptorPool& GetDescriptorPool();
+        virtual VkDescriptorSet& GetDescriptorSet();
+        virtual unsigned int GetSize();
+        virtual VkBuffer& GetBuffer();
 
     protected:
-        
+        VkPhysicalDevice m_physicalDevice;
+        VkDevice m_device;
 
     private:
+        VkDescriptorSetLayoutBinding m_descriptorSetLayoutBinding;
+        VkDescriptorSetLayout m_descriptorSetLayout;
+        VkDescriptorPool m_descriptorPool;
+        VkDescriptorSet m_descriptorSet;
+        VkBuffer m_buffer;
+        VkDeviceMemory m_bufferMemory;
 
     };
 };

@@ -107,7 +107,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr T Normalize(const vec4<T>& vec) {
+    constexpr vec4<T> Normalize(const vec4<T>& vec) {
         T length = Length(vec);
         return vec4<T>(vec.x / length, vec.y / length, vec.z / length, vec.w / length);
     }
@@ -117,22 +117,20 @@ namespace uvke {
         return x.x * y.x + x.y * y.y + x.z * y.z + x.w * y.w;
     }
 
-    // TODO
-    /* template<typename T>
-    constexpr vec3<T> CrossProduct(const vec3<T>& x, const vec3<T>& y) {
-        return vec3<T>(x.y * y.z - x.z * y.y, x.z * y.x - x.x * y.z, x.x * y.y - x.y * y.x);
-    } */
+    template<typename T>
+    constexpr vec4<T> CrossProduct(const vec4<T>& x, const vec4<T>& y) {
+        return vec4<T>(x.y * y.z - x.z * y.y, x.z * y.w - x.w * y.z, x.w * y.x - x.x * y.w, x.x * y.y - x.y * y.x);
+    }
 
     template<typename T, typename U>
     constexpr T DotProduct(const vec4<T>& x, const vec4<U>& y) {
         return x.x * y.x + x.y * y.y + x.z * y.z + x.w * y.w;
     }
 
-    // TODO
-    /* template<typename T, typename U>
-    constexpr vec3<T> CrossProduct(const vec3<T>& x, const vec3<U>& y) {
-        return vec3<T>(x.y * y.z - x.z * y.y, x.z * y.x - x.x * y.z, x.x * y.y - x.y * y.x);
-    } */
+    template<typename T, typename U>
+    constexpr vec4<T> CrossProduct(const vec4<T>& x, const vec4<U>& y) {
+        return vec4<T>(x.y * y.z - x.z * y.y, x.z * y.w - x.w * y.z, x.w * y.x - x.x * y.w, x.x * y.y - x.y * y.x);
+    }
 };
 
 #endif

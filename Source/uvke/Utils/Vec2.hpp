@@ -107,7 +107,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr T Normalize(const vec2<T>& vec) {
+    constexpr vec2<T> Normalize(const vec2<T>& vec) {
         T length = Length(vec);
         return vec2<T>(vec.x / length, vec.y / length);
     }
