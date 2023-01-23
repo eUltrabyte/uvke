@@ -15,9 +15,11 @@ namespace uvke {
 
         virtual VkBuffer& GetBuffer();
 
-    private:
+    protected:
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
+
+    private:
         unsigned int m_size;
         VkBuffer m_buffer;
         VkDeviceMemory m_bufferMemory;

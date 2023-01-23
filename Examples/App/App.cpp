@@ -1,4 +1,3 @@
-#include <uvke/uvke.hpp>
 #include <uvke/Graphics/Renderer.hpp>
 
 static int init = uvke::priv::Init();

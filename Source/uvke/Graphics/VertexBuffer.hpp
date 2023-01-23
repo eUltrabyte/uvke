@@ -3,7 +3,6 @@
 #define UVKE_VERTEX_BUFFER_HEADER
 
 #include "../uvke.hpp"
-#include "Shader.hpp"
 
 namespace uvke {
     struct Vertex {
@@ -24,9 +23,11 @@ namespace uvke {
         virtual unsigned int GetSize();
         virtual VkBuffer& GetBuffer();
 
-    private:
+    protected:
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
+
+    private:
         std::vector<Vertex> m_vertices;
         VkVertexInputBindingDescription m_vertexInputBindingDescription;
         std::array<VkVertexInputAttributeDescription, 2> m_vertexInputAttributeDescription;

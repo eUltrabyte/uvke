@@ -31,12 +31,15 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/VertexBuffer.cpp
     Source/uvke/Graphics/IndexBuffer.hpp
     Source/uvke/Graphics/IndexBuffer.cpp
+    Source/uvke/Graphics/UniformBuffer.hpp
+    Source/uvke/Graphics/UniformBuffer.cpp
 )
 
 set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Vec2.hpp
     Source/uvke/Utils/Vec3.hpp
     Source/uvke/Utils/Vec4.hpp
+    Source/uvke/Utils/Mat4x4.hpp
     Source/uvke/Utils/Clock.hpp
     Source/uvke/Utils/Clock.cpp
     Source/uvke/Utils/File.hpp
@@ -65,7 +68,7 @@ file(GLOB_RECURSE GLSL_SOURCE_FILES
 
 foreach(GLSL ${GLSL_SOURCE_FILES})
     get_filename_component(FILE_NAME ${GLSL} NAME)
-    set(SPIRV "${PROJECT_BINARY_DIR}/Resource/${FILE_NAME}.spv")
+    set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/${FILE_NAME}.spv")
     add_custom_command(OUTPUT ${SPIRV} COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV} DEPENDS ${GLSL})
     list(APPEND SPIRV_BINARY_FILES ${SPIRV})
 endforeach(GLSL)
@@ -74,6 +77,7 @@ add_custom_target(uvke-Shaders DEPENDS ${SPIRV_BINARY_FILES})
 
 option(UVKE_SHARED_LIBRARY "uvke build using shared libraries" OFF)
 option(UVKE_SHARED_BUILD "uvke build shared libraries files" OFF)
+option(UVKE_EXAMPLES "uvke build examples" ON)
 
 if(UVKE_SHARED_LIBRARY)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_SHARED_LIBRARY")
@@ -95,6 +99,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> 
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw Vulkan::Vulkan)
 
 file(COPY Resource/ DESTINATION Resource/)
-file(COPY ${CMAKE_CURRENT_BINARY_DIR}/Resource/ DESTINATION Examples/App/Resource/)
 
-add_subdirectory(Examples/App)
+if(UVKE_EXAMPLES)
+    add_subdirectory(Examples/App)
+endif()

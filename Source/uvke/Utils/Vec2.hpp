@@ -100,6 +100,37 @@ namespace uvke {
     using vec2u = vec2<unsigned>;
     using vec2d = vec2<double>;
     using vec2l = vec2<long>;
+
+    template<typename T>
+    constexpr T Length(const vec2<T>& vec) {
+        return Sqrt<T>((vec.x * vec.x) + (vec.y * vec.y));
+    }
+
+    template<typename T>
+    constexpr vec2<T> Normalize(const vec2<T>& vec) {
+        T length = Length(vec);
+        return vec2<T>(vec.x / length, vec.y / length);
+    }
+
+    template<typename T>
+    constexpr T DotProduct(const vec2<T>& x, const vec2<T>& y) {
+        return x.x * y.x + x.y * y.y;
+    }
+
+    template<typename T>
+    constexpr vec2<T> CrossProduct(const vec2<T>& x, const vec2<T>& y) {
+        return vec2<T>(x.x * y.y - x.y * y.x, x.y * y.x - x.x * y.y);
+    }
+
+    template<typename T, typename U>
+    constexpr T DotProduct(const vec2<T>& x, const vec2<U>& y) {
+        return x.x * y.x + x.y * y.y;
+    }
+
+    template<typename T, typename U>
+    constexpr vec2<T> CrossProduct(const vec2<T>& x, const vec2<U>& y) {
+        return vec2<T>(x.x * y.y - x.y * y.x, x.y * y.x - x.x * y.y);
+    }
 };
 
 #endif

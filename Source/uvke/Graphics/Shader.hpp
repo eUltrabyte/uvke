@@ -16,6 +16,9 @@ namespace uvke {
         virtual VkPipelineShaderStageCreateInfo* GetVertexShaderStageCreateInfo();
         virtual VkPipelineShaderStageCreateInfo* GetFragmentShaderStageCreateInfo();
 
+    protected:
+        VkDevice m_device;
+
     private:
         VkShaderModule CreateShaderModule(std::vector<char> code) {
             VkShaderModule shaderModule;
@@ -34,7 +37,6 @@ namespace uvke {
             return shaderModule;
         }
 
-        VkDevice m_device;
         VkShaderModule m_vertexShader;
         VkShaderModule m_fragmentShader;
         VkPipelineShaderStageCreateInfo m_vertexShaderStageCreateInfo;
