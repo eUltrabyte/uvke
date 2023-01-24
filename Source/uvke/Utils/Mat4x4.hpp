@@ -20,6 +20,86 @@ namespace uvke {
         template<typename U>
         mat4x4(const mat4x4<U>& mat) : data(static_cast<std::array<std::array<T, 4>, 4>>(mat.data)) {  }
 
+        mat4x4<T> operator+(const T& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] += value;
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        mat4x4<T> operator-(const T& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] -= value;
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        mat4x4<T> operator*(const T& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] *= value;
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        mat4x4<T> operator/(const T& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] /= value;
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        mat4x4<T> operator+(const mat4x4<T>& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] += value.data[x][y];
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        mat4x4<T> operator-(const mat4x4<T>& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] -= value.data[x][y];
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        mat4x4<T> operator*(const mat4x4<T>& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] *= value.data[x][y];
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        mat4x4<T> operator/(const mat4x4<T>& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] /= value.data[x][y];
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
         mat4x4<T> operator+=(const T& value) {
             for(int x = 0; x < data.size(); ++x) {
                 for(int y = 0; y < data[x].size(); ++y) {
@@ -94,6 +174,94 @@ namespace uvke {
             for(int x = 0; x < data.size(); ++x) {
                 for(int y = 0; y < data[x].size(); ++y) {
                     data[x][y] /= value.data[x][y];
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        template<typename U>
+        mat4x4<T> operator+(const U& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] += static_cast<T>(value);
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        template<typename U>
+        mat4x4<T> operator-(const U& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] -= static_cast<T>(value);
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        template<typename U>
+        mat4x4<T> operator*(const U& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] *= static_cast<T>(value);
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        template<typename U>
+        mat4x4<T> operator/(const U& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] /= static_cast<T>(value);
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        template<typename U>
+        mat4x4<T> operator+(const mat4x4<U>& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] += static_cast<T>(value.data[x][y]);
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        template<typename U>
+        mat4x4<T> operator-(const mat4x4<U>& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] -= static_cast<T>(value.data[x][y]);
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        template<typename U>
+        mat4x4<T> operator*(const mat4x4<U>& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] *= static_cast<T>(value.data[x][y]);
+                }
+            }
+
+            return mat4x4<T>(data);
+        }
+
+        template<typename U>
+        mat4x4<T> operator/(const mat4x4<U>& value) {
+            for(int x = 0; x < data.size(); ++x) {
+                for(int y = 0; y < data[x].size(); ++y) {
+                    data[x][y] /= static_cast<T>(value.data[x][y]);
                 }
             }
 

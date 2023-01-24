@@ -18,6 +18,7 @@ namespace uvke {
         virtual ~UniformBuffer();
 
         virtual void Update(const UniformBufferObject& ubo);
+        virtual void Bind(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout);
 
         virtual VkDescriptorSetLayout& GetDescriptorSetLayout();
         virtual VkDescriptorPool& GetDescriptorPool();

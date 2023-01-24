@@ -116,6 +116,10 @@ namespace uvke {
         vkUnmapMemory(m_device, m_bufferMemory);
     }
 
+    void UniformBuffer::Bind(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) {
+        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+    }
+
     VkDescriptorSetLayout& UniformBuffer::GetDescriptorSetLayout() {
         return m_descriptorSetLayout;
     }

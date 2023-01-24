@@ -3,73 +3,33 @@
 #define UVKE_RENDERER_HEADER
 
 #include "../uvke.hpp"
+#include "../Core/Base.hpp"
 #include "StagingBuffer.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
 
+// TODO
+// move vulkan surface to surface class
+// move vulkan swapchain to swapchain class
+// move vulkan pipeline to pipeline class
+
 namespace uvke {
     class UVKE_API Renderer {
     public:
-        Renderer(Window& window);
+        Renderer(Base& base, Window& window);
         virtual ~Renderer();
 
         virtual void Render();
 
-        virtual VkInstance& GetInstance();
-        virtual VkDevice& GetDevice();
-
     private:
-        VkPhysicalDevice GetSuitablePhysicalDevice() {
-            std::vector<VkPhysicalDevice> physicalDevices;
-            {
-                unsigned int physicalDevicesCount = 0;
-                vkEnumeratePhysicalDevices(m_instance, &physicalDevicesCount, nullptr);
-                physicalDevices = std::vector<VkPhysicalDevice>(physicalDevicesCount);
-                vkEnumeratePhysicalDevices(m_instance, &physicalDevicesCount, physicalDevices.data());
-            }
-
-            std::vector<VkPhysicalDeviceProperties> physicalDevicesProperties(physicalDevices.size());
-            std::vector<VkPhysicalDeviceFeatures> physicalDevicesFeatures(physicalDevices.size());
-
-            for(auto i = 0; i < physicalDevices.size(); ++i) {
-                vkGetPhysicalDeviceProperties(physicalDevices[i], &physicalDevicesProperties[i]);
-                vkGetPhysicalDeviceFeatures(physicalDevices[i], &physicalDevicesFeatures[i]);
-
-                if(physicalDevicesProperties.at(i).deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && physicalDevicesFeatures.at(i).geometryShader == VK_TRUE) {
-                    UVKE_LOG("GPU - " + std::string(physicalDevicesProperties.at(i).deviceName));
-                    return physicalDevices[i];
-                }
-            }
-
-            return physicalDevices[0];
-        }
-
-        unsigned int GetQueueFamily() {
-            std::vector<VkQueueFamilyProperties> queueFamilyProperties;
-            {
-                unsigned int queueFamilyPropertiesCount = 0;
-                vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyPropertiesCount, nullptr);
-                queueFamilyProperties = std::vector<VkQueueFamilyProperties>(queueFamilyPropertiesCount);
-                vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyPropertiesCount, queueFamilyProperties.data());
-            }
-
-            for(auto i = 0; i < queueFamilyProperties.size(); ++i) {
-                if(queueFamilyProperties.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-                    return i;
-                }
-            }
-
-            return 0;
-        }
-
         VkSurfaceFormatKHR GetSurfaceFormat() {
             std::vector<VkSurfaceFormatKHR> surfaceFormats;
             {
                 unsigned int surfaceFormatsCount = 0;
-                vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &surfaceFormatsCount, nullptr);
+                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base.GetPhysicalDevice(), m_surface, &surfaceFormatsCount, nullptr);
                 surfaceFormats = std::vector<VkSurfaceFormatKHR>(surfaceFormatsCount);
-                vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &surfaceFormatsCount, surfaceFormats.data());
+                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base.GetPhysicalDevice(), m_surface, &surfaceFormatsCount, surfaceFormats.data());
             }
 
             for(auto i = 0; i < surfaceFormats.size(); ++i) {
@@ -85,9 +45,9 @@ namespace uvke {
             std::vector<VkPresentModeKHR> presentModes;
             {
                 unsigned int presentModesCount = 0;
-                vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModesCount, nullptr);
+                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base.GetPhysicalDevice(), m_surface, &presentModesCount, nullptr);
                 presentModes = std::vector<VkPresentModeKHR>(presentModesCount);
-                vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModesCount, presentModes.data());
+                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base.GetPhysicalDevice(), m_surface, &presentModesCount, presentModes.data());
             }
 
             for(auto i = 0; i < presentModes.size(); ++i) {
@@ -101,7 +61,7 @@ namespace uvke {
 
         VkExtent2D GetSwapExtent() {
             VkSurfaceCapabilitiesKHR surfaceCapabilities;
-            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &surfaceCapabilities);
+            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_base.GetPhysicalDevice(), m_surface, &surfaceCapabilities);
 
             m_swapchainPreTransform = surfaceCapabilities.currentTransform;
 
@@ -163,10 +123,8 @@ namespace uvke {
 
             m_vertexBuffer->Bind(commandBuffer);
             m_indexBuffer->Bind(commandBuffer);
+            m_uniformBuffer->Bind(commandBuffer, m_pipelineLayout);
 
-            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_uniformBuffer->GetDescriptorSet(), 0, nullptr);
-
-            // vkCmdDraw(commandBuffer, m_vertexBuffer->GetVertices().size(), 1, 0, 0);
             vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
 
             vkCmdEndRenderPass(commandBuffer);
@@ -189,17 +147,17 @@ namespace uvke {
                 m_extent = GetSwapExtent();
             }
 
-            vkDeviceWaitIdle(m_device);
+            vkDeviceWaitIdle(m_base.GetDevice());
 
             for(auto i = 0; i < m_framebuffers.size(); ++i) {
-                vkDestroyFramebuffer(m_device, m_framebuffers[i], nullptr);
+                vkDestroyFramebuffer(m_base.GetDevice(), m_framebuffers[i], nullptr);
             }
 
             for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
-                vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
+                vkDestroyImageView(m_base.GetDevice(), m_swapchainImageViews[i], nullptr);
             }
 
-            vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+            vkDestroySwapchainKHR(m_base.GetDevice(), m_swapchain, nullptr);
 
             {
                 VkSwapchainCreateInfoKHR swapchainCreateInfo { };
@@ -223,15 +181,15 @@ namespace uvke {
                 swapchainCreateInfo.clipped = VK_TRUE;
                 swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-                UVKE_ASSERT(vkCreateSwapchainKHR(m_device, &swapchainCreateInfo, nullptr, &m_swapchain));
+                UVKE_ASSERT(vkCreateSwapchainKHR(m_base.GetDevice(), &swapchainCreateInfo, nullptr, &m_swapchain));
             }
 
             
             {
                 unsigned int swapchainImageCount = 0;
-                vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, nullptr);
+                vkGetSwapchainImagesKHR(m_base.GetDevice(), m_swapchain, &swapchainImageCount, nullptr);
                 m_swapchainImages = std::vector<VkImage>(swapchainImageCount);
-                vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, m_swapchainImages.data());
+                vkGetSwapchainImagesKHR(m_base.GetDevice(), m_swapchain, &swapchainImageCount, m_swapchainImages.data());
             }
 
 
@@ -253,7 +211,7 @@ namespace uvke {
                     imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
                     imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-                    UVKE_ASSERT(vkCreateImageView(m_device, &imageViewCreateInfo, nullptr, &m_swapchainImageViews[i]));
+                    UVKE_ASSERT(vkCreateImageView(m_base.GetDevice(), &imageViewCreateInfo, nullptr, &m_swapchainImageViews[i]));
                 }
             }
 
@@ -272,14 +230,12 @@ namespace uvke {
                     framebufferCreateInfo.height = m_extent.height;
                     framebufferCreateInfo.layers = 1;
 
-                    UVKE_ASSERT(vkCreateFramebuffer(m_device, &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
+                    UVKE_ASSERT(vkCreateFramebuffer(m_base.GetDevice(), &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
                 }
             }
         }
 
-        VkInstance m_instance;
-        VkPhysicalDevice m_physicalDevice;
-        VkDevice m_device;
+        Base& m_base;
         Window& m_window;
         VkQueue m_queue;
         VkSurfaceKHR m_surface;

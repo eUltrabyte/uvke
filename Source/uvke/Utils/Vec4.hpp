@@ -22,6 +22,38 @@ namespace uvke {
         template<typename U>
         vec4(const vec4<U>& vec) : x(static_cast<T>(vec.x)), y(static_cast<T>(vec.y)), z(static_cast<T>(vec.z)), w(static_cast<T>(vec.w)) {  }
 
+        vec4<T> operator+(const T& value) {
+            return vec4<T>(x + value, y + value, z + value, w + value);
+        }
+
+        vec4<T> operator-(const T& value) {
+            return vec4<T>(x - value, y - value, z - value, w - value);
+        }
+
+        vec4<T> operator*(const T& value) {
+            return vec4<T>(x * value, y * value, z * value, w * value);
+        }
+
+        vec4<T> operator/(const T& value) {
+            return vec4<T>(x / value, y / value, z / value, w / value);
+        }
+
+        vec4<T> operator+(const vec4<T>& value) {
+            return vec4<T>(x + value.x, y + value.y, z + value.z, w + value.w);
+        }
+
+        vec4<T> operator-(const vec4<T>& value) {
+            return vec4<T>(x - value.x, y - value.y, z - value.z, w - value.w);
+        }
+
+        vec4<T> operator*(const vec4<T>& value) {
+            return vec4<T>(x * value.x, y * value.y, z * value.z, w * value.w);
+        }
+
+        vec4<T> operator/(const vec4<T>& value) {
+            return vec4<T>(x / value.x, y / value.y, z / value.z, w / value.w);
+        }
+
         vec4<T> operator+=(const T& value) {
             return vec4<T>(x += value, y += value, z += value, w += value);
         }
@@ -52,6 +84,46 @@ namespace uvke {
 
         vec4<T> operator/=(const vec4<T>& value) {
             return vec4<T>(x /= value.x, y /= value.y, z /= value.z, w /= value.w);
+        }
+
+        template<typename U>
+        vec4<T> operator+(const U& value) {
+            return vec4<T>(x + static_cast<T>(value), y + static_cast<T>(value), z + static_cast<T>(value), w + static_cast<T>(value));
+        }
+
+        template<typename U>
+        vec4<T> operator-(const U& value) {
+            return vec4<T>(x - static_cast<T>(value), y - static_cast<T>(value), z - static_cast<T>(value), w - static_cast<T>(value));
+        }
+
+        template<typename U>
+        vec4<T> operator*(const U& value) {
+            return vec4<T>(x * static_cast<T>(value), y * static_cast<T>(value), z * static_cast<T>(value), w * static_cast<T>(value));
+        }
+
+        template<typename U>
+        vec4<T> operator/(const U& value) {
+            return vec4<T>(x / static_cast<T>(value), y / static_cast<T>(value), z / static_cast<T>(value), w / static_cast<T>(value));
+        }
+
+        template<typename U>
+        vec4<T> operator+(const vec4<U>& value) {
+            return vec4<T>(x + static_cast<T>(value.x), y + static_cast<T>(value.y), z + static_cast<T>(value.z), w + static_cast<T>(value.w));
+        }
+
+        template<typename U>
+        vec4<T> operator-(const vec4<U>& value) {
+            return vec4<T>(x - static_cast<T>(value.x), y - static_cast<T>(value.y), z - static_cast<T>(value.z), w - static_cast<T>(value.w));
+        }
+
+        template<typename U>
+        vec4<T> operator*(const vec4<U>& value) {
+            return vec4<T>(x * static_cast<T>(value.x), y * static_cast<T>(value.y), z * static_cast<T>(value.z), w * static_cast<T>(value.w));
+        }
+
+        template<typename U>
+        vec4<T> operator/(const vec4<U>& value) {
+            return vec4<T>(x / static_cast<T>(value.x), y / static_cast<T>(value.y), z / static_cast<T>(value.z), w / static_cast<T>(value.w));
         }
 
         template<typename U>

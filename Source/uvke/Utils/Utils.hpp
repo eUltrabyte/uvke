@@ -88,10 +88,12 @@ namespace uvke {
         return radians * 180.0f / priv::PI;
     }
 
-    template<typename T>
-    constexpr float Lerp(const T& x, const T& y, const T& fraction) {
+    template<typename T, typename U, typename O>
+    constexpr float Lerp(const T& x, const U& y, const O& fraction) {
         static_assert(std::is_arithmetic_v<T>, "uvke Lerp Type Is Not Arithmetic As Expected");
-        return x + (y - x) * fraction;
+        static_assert(std::is_arithmetic_v<U>, "uvke Lerp Type Is Not Arithmetic As Expected");
+        static_assert(std::is_arithmetic_v<O>, "uvke Lerp Type Is Not Arithmetic As Expected");
+        return x + (static_cast<T>(y) - x) * static_cast<T>(fraction);
     }
 };
 
