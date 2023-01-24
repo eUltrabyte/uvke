@@ -2,100 +2,18 @@
 #include "UniformBuffer.hpp"
 
 namespace uvke {
-    Renderer::Renderer(Window& window)
-        : m_window(window), m_framebufferRecreated(false) {
-        {
-            VkApplicationInfo appInfo { };
-            appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-            appInfo.pNext = nullptr;
-            appInfo.applicationVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
-            appInfo.pApplicationName = window.GetWindowProps()->title.c_str();
-            appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
-            appInfo.pEngineName = "uvke";
-            appInfo.apiVersion = uvke::GetSupportedVulkan();
+    Renderer::Renderer(Base& base, Window& window)
+        : m_base(base), m_window(window), m_framebufferRecreated(false) {
 
-            std::vector<const char*> layers = {
-                #ifdef UVKE_DEBUG
-                    "VK_LAYER_KHRONOS_validation"
-                #endif
-            };
-
-            unsigned int glfwExtensionsCount = 0;
-            const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionsCount);
-            std::vector<const char*> extensions = std::vector<const char*>(glfwExtensions, glfwExtensions + glfwExtensionsCount);
-
-            UVKE_LOG("Vulkan - " + std::to_string(VK_API_VERSION_MAJOR(appInfo.apiVersion)) + "." + std::to_string(VK_API_VERSION_MINOR(appInfo.apiVersion)) + "." + std::to_string(VK_API_VERSION_PATCH(appInfo.apiVersion)));
-            UVKE_LOG("App - " + std::string(appInfo.pApplicationName));
-
-            for(auto i = 0; i < layers.size(); ++i) {
-                UVKE_LOG("Layer #" + std::to_string(i) + " - " + std::string(layers.at(i)));
-            }
-
-            for(auto i = 0; i < extensions.size(); ++i) {
-                UVKE_LOG("Extension #" + std::to_string(i) + " - " + std::string(extensions.at(i)));
-            }
-
-            VkInstanceCreateInfo instanceCreateInfo { };
-            instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-            instanceCreateInfo.pNext = nullptr;
-            instanceCreateInfo.flags = 0;
-            instanceCreateInfo.pApplicationInfo = &appInfo;
-            instanceCreateInfo.enabledLayerCount = layers.size();
-            instanceCreateInfo.ppEnabledLayerNames = layers.data();
-            instanceCreateInfo.enabledExtensionCount = extensions.size();
-            instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
-
-            UVKE_ASSERT(vkCreateInstance(&instanceCreateInfo, nullptr, &m_instance));
-        }
-
-        m_physicalDevice = GetSuitablePhysicalDevice();
-        unsigned int queueFamilyIndex = GetQueueFamily();
+        m_window.CreateSurface(m_base.GetInstance(), &m_surface);
 
         {
-            VkPhysicalDeviceFeatures physicalDeviceFeatures { };
-            vkGetPhysicalDeviceFeatures(m_physicalDevice, &physicalDeviceFeatures);
+            vkGetDeviceQueue(m_base.GetDevice(), m_base.GetQueueFamily(), 0, &m_queue);
 
-            std::vector<float> deviceQueuePriorities(4);
-            for(auto i = 0; i < deviceQueuePriorities.size(); ++i) {
-                deviceQueuePriorities[i] = 1.0f;
-            }
-
-            std::vector<const char*> deviceExtensions = {
-                VK_KHR_SWAPCHAIN_EXTENSION_NAME
-            };
-
-            VkDeviceQueueCreateInfo deviceQueueCreateInfo { };
-            deviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-            deviceQueueCreateInfo.pNext = nullptr;
-            deviceQueueCreateInfo.flags = 0;
-            deviceQueueCreateInfo.queueFamilyIndex = queueFamilyIndex;
-            deviceQueueCreateInfo.queueCount = deviceQueuePriorities.size();
-            deviceQueueCreateInfo.pQueuePriorities = deviceQueuePriorities.data();
-
-            VkDeviceCreateInfo deviceCreateInfo { };
-            deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-            deviceCreateInfo.pNext = nullptr;
-            deviceCreateInfo.flags = 0;
-            deviceCreateInfo.queueCreateInfoCount = 1;
-            deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
-            deviceCreateInfo.enabledLayerCount = 0;
-            deviceCreateInfo.ppEnabledLayerNames = nullptr;
-            deviceCreateInfo.enabledExtensionCount = deviceExtensions.size();
-            deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
-            deviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
-
-            UVKE_ASSERT(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device));
-        }
-
-        m_window.CreateSurface(m_instance, &m_surface);
-
-        {
-            vkGetDeviceQueue(m_device, queueFamilyIndex, 0, &m_queue);
-
-            UVKE_LOG("Queue Family Index - " + std::to_string(queueFamilyIndex));
+            UVKE_LOG("Queue Family Index - " + std::to_string(m_base.GetQueueFamily()));
 
             VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, queueFamilyIndex, m_surface, &presentSupport);
+            vkGetPhysicalDeviceSurfaceSupportKHR(m_base.GetPhysicalDevice(), m_base.GetQueueFamily(), m_surface, &presentSupport);
             UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
         }
 
@@ -129,14 +47,14 @@ namespace uvke {
             swapchainCreateInfo.clipped = VK_TRUE;
             swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-            UVKE_ASSERT(vkCreateSwapchainKHR(m_device, &swapchainCreateInfo, nullptr, &m_swapchain));
+            UVKE_ASSERT(vkCreateSwapchainKHR(m_base.GetDevice(), &swapchainCreateInfo, nullptr, &m_swapchain));
         }
 
         {
             unsigned int swapchainImageCount = 0;
-            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, nullptr);
+            vkGetSwapchainImagesKHR(m_base.GetDevice(), m_swapchain, &swapchainImageCount, nullptr);
             m_swapchainImages = std::vector<VkImage>(swapchainImageCount);
-            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, m_swapchainImages.data());
+            vkGetSwapchainImagesKHR(m_base.GetDevice(), m_swapchain, &swapchainImageCount, m_swapchainImages.data());
         }
 
         {
@@ -157,11 +75,11 @@ namespace uvke {
                 imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
                 imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-                UVKE_ASSERT(vkCreateImageView(m_device, &imageViewCreateInfo, nullptr, &m_swapchainImageViews[i]));
+                UVKE_ASSERT(vkCreateImageView(m_base.GetDevice(), &imageViewCreateInfo, nullptr, &m_swapchainImageViews[i]));
             }
         }
 
-        Shader shader(m_device, File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
+        Shader shader(m_base.GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
         UVKE_LOG("Shaders Loaded");
 
         /* m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device, std::vector<Vertex> {
@@ -175,17 +93,17 @@ namespace uvke {
             0, 1, 2, 2, 3, 0,
         } ); */
 
-        m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device, std::vector<Vertex> {
+        m_vertexBuffer = new VertexBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), std::vector<Vertex> {
             {{ -0.5f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
             {{ 0.0f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
             {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
         } );
 
-        m_indexBuffer = new IndexBuffer(m_physicalDevice, m_device, std::vector<unsigned int> {
+        m_indexBuffer = new IndexBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), std::vector<unsigned int> {
             0, 1, 2,
         } );
 
-        m_uniformBuffer = new UniformBuffer(m_physicalDevice, m_device);
+        m_uniformBuffer = new UniformBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice());
 
         {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *shader.GetVertexShaderStageCreateInfo(), *shader.GetFragmentShaderStageCreateInfo() };
@@ -317,7 +235,7 @@ namespace uvke {
             renderPassCreateInfo.subpassCount = 1;
             renderPassCreateInfo.pSubpasses = &subpassDescription;
 
-            UVKE_ASSERT(vkCreateRenderPass(m_device, &renderPassCreateInfo, nullptr, &m_renderPass));
+            UVKE_ASSERT(vkCreateRenderPass(m_base.GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -328,7 +246,7 @@ namespace uvke {
             pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
             pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 
-            UVKE_ASSERT(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
+            UVKE_ASSERT(vkCreatePipelineLayout(m_base.GetDevice(), &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
             
             VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo { };
             graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -350,7 +268,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base.GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
             UVKE_LOG("Graphics Pipeline Created");
         }
 
@@ -371,7 +289,7 @@ namespace uvke {
                 framebufferCreateInfo.height = m_extent.height;
                 framebufferCreateInfo.layers = 1;
 
-                UVKE_ASSERT(vkCreateFramebuffer(m_device, &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
+                UVKE_ASSERT(vkCreateFramebuffer(m_base.GetDevice(), &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
             }
 
             UVKE_LOG("Framebuffers Created");
@@ -382,19 +300,19 @@ namespace uvke {
             commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
             commandPoolCreateInfo.pNext = nullptr;
             commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            commandPoolCreateInfo.queueFamilyIndex = queueFamilyIndex;
+            commandPoolCreateInfo.queueFamilyIndex = m_base.GetQueueFamily();
 
-            UVKE_ASSERT(vkCreateCommandPool(m_device, &commandPoolCreateInfo, nullptr, &m_commandPool));
+            UVKE_ASSERT(vkCreateCommandPool(m_base.GetDevice(), &commandPoolCreateInfo, nullptr, &m_commandPool));
         }
 
-        m_stagingBuffer = new StagingBuffer(m_physicalDevice, m_device, m_vertexBuffer->GetSize());
+        m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
         m_stagingBuffer->Copy(m_commandPool, m_queue, m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
 
         delete m_stagingBuffer;
 
-        m_stagingBuffer = new StagingBuffer(m_physicalDevice, m_device, m_indexBuffer->GetSize());
+        m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_indexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
         m_stagingBuffer->Copy(m_commandPool, m_queue, m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
@@ -409,7 +327,7 @@ namespace uvke {
             commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
             commandBufferAllocateInfo.commandBufferCount = 1;
 
-            UVKE_ASSERT(vkAllocateCommandBuffers(m_device, &commandBufferAllocateInfo, &m_commandBuffer));
+            UVKE_ASSERT(vkAllocateCommandBuffers(m_base.GetDevice(), &commandBufferAllocateInfo, &m_commandBuffer));
         }
 
         {
@@ -418,55 +336,53 @@ namespace uvke {
             semaphoreCreateInfo.pNext = nullptr;
             semaphoreCreateInfo.flags = 0;
 
-            UVKE_ASSERT(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_availableSemaphore));
-            UVKE_ASSERT(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_finishedSemaphore));
+            UVKE_ASSERT(vkCreateSemaphore(m_base.GetDevice(), &semaphoreCreateInfo, nullptr, &m_availableSemaphore));
+            UVKE_ASSERT(vkCreateSemaphore(m_base.GetDevice(), &semaphoreCreateInfo, nullptr, &m_finishedSemaphore));
 
             VkFenceCreateInfo fenceCreateInfo { };
             fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
             fenceCreateInfo.pNext = nullptr;
             fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-            UVKE_ASSERT(vkCreateFence(m_device, &fenceCreateInfo, nullptr, &m_fence));
+            UVKE_ASSERT(vkCreateFence(m_base.GetDevice(), &fenceCreateInfo, nullptr, &m_fence));
         }
     }
 
     Renderer::~Renderer() {
-        vkDeviceWaitIdle(m_device);
+        vkDeviceWaitIdle(m_base.GetDevice());
 
-        vkDestroyFence(m_device, m_fence, nullptr);
-        vkDestroySemaphore(m_device, m_finishedSemaphore, nullptr);
-        vkDestroySemaphore(m_device, m_availableSemaphore, nullptr);
+        vkDestroyFence(m_base.GetDevice(), m_fence, nullptr);
+        vkDestroySemaphore(m_base.GetDevice(), m_finishedSemaphore, nullptr);
+        vkDestroySemaphore(m_base.GetDevice(), m_availableSemaphore, nullptr);
 
-        vkDestroyCommandPool(m_device, m_commandPool, nullptr);
+        vkDestroyCommandPool(m_base.GetDevice(), m_commandPool, nullptr);
 
         for(auto i = 0; i < m_framebuffers.size(); ++i) {
-            vkDestroyFramebuffer(m_device, m_framebuffers[i], nullptr);
+            vkDestroyFramebuffer(m_base.GetDevice(), m_framebuffers[i], nullptr);
         }
 
-        vkDestroyPipeline(m_device, m_pipeline, nullptr);
+        vkDestroyPipeline(m_base.GetDevice(), m_pipeline, nullptr);
 
-        vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
-        vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+        vkDestroyPipelineLayout(m_base.GetDevice(), m_pipelineLayout, nullptr);
+        vkDestroyRenderPass(m_base.GetDevice(), m_renderPass, nullptr);
 
         delete m_uniformBuffer;
         delete m_indexBuffer;
         delete m_vertexBuffer;
 
         for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
-            vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
+            vkDestroyImageView(m_base.GetDevice(), m_swapchainImageViews[i], nullptr);
         }
 
-        vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
-        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
-        vkDestroyDevice(m_device, nullptr);
-        vkDestroyInstance(m_instance, nullptr);
+        vkDestroySwapchainKHR(m_base.GetDevice(), m_swapchain, nullptr);
+        vkDestroySurfaceKHR(m_base.GetInstance(), m_surface, nullptr);
     }
 
     void Renderer::Render() {
         vkQueueWaitIdle(m_queue);
 
         unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_device, m_swapchain, std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
+        VkResult result = vkAcquireNextImageKHR(m_base.GetDevice(), m_swapchain, std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
             RecreateSwapchain();
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -490,8 +406,8 @@ namespace uvke {
         m_uniformBuffer->Update(ubo);
 
         // TODO SUPPORT FOR MORE FENCES AND IMAGES IN FLIGHT
-        vkWaitForFences(m_device, 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
-        vkResetFences(m_device, 1, &m_fence);
+        vkWaitForFences(m_base.GetDevice(), 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
+        vkResetFences(m_base.GetDevice(), 1, &m_fence);
 
         vkResetCommandBuffer(m_commandBuffer, 0);
         RecordCommandBuffer(m_commandBuffer, index);
@@ -531,13 +447,5 @@ namespace uvke {
         if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
             m_clock.Restart();
         }
-    }
-
-    VkInstance& Renderer::GetInstance() {
-        return m_instance;
-    }
-    
-    VkDevice& Renderer::GetDevice() {
-        return m_device;
     }
 };
