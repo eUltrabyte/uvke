@@ -171,10 +171,19 @@ namespace uvke {
                 swapchainCreateInfo.imageExtent = m_extent;
                 swapchainCreateInfo.imageArrayLayers = 1;
                 swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-                // TODO SUPPORT FOR MORE QUEUES
-                swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-                swapchainCreateInfo.queueFamilyIndexCount = 0;
-                swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+
+                if(m_multiQueue) {
+                    unsigned int indices[2] = { m_base.GetQueueFamily(), m_base.GetQueueFamily() + 1 };
+
+                    swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+                    swapchainCreateInfo.queueFamilyIndexCount = 2;
+                    swapchainCreateInfo.pQueueFamilyIndices = indices;
+                } else {
+                    swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+                    swapchainCreateInfo.queueFamilyIndexCount = 0;
+                    swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+                }
+
                 swapchainCreateInfo.preTransform = m_swapchainPreTransform;
                 swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
                 swapchainCreateInfo.presentMode = m_presentMode;
@@ -237,7 +246,8 @@ namespace uvke {
 
         Base& m_base;
         Window& m_window;
-        VkQueue m_queue;
+        bool m_multiQueue;
+        std::vector<VkQueue> m_queues;
         VkSurfaceKHR m_surface;
         VkSurfaceFormatKHR m_surfaceFormat;
         VkPresentModeKHR m_presentMode;

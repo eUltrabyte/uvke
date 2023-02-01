@@ -3,12 +3,22 @@
 
 namespace uvke {
     Renderer::Renderer(Base& base, Window& window)
-        : m_base(base), m_window(window), m_framebufferRecreated(false) {
+        : m_base(base), m_window(window), m_multiQueue(false), m_framebufferRecreated(false) {
 
         m_window.CreateSurface(m_base.GetInstance(), &m_surface);
 
         {
-            vkGetDeviceQueue(m_base.GetDevice(), m_base.GetQueueFamily(), 0, &m_queue);
+            m_multiQueue = m_base.IsMultiQueueSupported();
+            if(m_multiQueue) {
+                m_queues.clear();
+                m_queues.resize(2);
+                vkGetDeviceQueue(m_base.GetDevice(), m_base.GetQueueFamily(), 0, &m_queues[0]);
+                vkGetDeviceQueue(m_base.GetDevice(), m_base.GetQueueFamily(), 0, &m_queues[1]);
+            } else {
+                m_queues.clear();
+                m_queues.resize(1);
+                vkGetDeviceQueue(m_base.GetDevice(), m_base.GetQueueFamily(), 0, &m_queues[0]);
+            }
 
             UVKE_LOG("Queue Family Index - " + std::to_string(m_base.GetQueueFamily()));
 
@@ -37,10 +47,19 @@ namespace uvke {
             swapchainCreateInfo.imageExtent = m_extent;
             swapchainCreateInfo.imageArrayLayers = 1;
             swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-            // TODO SUPPORT FOR MORE QUEUES
-            swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            swapchainCreateInfo.queueFamilyIndexCount = 0;
-            swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+
+            if(m_multiQueue) {
+                unsigned int indices[2] = { m_base.GetQueueFamily(), m_base.GetQueueFamily() + 1 };
+
+                swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+                swapchainCreateInfo.queueFamilyIndexCount = 2;
+                swapchainCreateInfo.pQueueFamilyIndices = indices;
+            } else {
+                swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+                swapchainCreateInfo.queueFamilyIndexCount = 0;
+                swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+            }
+
             swapchainCreateInfo.preTransform = m_swapchainPreTransform;
             swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
             swapchainCreateInfo.presentMode = m_presentMode;
@@ -308,14 +327,14 @@ namespace uvke {
         m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_queue, m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandPool, m_queues[0], m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
 
         delete m_stagingBuffer;
 
         m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_indexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_queue, m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandPool, m_queues[0], m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
 
         delete m_stagingBuffer;
 
@@ -379,7 +398,7 @@ namespace uvke {
     }
 
     void Renderer::Render() {
-        vkQueueWaitIdle(m_queue);
+        vkQueueWaitIdle(m_queues[1]);
 
         unsigned int index = 0;
         VkResult result = vkAcquireNextImageKHR(m_base.GetDevice(), m_swapchain, std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
@@ -424,7 +443,7 @@ namespace uvke {
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = &m_finishedSemaphore;
 
-        UVKE_ASSERT(vkQueueSubmit(m_queue, 1, &submitInfo, m_fence));
+        UVKE_ASSERT(vkQueueSubmit(m_queues[0], 1, &submitInfo, m_fence));
 
         VkPresentInfoKHR presentInfo { };
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -436,7 +455,7 @@ namespace uvke {
         presentInfo.pImageIndices = &index;
         presentInfo.pResults = nullptr;
 
-        result = vkQueuePresentKHR(m_queue, &presentInfo);
+        result = vkQueuePresentKHR(m_queues[1], &presentInfo);
         if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferRecreated) {
             m_framebufferRecreated = false;
             RecreateSwapchain();

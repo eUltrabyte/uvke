@@ -106,4 +106,8 @@ namespace uvke {
     unsigned int Base::GetQueueFamily() {
         return m_queueFamilyIndex;
     }
+
+    bool Base::IsMultiQueueSupported() {
+        return m_multiQueue;
+    }
 };

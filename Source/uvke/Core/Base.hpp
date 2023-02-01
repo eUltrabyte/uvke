@@ -14,6 +14,7 @@ namespace uvke {
         virtual VkPhysicalDevice& GetPhysicalDevice();
         virtual VkDevice& GetDevice();
         virtual unsigned int GetQueueFamily();
+        virtual bool IsMultiQueueSupported();
 
     protected:
         VkPhysicalDevice GetSuitablePhysicalDevice() {
@@ -52,6 +53,12 @@ namespace uvke {
 
             for(auto i = 0; i < queueFamilyProperties.size(); ++i) {
                 if(queueFamilyProperties.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                    if(queueFamilyProperties.at(i).queueCount > 1) {
+                        m_multiQueue = true;
+                    } else {
+                        m_multiQueue = false;
+                    }
+
                     return i;
                 }
             }
@@ -64,6 +71,7 @@ namespace uvke {
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
         unsigned int m_queueFamilyIndex;
+        bool m_multiQueue;
 
     };
 };
