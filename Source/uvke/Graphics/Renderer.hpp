@@ -4,13 +4,13 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
+#include "Surface.hpp"
 #include "StagingBuffer.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
 
 // TODO
-// move vulkan surface to surface class
 // move vulkan swapchain to swapchain class
 // move vulkan pipeline to pipeline class
 
@@ -27,9 +27,9 @@ namespace uvke {
             std::vector<VkSurfaceFormatKHR> surfaceFormats;
             {
                 unsigned int surfaceFormatsCount = 0;
-                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base.GetPhysicalDevice(), m_surface, &surfaceFormatsCount, nullptr);
+                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &surfaceFormatsCount, nullptr);
                 surfaceFormats = std::vector<VkSurfaceFormatKHR>(surfaceFormatsCount);
-                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base.GetPhysicalDevice(), m_surface, &surfaceFormatsCount, surfaceFormats.data());
+                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &surfaceFormatsCount, surfaceFormats.data());
             }
 
             for(auto i = 0; i < surfaceFormats.size(); ++i) {
@@ -45,9 +45,9 @@ namespace uvke {
             std::vector<VkPresentModeKHR> presentModes;
             {
                 unsigned int presentModesCount = 0;
-                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base.GetPhysicalDevice(), m_surface, &presentModesCount, nullptr);
+                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &presentModesCount, nullptr);
                 presentModes = std::vector<VkPresentModeKHR>(presentModesCount);
-                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base.GetPhysicalDevice(), m_surface, &presentModesCount, presentModes.data());
+                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &presentModesCount, presentModes.data());
             }
 
             for(auto i = 0; i < presentModes.size(); ++i) {
@@ -61,7 +61,7 @@ namespace uvke {
 
         VkExtent2D GetSwapExtent() {
             VkSurfaceCapabilitiesKHR surfaceCapabilities;
-            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_base.GetPhysicalDevice(), m_surface, &surfaceCapabilities);
+            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &surfaceCapabilities);
 
             m_swapchainPreTransform = surfaceCapabilities.currentTransform;
 
@@ -96,7 +96,7 @@ namespace uvke {
             renderPassBeginInfo.renderPass = m_renderPass;
             renderPassBeginInfo.framebuffer = m_framebuffers[index];
             renderPassBeginInfo.renderArea.offset = { 0, 0 };
-            renderPassBeginInfo.renderArea.extent = m_extent;
+            renderPassBeginInfo.renderArea.extent = m_surface->GetExtent();
             VkClearValue clearValue = {{{ 0.0f, 0.0f, 0.0f, 1.0f }}};
             renderPassBeginInfo.clearValueCount = 1;
             renderPassBeginInfo.pClearValues = &clearValue;
@@ -108,8 +108,8 @@ namespace uvke {
             VkViewport viewport { };
             viewport.x = 0.0f;
             viewport.y = 0.0f;
-            viewport.width = m_extent.width;
-            viewport.height = m_extent.height;
+            viewport.width = m_surface->GetExtent().width;
+            viewport.height = m_surface->GetExtent().height;
             viewport.minDepth = 0.0f;
             viewport.maxDepth = 1.0f;
 
@@ -117,7 +117,7 @@ namespace uvke {
 
             VkRect2D scissor { };
             scissor.offset = { 0, 0 };
-            scissor.extent = m_extent;
+            scissor.extent = m_surface->GetExtent();
 
             vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
@@ -139,12 +139,12 @@ namespace uvke {
             for(; size.x == 0 || size.y == 0 ;) {
                 m_window.Update();
                 size = vec2i(m_window.GetWindowProps()->size.x, m_window.GetWindowProps()->size.y);
-                m_extent = GetSwapExtent();
+                m_surface->SetExtent(GetSwapExtent());
                 glfwWaitEvents();
             }
 
             if(size.x != 0 || size.y != 0) {
-                m_extent = GetSwapExtent();
+                m_surface->SetExtent(GetSwapExtent());
             }
 
             vkDeviceWaitIdle(m_base.GetDevice());
@@ -164,16 +164,16 @@ namespace uvke {
                 swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
                 swapchainCreateInfo.pNext = nullptr;
                 swapchainCreateInfo.flags = 0;
-                swapchainCreateInfo.surface = m_surface;
+                swapchainCreateInfo.surface = m_surface->GetSurface();
                 swapchainCreateInfo.minImageCount = m_swapchainImageCount;
-                swapchainCreateInfo.imageFormat = m_surfaceFormat.format;
-                swapchainCreateInfo.imageColorSpace = m_surfaceFormat.colorSpace;
-                swapchainCreateInfo.imageExtent = m_extent;
+                swapchainCreateInfo.imageFormat = m_surface->GetSurfaceFormat().format;
+                swapchainCreateInfo.imageColorSpace = m_surface->GetSurfaceFormat().colorSpace;
+                swapchainCreateInfo.imageExtent = m_surface->GetExtent();
                 swapchainCreateInfo.imageArrayLayers = 1;
                 swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-                if(m_multiQueue) {
-                    unsigned int indices[2] = { m_base.GetQueueFamily(), m_base.GetQueueFamily() + 1 };
+                if(m_surface->IsMultiQueueMode()) {
+                    unsigned int indices[2] = { m_surface->GetQueueFamily(), m_surface->GetQueueFamily() + 1 };
 
                     swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
                     swapchainCreateInfo.queueFamilyIndexCount = 2;
@@ -186,7 +186,7 @@ namespace uvke {
 
                 swapchainCreateInfo.preTransform = m_swapchainPreTransform;
                 swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-                swapchainCreateInfo.presentMode = m_presentMode;
+                swapchainCreateInfo.presentMode = m_surface->GetPresentMode();
                 swapchainCreateInfo.clipped = VK_TRUE;
                 swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
@@ -212,7 +212,7 @@ namespace uvke {
                     imageViewCreateInfo.flags = 0;
                     imageViewCreateInfo.image = m_swapchainImages[i];
                     imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-                    imageViewCreateInfo.format = m_surfaceFormat.format;
+                    imageViewCreateInfo.format = m_surface->GetSurfaceFormat().format;
                     imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
                     imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
                     imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
@@ -235,8 +235,8 @@ namespace uvke {
                     framebufferCreateInfo.renderPass = m_renderPass;
                     framebufferCreateInfo.attachmentCount = 1;
                     framebufferCreateInfo.pAttachments = &m_swapchainImageViews[i];
-                    framebufferCreateInfo.width = m_extent.width;
-                    framebufferCreateInfo.height = m_extent.height;
+                    framebufferCreateInfo.width = m_surface->GetExtent().width;
+                    framebufferCreateInfo.height = m_surface->GetExtent().height;
                     framebufferCreateInfo.layers = 1;
 
                     UVKE_ASSERT(vkCreateFramebuffer(m_base.GetDevice(), &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
@@ -246,12 +246,7 @@ namespace uvke {
 
         Base& m_base;
         Window& m_window;
-        bool m_multiQueue;
-        std::vector<VkQueue> m_queues;
-        VkSurfaceKHR m_surface;
-        VkSurfaceFormatKHR m_surfaceFormat;
-        VkPresentModeKHR m_presentMode;
-        VkExtent2D m_extent;
+        Surface* m_surface;
         VkSurfaceTransformFlagBitsKHR m_swapchainPreTransform;
         unsigned int m_swapchainImageCount;
         VkSwapchainKHR m_swapchain;

@@ -10,6 +10,10 @@ namespace uvke {
         Base(std::string_view name = "uvke Base");
         virtual ~Base();
 
+        virtual void SetInstance(VkInstance instance);
+        virtual void SetPhysicalDevice(VkPhysicalDevice physicalDevice);
+        virtual void SetDevice(VkDevice device);
+
         virtual VkInstance& GetInstance();
         virtual VkPhysicalDevice& GetPhysicalDevice();
         virtual VkDevice& GetDevice();
