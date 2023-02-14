@@ -23,42 +23,6 @@ namespace uvke {
         virtual void Render();
 
     private:
-        VkSurfaceFormatKHR GetSurfaceFormat() {
-            std::vector<VkSurfaceFormatKHR> surfaceFormats;
-            {
-                unsigned int surfaceFormatsCount = 0;
-                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &surfaceFormatsCount, nullptr);
-                surfaceFormats = std::vector<VkSurfaceFormatKHR>(surfaceFormatsCount);
-                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &surfaceFormatsCount, surfaceFormats.data());
-            }
-
-            for(auto i = 0; i < surfaceFormats.size(); ++i) {
-                if(surfaceFormats.at(i).format == VK_FORMAT_B8G8R8A8_SRGB && surfaceFormats.at(i).colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-                    return surfaceFormats.at(i);
-                }
-            }
-
-            return surfaceFormats.at(0);
-        }
-
-        VkPresentModeKHR GetPresentMode() {
-            std::vector<VkPresentModeKHR> presentModes;
-            {
-                unsigned int presentModesCount = 0;
-                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &presentModesCount, nullptr);
-                presentModes = std::vector<VkPresentModeKHR>(presentModesCount);
-                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &presentModesCount, presentModes.data());
-            }
-
-            for(auto i = 0; i < presentModes.size(); ++i) {
-                if(presentModes.at(i) == VK_PRESENT_MODE_MAILBOX_KHR) {
-                    return presentModes.at(i);
-                }
-            }
-
-            return VK_PRESENT_MODE_FIFO_KHR;
-        }
-
         VkExtent2D GetSwapExtent() {
             VkSurfaceCapabilitiesKHR surfaceCapabilities;
             vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &surfaceCapabilities);
@@ -157,8 +121,6 @@ namespace uvke {
                 vkDestroyImageView(m_base.GetDevice(), m_swapchainImageViews[i], nullptr);
             }
 
-            vkDestroySwapchainKHR(m_base.GetDevice(), m_swapchain, nullptr);
-
             {
                 VkSwapchainCreateInfoKHR swapchainCreateInfo { };
                 swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -188,7 +150,7 @@ namespace uvke {
                 swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
                 swapchainCreateInfo.presentMode = m_surface->GetPresentMode();
                 swapchainCreateInfo.clipped = VK_TRUE;
-                swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+                swapchainCreateInfo.oldSwapchain = m_swapchain;
 
                 UVKE_ASSERT(vkCreateSwapchainKHR(m_base.GetDevice(), &swapchainCreateInfo, nullptr, &m_swapchain));
             }

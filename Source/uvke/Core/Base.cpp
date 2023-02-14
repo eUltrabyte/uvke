@@ -53,7 +53,7 @@ namespace uvke {
             VkPhysicalDeviceFeatures physicalDeviceFeatures { };
             vkGetPhysicalDeviceFeatures(m_physicalDevice, &physicalDeviceFeatures);
 
-            std::vector<float> deviceQueuePriorities(4);
+            std::vector<float> deviceQueuePriorities(m_queueCount);
             for(auto i = 0; i < deviceQueuePriorities.size(); ++i) {
                 deviceQueuePriorities[i] = 1.0f;
             }
@@ -117,6 +117,10 @@ namespace uvke {
 
     unsigned int Base::GetQueueFamily() {
         return m_queueFamilyIndex;
+    }
+
+    unsigned int Base::GetQueueCount() {
+        return m_queueCount;
     }
     
     bool Base::IsMultiQueueSupported() {
