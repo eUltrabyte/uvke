@@ -4,46 +4,56 @@
 namespace uvke {
     Renderer::Renderer(Base& base, Window& window)
         : m_base(base), m_window(window), m_framebufferRecreated(false) {
+        m_surface = new Surface(m_base.GetInstance(), m_base.GetPhysicalDevice(), m_base.GetDevice());
+        m_window.CreateSurface(m_base.GetInstance(), &m_surface->GetSurface());
 
-        m_window.CreateSurface(m_base.GetInstance(), &m_surface);
-
+        m_surface->SetQueueFamily(m_base.GetQueueFamily());
+        m_surface->SetMultiQueueMode(m_base.IsMultiQueueSupported());
+        
         {
-            vkGetDeviceQueue(m_base.GetDevice(), m_base.GetQueueFamily(), 0, &m_queue);
+            m_surface->CheckQueues();
 
             UVKE_LOG("Queue Family Index - " + std::to_string(m_base.GetQueueFamily()));
 
             VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(m_base.GetPhysicalDevice(), m_base.GetQueueFamily(), m_surface, &presentSupport);
+            vkGetPhysicalDeviceSurfaceSupportKHR(m_base.GetPhysicalDevice(), m_base.GetQueueFamily(), m_surface->GetSurface(), &presentSupport);
             UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
         }
 
-        m_surfaceFormat = GetSurfaceFormat();
-        m_presentMode = GetPresentMode();
-        m_extent = GetSwapExtent();
+        m_surface->SetExtent(GetSwapExtent());
 
-        UVKE_LOG("Format - " + std::to_string(m_surfaceFormat.format));
-        UVKE_LOG("Present Mode - " + std::to_string(m_presentMode));
-        UVKE_LOG("Extent - " + std::to_string(m_extent.width) + "/" + std::to_string(m_extent.height));
+        UVKE_LOG("Format - " + std::to_string(m_surface->GetSurfaceFormat().format));
+        UVKE_LOG("Present Mode - " + std::to_string(m_surface->GetPresentMode()));
+        UVKE_LOG("Extent - " + std::to_string(m_surface->GetExtent().width) + "/" + std::to_string(m_surface->GetExtent().height));
 
         {
             VkSwapchainCreateInfoKHR swapchainCreateInfo { };
             swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
             swapchainCreateInfo.pNext = nullptr;
             swapchainCreateInfo.flags = 0;
-            swapchainCreateInfo.surface = m_surface;
+            swapchainCreateInfo.surface = m_surface->GetSurface();
             swapchainCreateInfo.minImageCount = m_swapchainImageCount;
-            swapchainCreateInfo.imageFormat = m_surfaceFormat.format;
-            swapchainCreateInfo.imageColorSpace = m_surfaceFormat.colorSpace;
-            swapchainCreateInfo.imageExtent = m_extent;
+            swapchainCreateInfo.imageFormat = m_surface->GetSurfaceFormat().format;
+            swapchainCreateInfo.imageColorSpace = m_surface->GetSurfaceFormat().colorSpace;
+            swapchainCreateInfo.imageExtent = m_surface->GetExtent();
             swapchainCreateInfo.imageArrayLayers = 1;
             swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-            // TODO SUPPORT FOR MORE QUEUES
-            swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            swapchainCreateInfo.queueFamilyIndexCount = 0;
-            swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+
+            if(m_surface->IsMultiQueueMode()) {
+                unsigned int indices[2] = { m_surface->GetQueueFamily(), m_surface->GetQueueFamily() + 1 };
+
+                swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+                swapchainCreateInfo.queueFamilyIndexCount = 2;
+                swapchainCreateInfo.pQueueFamilyIndices = indices;
+            } else {
+                swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+                swapchainCreateInfo.queueFamilyIndexCount = 0;
+                swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+            }
+
             swapchainCreateInfo.preTransform = m_swapchainPreTransform;
             swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-            swapchainCreateInfo.presentMode = m_presentMode;
+            swapchainCreateInfo.presentMode = m_surface->GetPresentMode();
             swapchainCreateInfo.clipped = VK_TRUE;
             swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
@@ -67,7 +77,7 @@ namespace uvke {
                 imageViewCreateInfo.flags = 0;
                 imageViewCreateInfo.image = m_swapchainImages[i];
                 imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-                imageViewCreateInfo.format = m_surfaceFormat.format;
+                imageViewCreateInfo.format = m_surface->GetSurfaceFormat().format;
                 imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
                 imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
                 imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
@@ -139,14 +149,14 @@ namespace uvke {
             VkViewport viewport { };
             viewport.x = 0.0f;
             viewport.y = 0.0f;
-            viewport.width = m_extent.width;
-            viewport.height = m_extent.height;
+            viewport.width = m_surface->GetExtent().width;
+            viewport.height = m_surface->GetExtent().height;
             viewport.minDepth = 0.0f;
             viewport.maxDepth = 1.0f;
 
             VkRect2D scissor { };
             scissor.offset = { 0, 0 };
-            scissor.extent = m_extent;
+            scissor.extent = m_surface->GetExtent();
 
             VkPipelineViewportStateCreateInfo pipelineViewportStateCreateInfo { };
             pipelineViewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -207,7 +217,7 @@ namespace uvke {
             pipelineColorBlendStateCreateInfo.blendConstants[3] = 0.0f;
 
             VkAttachmentDescription attachmentDescription { };
-            attachmentDescription.format = m_surfaceFormat.format;
+            attachmentDescription.format = m_surface->GetSurfaceFormat().format;
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -285,8 +295,8 @@ namespace uvke {
                 framebufferCreateInfo.renderPass = m_renderPass;
                 framebufferCreateInfo.attachmentCount = 1;
                 framebufferCreateInfo.pAttachments = imageView;
-                framebufferCreateInfo.width = m_extent.width;
-                framebufferCreateInfo.height = m_extent.height;
+                framebufferCreateInfo.width = m_surface->GetExtent().width;
+                framebufferCreateInfo.height = m_surface->GetExtent().height;
                 framebufferCreateInfo.layers = 1;
 
                 UVKE_ASSERT(vkCreateFramebuffer(m_base.GetDevice(), &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
@@ -308,14 +318,14 @@ namespace uvke {
         m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_queue, m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueues()[0], m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
 
         delete m_stagingBuffer;
 
         m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_indexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_queue, m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueues()[0], m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
 
         delete m_stagingBuffer;
 
@@ -375,11 +385,12 @@ namespace uvke {
         }
 
         vkDestroySwapchainKHR(m_base.GetDevice(), m_swapchain, nullptr);
-        vkDestroySurfaceKHR(m_base.GetInstance(), m_surface, nullptr);
+        // vkDestroySurfaceKHR(m_base.GetInstance(), m_surface->GetSurface(), nullptr);
+        delete m_surface;
     }
 
     void Renderer::Render() {
-        vkQueueWaitIdle(m_queue);
+        vkQueueWaitIdle(m_surface->GetQueues()[1]);
 
         unsigned int index = 0;
         VkResult result = vkAcquireNextImageKHR(m_base.GetDevice(), m_swapchain, std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
@@ -424,7 +435,7 @@ namespace uvke {
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = &m_finishedSemaphore;
 
-        UVKE_ASSERT(vkQueueSubmit(m_queue, 1, &submitInfo, m_fence));
+        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueues()[0], 1, &submitInfo, m_fence));
 
         VkPresentInfoKHR presentInfo { };
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -436,7 +447,7 @@ namespace uvke {
         presentInfo.pImageIndices = &index;
         presentInfo.pResults = nullptr;
 
-        result = vkQueuePresentKHR(m_queue, &presentInfo);
+        result = vkQueuePresentKHR(m_surface->GetQueues()[1], &presentInfo);
         if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferRecreated) {
             m_framebufferRecreated = false;
             RecreateSwapchain();

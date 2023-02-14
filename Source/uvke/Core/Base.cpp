@@ -53,7 +53,7 @@ namespace uvke {
             VkPhysicalDeviceFeatures physicalDeviceFeatures { };
             vkGetPhysicalDeviceFeatures(m_physicalDevice, &physicalDeviceFeatures);
 
-            std::vector<float> deviceQueuePriorities(4);
+            std::vector<float> deviceQueuePriorities(m_queueCount);
             for(auto i = 0; i < deviceQueuePriorities.size(); ++i) {
                 deviceQueuePriorities[i] = 1.0f;
             }
@@ -90,6 +90,18 @@ namespace uvke {
         vkDestroyDevice(m_device, nullptr);
         vkDestroyInstance(m_instance, nullptr);
     }
+    
+    void Base::SetInstance(VkInstance instance) {
+        m_instance = instance;
+    }
+    
+    void Base::SetPhysicalDevice(VkPhysicalDevice physicalDevice) {
+        m_physicalDevice = physicalDevice;
+    }
+    
+    void Base::SetDevice(VkDevice device) {
+        m_device = device;
+    }
 
     VkInstance& Base::GetInstance() {
         return m_instance;
@@ -105,5 +117,13 @@ namespace uvke {
 
     unsigned int Base::GetQueueFamily() {
         return m_queueFamilyIndex;
+    }
+
+    unsigned int Base::GetQueueCount() {
+        return m_queueCount;
+    }
+    
+    bool Base::IsMultiQueueSupported() {
+        return m_multiQueue;
     }
 };

@@ -10,10 +10,16 @@ namespace uvke {
         Base(std::string_view name = "uvke Base");
         virtual ~Base();
 
+        virtual void SetInstance(VkInstance instance);
+        virtual void SetPhysicalDevice(VkPhysicalDevice physicalDevice);
+        virtual void SetDevice(VkDevice device);
+
         virtual VkInstance& GetInstance();
         virtual VkPhysicalDevice& GetPhysicalDevice();
         virtual VkDevice& GetDevice();
         virtual unsigned int GetQueueFamily();
+        virtual unsigned int GetQueueCount();
+        virtual bool IsMultiQueueSupported();
 
     protected:
         VkPhysicalDevice GetSuitablePhysicalDevice() {
@@ -52,6 +58,13 @@ namespace uvke {
 
             for(auto i = 0; i < queueFamilyProperties.size(); ++i) {
                 if(queueFamilyProperties.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                    m_queueCount = queueFamilyProperties.at(i).queueCount;
+                    if(m_queueCount > 1) {
+                        m_multiQueue = true;
+                    } else {
+                        m_multiQueue = false;
+                    }
+
                     return i;
                 }
             }
@@ -64,6 +77,8 @@ namespace uvke {
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
         unsigned int m_queueFamilyIndex;
+        unsigned int m_queueCount;
+        bool m_multiQueue;
 
     };
 };
