@@ -21,6 +21,7 @@ namespace uvke {
         vec2(U a, U b) : x(static_cast<T>(a)), y(static_cast<T>(b)) {  }
         template<typename U>
         vec2(const vec2<U>& vec) : x(static_cast<T>(vec.x)), y(static_cast<T>(vec.y)) {  }
+        ~vec2() = default;
 
         vec2<T> operator+(const T& value) {
             return vec2<T>(x + value, y + value);

@@ -21,6 +21,7 @@ namespace uvke {
         vec4(U a, U b, U c, U d) : x(static_cast<T>(a)), y(static_cast<T>(b)), z(static_cast<T>(c)), w(static_cast<T>(d)) {  }
         template<typename U>
         vec4(const vec4<U>& vec) : x(static_cast<T>(vec.x)), y(static_cast<T>(vec.y)), z(static_cast<T>(vec.z)), w(static_cast<T>(vec.w)) {  }
+        ~vec4() = default;
 
         vec4<T> operator+(const T& value) {
             return vec4<T>(x + value, y + value, z + value, w + value);

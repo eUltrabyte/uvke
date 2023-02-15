@@ -89,7 +89,7 @@ namespace uvke {
         return m_surface;
     }
 
-    VkSurfaceFormatKHR& Surface::GetSurfaceFormat() {
+    VkSurfaceFormatKHR& Surface::GetFormat() {
         return m_surfaceFormat;
     }
 
@@ -99,5 +99,9 @@ namespace uvke {
 
     VkExtent2D& Surface::GetExtent() {
         return m_extent;
+    }
+
+    VkSurfaceCapabilitiesKHR& Surface::GetCapabilities() {
+        return m_surfaceCapabilities;
     }
 };

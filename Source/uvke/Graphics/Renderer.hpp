@@ -23,25 +23,12 @@ namespace uvke {
         virtual void Render();
 
     private:
-        VkExtent2D GetSwapExtent() {
-            VkSurfaceCapabilitiesKHR surfaceCapabilities;
-            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_base.GetPhysicalDevice(), m_surface->GetSurface(), &surfaceCapabilities);
+        void SetSwapchainCapabilities() {
+            m_swapchainPreTransform = m_surface->GetCapabilities().currentTransform;
 
-            m_swapchainPreTransform = surfaceCapabilities.currentTransform;
-
-            m_swapchainImageCount = surfaceCapabilities.minImageCount + 1;
-            if(surfaceCapabilities.maxImageCount > 0 && m_swapchainImageCount > surfaceCapabilities.maxImageCount) {
-                m_swapchainImageCount = surfaceCapabilities.maxImageCount;
-            }
-            
-            if(surfaceCapabilities.currentExtent.width != std::numeric_limits<unsigned int>::infinity() || surfaceCapabilities.currentExtent.height != std::numeric_limits<unsigned int>::infinity()) {
-                return surfaceCapabilities.currentExtent;
-            } else {
-                m_window.Update();
-                VkExtent2D fixedExtent = { static_cast<unsigned int>(m_window.GetWindowProps()->size.x), static_cast<unsigned int>(m_window.GetWindowProps()->size.y) };
-                fixedExtent.width = std::clamp(fixedExtent.width, surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width);
-                fixedExtent.height = std::clamp(fixedExtent.height, surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height);
-                return fixedExtent;
+            m_swapchainImageCount = m_surface->GetCapabilities().minImageCount + 1;
+            if(m_surface->GetCapabilities().maxImageCount > 0 && m_swapchainImageCount > m_surface->GetCapabilities().maxImageCount) {
+                m_swapchainImageCount = m_surface->GetCapabilities().maxImageCount;
             }
         }
 
@@ -98,17 +85,18 @@ namespace uvke {
 
         void RecreateSwapchain() {
             m_window.Update();
+            SetSwapchainCapabilities();
 
             vec2i size(m_window.GetWindowProps()->size.x, m_window.GetWindowProps()->size.y);
             for(; size.x == 0 || size.y == 0 ;) {
                 m_window.Update();
                 size = vec2i(m_window.GetWindowProps()->size.x, m_window.GetWindowProps()->size.y);
-                m_surface->SetExtent(GetSwapExtent());
+                m_surface->SetExtent(m_surface->GetSwapExtent(m_window));
                 glfwWaitEvents();
             }
 
             if(size.x != 0 || size.y != 0) {
-                m_surface->SetExtent(GetSwapExtent());
+                m_surface->SetExtent(m_surface->GetSwapExtent(m_window));
             }
 
             vkDeviceWaitIdle(m_base.GetDevice());
@@ -128,8 +116,8 @@ namespace uvke {
                 swapchainCreateInfo.flags = 0;
                 swapchainCreateInfo.surface = m_surface->GetSurface();
                 swapchainCreateInfo.minImageCount = m_swapchainImageCount;
-                swapchainCreateInfo.imageFormat = m_surface->GetSurfaceFormat().format;
-                swapchainCreateInfo.imageColorSpace = m_surface->GetSurfaceFormat().colorSpace;
+                swapchainCreateInfo.imageFormat = m_surface->GetFormat().format;
+                swapchainCreateInfo.imageColorSpace = m_surface->GetFormat().colorSpace;
                 swapchainCreateInfo.imageExtent = m_surface->GetExtent();
                 swapchainCreateInfo.imageArrayLayers = 1;
                 swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -174,7 +162,7 @@ namespace uvke {
                     imageViewCreateInfo.flags = 0;
                     imageViewCreateInfo.image = m_swapchainImages[i];
                     imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-                    imageViewCreateInfo.format = m_surface->GetSurfaceFormat().format;
+                    imageViewCreateInfo.format = m_surface->GetFormat().format;
                     imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
                     imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
                     imageViewCreateInfo.subresourceRange.baseMipLevel = 0;

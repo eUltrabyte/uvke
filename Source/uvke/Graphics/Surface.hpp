@@ -3,6 +3,7 @@
 #define UVKE_SURFACE_HEADER
 
 #include "../uvke.hpp"
+#include "../Core/Window.hpp"
 
 namespace uvke {
     class UVKE_API Surface {
@@ -29,15 +30,31 @@ namespace uvke {
         virtual bool IsMultiQueueMode();
         virtual std::vector<VkQueue>& GetQueues();
         virtual VkSurfaceKHR& GetSurface();
-        virtual VkSurfaceFormatKHR& GetSurfaceFormat();
+        virtual VkSurfaceFormatKHR& GetFormat();
         virtual VkPresentModeKHR& GetPresentMode();
         virtual VkExtent2D& GetExtent();
+        virtual VkSurfaceCapabilitiesKHR& GetCapabilities();
+        
+        virtual VkExtent2D GetSwapExtent(Window& window) {
+            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &m_surfaceCapabilities);
+
+            if(m_surfaceCapabilities.currentExtent.width != std::numeric_limits<unsigned int>::infinity() || m_surfaceCapabilities.currentExtent.height != std::numeric_limits<unsigned int>::infinity()) {
+                return m_surfaceCapabilities.currentExtent;
+            } else {
+                window.Update();
+                VkExtent2D fixedExtent = { static_cast<unsigned int>(window.GetWindowProps()->size.x), static_cast<unsigned int>(window.GetWindowProps()->size.y) };
+                fixedExtent.width = std::clamp(fixedExtent.width, m_surfaceCapabilities.minImageExtent.width, m_surfaceCapabilities.maxImageExtent.width);
+                fixedExtent.height = std::clamp(fixedExtent.height, m_surfaceCapabilities.minImageExtent.height, m_surfaceCapabilities.maxImageExtent.height);
+                return fixedExtent;
+            }
+        }
 
     protected:
         VkInstance m_instance;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
 
+    private:
         VkSurfaceFormatKHR GetSuitableSurfaceFormat() {
             std::vector<VkSurfaceFormatKHR> surfaceFormats;
             {
@@ -74,7 +91,6 @@ namespace uvke {
             return VK_PRESENT_MODE_FIFO_KHR;
         }
 
-    private:
         unsigned int m_queueFamilyIndex;
         bool m_multiQueue;
         std::vector<VkQueue> m_queues;
@@ -82,6 +98,7 @@ namespace uvke {
         VkSurfaceFormatKHR m_surfaceFormat;
         VkPresentModeKHR m_presentMode;
         VkExtent2D m_extent;
+        VkSurfaceCapabilitiesKHR m_surfaceCapabilities;
 
     };
 };

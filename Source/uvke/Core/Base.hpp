@@ -21,7 +21,7 @@ namespace uvke {
         virtual unsigned int GetQueueCount();
         virtual bool IsMultiQueueSupported();
 
-    protected:
+    private:
         VkPhysicalDevice GetSuitablePhysicalDevice() {
             std::vector<VkPhysicalDevice> physicalDevices;
             {
@@ -72,7 +72,6 @@ namespace uvke {
             return 0;
         }
 
-    private:
         VkInstance m_instance;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;

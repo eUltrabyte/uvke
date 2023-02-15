@@ -20,21 +20,23 @@ namespace uvke {
             UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
         }
 
-        m_surface->SetExtent(GetSwapExtent());
+        m_surface->SetExtent(m_surface->GetSwapExtent(m_window));
 
-        UVKE_LOG("Format - " + std::to_string(m_surface->GetSurfaceFormat().format));
+        UVKE_LOG("Format - " + std::to_string(m_surface->GetFormat().format));
         UVKE_LOG("Present Mode - " + std::to_string(m_surface->GetPresentMode()));
         UVKE_LOG("Extent - " + std::to_string(m_surface->GetExtent().width) + "/" + std::to_string(m_surface->GetExtent().height));
 
         {
+            SetSwapchainCapabilities();
+
             VkSwapchainCreateInfoKHR swapchainCreateInfo { };
             swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
             swapchainCreateInfo.pNext = nullptr;
             swapchainCreateInfo.flags = 0;
             swapchainCreateInfo.surface = m_surface->GetSurface();
             swapchainCreateInfo.minImageCount = m_swapchainImageCount;
-            swapchainCreateInfo.imageFormat = m_surface->GetSurfaceFormat().format;
-            swapchainCreateInfo.imageColorSpace = m_surface->GetSurfaceFormat().colorSpace;
+            swapchainCreateInfo.imageFormat = m_surface->GetFormat().format;
+            swapchainCreateInfo.imageColorSpace = m_surface->GetFormat().colorSpace;
             swapchainCreateInfo.imageExtent = m_surface->GetExtent();
             swapchainCreateInfo.imageArrayLayers = 1;
             swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -77,7 +79,7 @@ namespace uvke {
                 imageViewCreateInfo.flags = 0;
                 imageViewCreateInfo.image = m_swapchainImages[i];
                 imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-                imageViewCreateInfo.format = m_surface->GetSurfaceFormat().format;
+                imageViewCreateInfo.format = m_surface->GetFormat().format;
                 imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
                 imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
                 imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
@@ -217,7 +219,7 @@ namespace uvke {
             pipelineColorBlendStateCreateInfo.blendConstants[3] = 0.0f;
 
             VkAttachmentDescription attachmentDescription { };
-            attachmentDescription.format = m_surface->GetSurfaceFormat().format;
+            attachmentDescription.format = m_surface->GetFormat().format;
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
