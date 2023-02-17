@@ -16,9 +16,24 @@ namespace uvke {
         }
     }
 
+    File::File(const std::vector<char>& data) {
+        m_data = data;
+    }
+
+    File::File(std::string_view filename, const std::vector<char>& data) {
+        std::ofstream file(filename.data());
+        file.write(data.data(), data.size());
+        file.close();
+    }
+
+    void File::Save(std::string_view filename, const std::vector<char>& data) {
+        std::ofstream file(filename.data());
+        file.write(data.data(), data.size());
+        file.close();
+    }
+
     std::vector<char> File::Load(std::string_view filename) {
         std::ifstream file(filename.data(), std::ios::ate | std::ios::binary);
-
         if(file.is_open()) {
             size_t size = (size_t)file.tellg();
             std::vector<char> data(size);

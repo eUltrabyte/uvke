@@ -26,9 +26,9 @@ namespace uvke {
         UVKE_LOG("Present Mode - " + std::to_string(m_surface->GetPresentMode()));
         UVKE_LOG("Extent - " + std::to_string(m_surface->GetExtent().width) + "/" + std::to_string(m_surface->GetExtent().height));
 
-        {
-            SetSwapchainCapabilities();
+        SetSwapchainCapabilities();
 
+        {
             VkSwapchainCreateInfoKHR swapchainCreateInfo { };
             swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
             swapchainCreateInfo.pNext = nullptr;
@@ -53,7 +53,7 @@ namespace uvke {
                 swapchainCreateInfo.pQueueFamilyIndices = nullptr;
             }
 
-            swapchainCreateInfo.preTransform = m_swapchainPreTransform;
+            swapchainCreateInfo.preTransform = m_surface->GetCapabilities().currentTransform;
             swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
             swapchainCreateInfo.presentMode = m_surface->GetPresentMode();
             swapchainCreateInfo.clipped = VK_TRUE;

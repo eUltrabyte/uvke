@@ -9,8 +9,11 @@ namespace uvke {
     public:
         File() = default;
         File(std::string_view filename);
+        File(const std::vector<char>& data);
+        File(std::string_view filename, const std::vector<char>& data);
         virtual ~File() = default;
 
+        static void Save(std::string_view filename, const std::vector<char>& data);
         static std::vector<char> Load(std::string_view filename);
 
         virtual std::vector<char> GetData();

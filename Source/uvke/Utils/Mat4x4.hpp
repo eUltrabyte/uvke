@@ -19,6 +19,7 @@ namespace uvke {
         mat4x4(const std::array<std::array<U, 4>, 4>& mat) : data(static_cast<std::array<std::array<T, 4>, 4>>(mat)) {  }
         template<typename U>
         mat4x4(const mat4x4<U>& mat) : data(static_cast<std::array<std::array<T, 4>, 4>>(mat.data)) {  }
+        ~mat4x4() = default;
 
         mat4x4<T> operator+(const T& value) {
             for(int x = 0; x < data.size(); ++x) {

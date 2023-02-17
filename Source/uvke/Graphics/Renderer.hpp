@@ -10,10 +10,6 @@
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
 
-// TODO
-// move vulkan swapchain to swapchain class
-// move vulkan pipeline to pipeline class
-
 namespace uvke {
     class UVKE_API Renderer {
     public:
@@ -24,8 +20,6 @@ namespace uvke {
 
     private:
         void SetSwapchainCapabilities() {
-            m_swapchainPreTransform = m_surface->GetCapabilities().currentTransform;
-
             m_swapchainImageCount = m_surface->GetCapabilities().minImageCount + 1;
             if(m_surface->GetCapabilities().maxImageCount > 0 && m_swapchainImageCount > m_surface->GetCapabilities().maxImageCount) {
                 m_swapchainImageCount = m_surface->GetCapabilities().maxImageCount;
@@ -85,7 +79,6 @@ namespace uvke {
 
         void RecreateSwapchain() {
             m_window.Update();
-            SetSwapchainCapabilities();
 
             vec2i size(m_window.GetWindowProps()->size.x, m_window.GetWindowProps()->size.y);
             for(; size.x == 0 || size.y == 0 ;) {
@@ -134,7 +127,7 @@ namespace uvke {
                     swapchainCreateInfo.pQueueFamilyIndices = nullptr;
                 }
 
-                swapchainCreateInfo.preTransform = m_swapchainPreTransform;
+                swapchainCreateInfo.preTransform = m_surface->GetCapabilities().currentTransform;
                 swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
                 swapchainCreateInfo.presentMode = m_surface->GetPresentMode();
                 swapchainCreateInfo.clipped = VK_TRUE;
@@ -197,7 +190,6 @@ namespace uvke {
         Base& m_base;
         Window& m_window;
         Surface* m_surface;
-        VkSurfaceTransformFlagBitsKHR m_swapchainPreTransform;
         unsigned int m_swapchainImageCount;
         VkSwapchainKHR m_swapchain;
         std::vector<VkImage> m_swapchainImages;
