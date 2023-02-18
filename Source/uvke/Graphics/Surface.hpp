@@ -8,7 +8,7 @@
 namespace uvke {
     class UVKE_API Surface {
     public:
-        Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device);
+        Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device, Window& window);
         virtual ~Surface();
 
         virtual void CheckQueues();
@@ -22,6 +22,7 @@ namespace uvke {
         virtual void SetSurfaceFormat(VkSurfaceFormatKHR surfaceFormat);
         virtual void SetPresentMode(VkPresentModeKHR presentMode);
         virtual void SetExtent(VkExtent2D extent);
+        virtual void SetSwapExtent(Window& window);
 
         virtual VkInstance& GetInstance();
         virtual VkPhysicalDevice& GetPhysicalDevice();
@@ -29,26 +30,13 @@ namespace uvke {
         virtual unsigned int GetQueueFamily();
         virtual bool IsMultiQueueMode();
         virtual std::vector<VkQueue>& GetQueues();
+        virtual VkQueue& GetQueue(unsigned int index);
         virtual VkSurfaceKHR& GetSurface();
         virtual VkSurfaceFormatKHR& GetFormat();
         virtual VkPresentModeKHR& GetPresentMode();
         virtual VkExtent2D& GetExtent();
         virtual VkSurfaceCapabilitiesKHR& GetCapabilities();
         
-        virtual VkExtent2D GetSwapExtent(Window& window) {
-            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &m_surfaceCapabilities);
-
-            if(m_surfaceCapabilities.currentExtent.width != std::numeric_limits<unsigned int>::infinity() || m_surfaceCapabilities.currentExtent.height != std::numeric_limits<unsigned int>::infinity()) {
-                return m_surfaceCapabilities.currentExtent;
-            } else {
-                window.Update();
-                VkExtent2D fixedExtent = { static_cast<unsigned int>(window.GetWindowProps()->size.x), static_cast<unsigned int>(window.GetWindowProps()->size.y) };
-                fixedExtent.width = std::clamp(fixedExtent.width, m_surfaceCapabilities.minImageExtent.width, m_surfaceCapabilities.maxImageExtent.width);
-                fixedExtent.height = std::clamp(fixedExtent.height, m_surfaceCapabilities.minImageExtent.height, m_surfaceCapabilities.maxImageExtent.height);
-                return fixedExtent;
-            }
-        }
-
     protected:
         VkInstance m_instance;
         VkPhysicalDevice m_physicalDevice;

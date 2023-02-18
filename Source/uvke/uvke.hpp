@@ -33,7 +33,7 @@
 #include "Core/Window.hpp"
 
 // TODO
-// move vulkan swapchain from renderer to swapchain class
+// fix issue with swapchain recreation ( without recreation on init it doesnt work properly )
 // move vulkan pipeline from renderer to pipeline class
 // add more fences and frames in flight support
 // change file class to support other types than std::vector<char>

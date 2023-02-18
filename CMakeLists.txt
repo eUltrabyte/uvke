@@ -29,6 +29,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Renderer.cpp
     Source/uvke/Graphics/Surface.hpp
     Source/uvke/Graphics/Surface.cpp
+    Source/uvke/Graphics/Swapchain.hpp
+    Source/uvke/Graphics/Swapchain.cpp
     Source/uvke/Graphics/StagingBuffer.hpp
     Source/uvke/Graphics/StagingBuffer.cpp
     Source/uvke/Graphics/VertexBuffer.hpp

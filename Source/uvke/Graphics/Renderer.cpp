@@ -4,8 +4,7 @@
 namespace uvke {
     Renderer::Renderer(Base& base, Window& window)
         : m_base(base), m_window(window), m_framebufferRecreated(false) {
-        m_surface = new Surface(m_base.GetInstance(), m_base.GetPhysicalDevice(), m_base.GetDevice());
-        m_window.CreateSurface(m_base.GetInstance(), &m_surface->GetSurface());
+        m_surface = new Surface(m_base.GetInstance(), m_base.GetPhysicalDevice(), m_base.GetDevice(), m_window);
 
         m_surface->SetQueueFamily(m_base.GetQueueFamily());
         m_surface->SetMultiQueueMode(m_base.IsMultiQueueSupported());
@@ -20,76 +19,13 @@ namespace uvke {
             UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
         }
 
-        m_surface->SetExtent(m_surface->GetSwapExtent(m_window));
+        m_surface->SetSwapExtent(m_window);
 
         UVKE_LOG("Format - " + std::to_string(m_surface->GetFormat().format));
         UVKE_LOG("Present Mode - " + std::to_string(m_surface->GetPresentMode()));
         UVKE_LOG("Extent - " + std::to_string(m_surface->GetExtent().width) + "/" + std::to_string(m_surface->GetExtent().height));
 
-        SetSwapchainCapabilities();
-
-        {
-            VkSwapchainCreateInfoKHR swapchainCreateInfo { };
-            swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-            swapchainCreateInfo.pNext = nullptr;
-            swapchainCreateInfo.flags = 0;
-            swapchainCreateInfo.surface = m_surface->GetSurface();
-            swapchainCreateInfo.minImageCount = m_swapchainImageCount;
-            swapchainCreateInfo.imageFormat = m_surface->GetFormat().format;
-            swapchainCreateInfo.imageColorSpace = m_surface->GetFormat().colorSpace;
-            swapchainCreateInfo.imageExtent = m_surface->GetExtent();
-            swapchainCreateInfo.imageArrayLayers = 1;
-            swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-            if(m_surface->IsMultiQueueMode()) {
-                unsigned int indices[2] = { m_surface->GetQueueFamily(), m_surface->GetQueueFamily() + 1 };
-
-                swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-                swapchainCreateInfo.queueFamilyIndexCount = 2;
-                swapchainCreateInfo.pQueueFamilyIndices = indices;
-            } else {
-                swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-                swapchainCreateInfo.queueFamilyIndexCount = 0;
-                swapchainCreateInfo.pQueueFamilyIndices = nullptr;
-            }
-
-            swapchainCreateInfo.preTransform = m_surface->GetCapabilities().currentTransform;
-            swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-            swapchainCreateInfo.presentMode = m_surface->GetPresentMode();
-            swapchainCreateInfo.clipped = VK_TRUE;
-            swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
-
-            UVKE_ASSERT(vkCreateSwapchainKHR(m_base.GetDevice(), &swapchainCreateInfo, nullptr, &m_swapchain));
-        }
-
-        {
-            unsigned int swapchainImageCount = 0;
-            vkGetSwapchainImagesKHR(m_base.GetDevice(), m_swapchain, &swapchainImageCount, nullptr);
-            m_swapchainImages = std::vector<VkImage>(swapchainImageCount);
-            vkGetSwapchainImagesKHR(m_base.GetDevice(), m_swapchain, &swapchainImageCount, m_swapchainImages.data());
-        }
-
-        {
-            m_swapchainImageViews = std::vector<VkImageView>(m_swapchainImages.size());
-
-            for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
-                VkImageViewCreateInfo imageViewCreateInfo { };
-                imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-                imageViewCreateInfo.pNext = nullptr;
-                imageViewCreateInfo.flags = 0;
-                imageViewCreateInfo.image = m_swapchainImages[i];
-                imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-                imageViewCreateInfo.format = m_surface->GetFormat().format;
-                imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
-                imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-                imageViewCreateInfo.subresourceRange.levelCount = 1;
-                imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-                imageViewCreateInfo.subresourceRange.layerCount = 1;
-
-                UVKE_ASSERT(vkCreateImageView(m_base.GetDevice(), &imageViewCreateInfo, nullptr, &m_swapchainImageViews[i]));
-            }
-        }
+        m_swapchain = new Swapchain(m_base.GetDevice(), m_surface); 
 
         Shader shader(m_base.GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
         UVKE_LOG("Shaders Loaded");
@@ -285,10 +221,10 @@ namespace uvke {
         }
 
         {
-            m_framebuffers = std::vector<VkFramebuffer>(m_swapchainImageViews.size());
+            m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
 
             for(auto i = 0; i < m_framebuffers.size(); ++i) {
-                VkImageView imageView[] = { m_swapchainImageViews[i] };
+                VkImageView imageView[] = { m_swapchain->GetImageView(1) };
 
                 VkFramebufferCreateInfo framebufferCreateInfo { };
                 framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -307,6 +243,8 @@ namespace uvke {
             UVKE_LOG("Framebuffers Created");
         }
 
+        m_swapchain->Recreate(m_window, m_framebuffers, m_renderPass);
+
         {
             VkCommandPoolCreateInfo commandPoolCreateInfo { };
             commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -320,14 +258,14 @@ namespace uvke {
         m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueues()[0], m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
 
         delete m_stagingBuffer;
 
         m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_indexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueues()[0], m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
 
         delete m_stagingBuffer;
 
@@ -382,22 +320,17 @@ namespace uvke {
         delete m_indexBuffer;
         delete m_vertexBuffer;
 
-        for(auto i = 0; i < m_swapchainImageViews.size(); ++i) {
-            vkDestroyImageView(m_base.GetDevice(), m_swapchainImageViews[i], nullptr);
-        }
-
-        vkDestroySwapchainKHR(m_base.GetDevice(), m_swapchain, nullptr);
-        // vkDestroySurfaceKHR(m_base.GetInstance(), m_surface->GetSurface(), nullptr);
+        delete m_swapchain;
         delete m_surface;
     }
 
     void Renderer::Render() {
-        vkQueueWaitIdle(m_surface->GetQueues()[1]);
+        vkQueueWaitIdle(m_surface->GetQueue(1));
 
         unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_base.GetDevice(), m_swapchain, std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
+        VkResult result = vkAcquireNextImageKHR(m_base.GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
-            RecreateSwapchain();
+            m_swapchain->Recreate(m_window, m_framebuffers, m_renderPass);
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             UVKE_FATAL("Swapchain Acquire Image Error");
         }
@@ -418,7 +351,6 @@ namespace uvke {
 
         m_uniformBuffer->Update(ubo);
 
-        // TODO SUPPORT FOR MORE FENCES AND IMAGES IN FLIGHT
         vkWaitForFences(m_base.GetDevice(), 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
         vkResetFences(m_base.GetDevice(), 1, &m_fence);
 
@@ -437,7 +369,7 @@ namespace uvke {
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = &m_finishedSemaphore;
 
-        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueues()[0], 1, &submitInfo, m_fence));
+        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueue(0), 1, &submitInfo, m_fence));
 
         VkPresentInfoKHR presentInfo { };
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -445,14 +377,14 @@ namespace uvke {
         presentInfo.waitSemaphoreCount = 1;
         presentInfo.pWaitSemaphores = &m_finishedSemaphore;
         presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = &m_swapchain;
+        presentInfo.pSwapchains = &m_swapchain->GetSwapchain();
         presentInfo.pImageIndices = &index;
         presentInfo.pResults = nullptr;
 
-        result = vkQueuePresentKHR(m_surface->GetQueues()[1], &presentInfo);
+        result = vkQueuePresentKHR(m_surface->GetQueue(1), &presentInfo);
         if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferRecreated) {
             m_framebufferRecreated = false;
-            RecreateSwapchain();
+            m_swapchain->Recreate(m_window, m_framebuffers, m_renderPass);
         } else if(result != VK_SUCCESS) {
             UVKE_FATAL("Framebuffer Recreation Error");
         }
