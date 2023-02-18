@@ -12,6 +12,7 @@ namespace uvke {
     };
 
     extern void Log(std::string_view message, Severity severity = Severity::Debug);
+    extern void Log(std::string_view message, Severity severity, std::string_view filename);
 };
 
 #endif

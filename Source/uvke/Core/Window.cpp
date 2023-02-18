@@ -5,41 +5,17 @@ namespace uvke {
         void glfwErrorCallback(int error, const char* description) { UVKE_LOG("GLFW Error - " + std::to_string(error) + " - " + description); }
     };
 
-    Window::Window(const WindowProps& windowProps)
-        : m_windowProps(std::make_shared<WindowProps>(windowProps)) {
-        std::string temporaryTitle = "";
-
+    Window::Window(const WindowProps& windowProps) {
         glfwSetErrorCallback(priv::glfwErrorCallback);
 
-        if(windowProps.style == Style::None) {
-            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-        } else {
-            if(windowProps.style & Style::Titlebar) {
-                temporaryTitle = windowProps.title;
-            }
-
-            if(windowProps.style & Style::Resizable) {
-                glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-            } else {
-                glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-            }
-        }
-
-        m_window = glfwCreateWindow(windowProps.size.x, windowProps.size.y, temporaryTitle.c_str(), nullptr, nullptr);
-
-        int count = 0;
-        GLFWmonitor** monitors = glfwGetMonitors(&count);
-
-        if(windowProps.style & Style::Fullscreen) {
-            glfwSetWindowMonitor(m_window, monitors[0], 0, 0, windowProps.size.x, windowProps.size.y, 60);
-        }
+        SetWindowProps(windowProps);
     }
 
     Window::~Window() {
         glfwDestroyWindow(m_window);
     }
 
-    void Window::CreateSurface(VkInstance instance, VkSurfaceKHR* surface) {
+    void Window::CreatePlatformSurface(VkInstance instance, VkSurfaceKHR* surface) {
         glfwCreateWindowSurface(instance, m_window, nullptr, surface);
     }
 
@@ -53,8 +29,36 @@ namespace uvke {
         glfwPollEvents();
     }
 
-    bool Window::IsOpen() {
-        return !glfwWindowShouldClose(m_window);
+    void Window::Wait() {
+        glfwWaitEvents();
+    }
+
+    void Window::SetWindowProps(const WindowProps& windowProps) {
+        m_windowProps = std::make_shared<WindowProps>(windowProps);
+        std::string title = "";
+
+        if(windowProps.style == Style::None) {
+            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+        } else {
+            if(windowProps.style & Style::Titlebar) {
+                title = windowProps.title;
+            }
+
+            if(windowProps.style & Style::Resizable) {
+                glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+            } else {
+                glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+            }
+        }
+
+        m_window = glfwCreateWindow(windowProps.size.x, windowProps.size.y, title.c_str(), nullptr, nullptr);
+
+        if(windowProps.style & Style::Fullscreen) {
+            int count = 0;
+            GLFWmonitor** monitors = glfwGetMonitors(&count);
+            glfwSetWindowMonitor(m_window, monitors[0], 0, 0, windowProps.size.x, windowProps.size.y, 60);
+            delete[] monitors;
+        }
     }
 
     std::shared_ptr<WindowProps> Window::GetWindowProps() {
@@ -63,5 +67,9 @@ namespace uvke {
 
     GLFWwindow* Window::GetWindow() {
         return m_window;
+    }
+
+    bool Window::GetStatus() {
+        return !glfwWindowShouldClose(m_window);
     }
 };

@@ -1,8 +1,9 @@
 #include "Surface.hpp"
 
 namespace uvke {
-    Surface::Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device)
-        : m_instance(instance), m_physicalDevice(physicalDevice), m_device(device) {
+    Surface::Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device, Window& window)
+        : m_instance(instance), m_physicalDevice(physicalDevice), m_device(device), m_extent({ 0, 0 }) {
+        window.CreatePlatformSurface(m_instance, &m_surface);
     }
 
     Surface::~Surface() {
@@ -61,6 +62,18 @@ namespace uvke {
         m_extent = extent;
     }
 
+    void Surface::SetSwapExtent(Window& window) {
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &m_surfaceCapabilities);
+
+        if(m_surfaceCapabilities.currentExtent.width != std::numeric_limits<unsigned int>::infinity() || m_surfaceCapabilities.currentExtent.height != std::numeric_limits<unsigned int>::infinity()) {
+            m_extent = m_surfaceCapabilities.currentExtent;
+        } else {
+            window.Update();
+            m_extent.width = std::clamp(static_cast<unsigned int>(window.GetWindowProps()->size.x), m_surfaceCapabilities.minImageExtent.width, m_surfaceCapabilities.maxImageExtent.width);
+            m_extent.height = std::clamp(static_cast<unsigned int>(window.GetWindowProps()->size.y), m_surfaceCapabilities.minImageExtent.height, m_surfaceCapabilities.maxImageExtent.height);
+        }
+    }
+
     VkInstance& Surface::GetInstance() {
         return m_instance;
     }
@@ -85,11 +98,19 @@ namespace uvke {
         return m_queues;
     }
 
+    VkQueue& Surface::GetQueue(unsigned int index) {
+        if(index < 0 || index >= m_queues.size()) {
+            return m_queues[0];
+        } else {
+            return m_queues[index];
+        }
+    }
+
     VkSurfaceKHR& Surface::GetSurface() {
         return m_surface;
     }
 
-    VkSurfaceFormatKHR& Surface::GetSurfaceFormat() {
+    VkSurfaceFormatKHR& Surface::GetFormat() {
         return m_surfaceFormat;
     }
 
@@ -99,5 +120,9 @@ namespace uvke {
 
     VkExtent2D& Surface::GetExtent() {
         return m_extent;
+    }
+
+    VkSurfaceCapabilitiesKHR& Surface::GetCapabilities() {
+        return m_surfaceCapabilities;
     }
 };

@@ -3,11 +3,12 @@
 #define UVKE_SURFACE_HEADER
 
 #include "../uvke.hpp"
+#include "../Core/Window.hpp"
 
 namespace uvke {
     class UVKE_API Surface {
     public:
-        Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device);
+        Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device, Window& window);
         virtual ~Surface();
 
         virtual void CheckQueues();
@@ -21,6 +22,7 @@ namespace uvke {
         virtual void SetSurfaceFormat(VkSurfaceFormatKHR surfaceFormat);
         virtual void SetPresentMode(VkPresentModeKHR presentMode);
         virtual void SetExtent(VkExtent2D extent);
+        virtual void SetSwapExtent(Window& window);
 
         virtual VkInstance& GetInstance();
         virtual VkPhysicalDevice& GetPhysicalDevice();
@@ -28,16 +30,19 @@ namespace uvke {
         virtual unsigned int GetQueueFamily();
         virtual bool IsMultiQueueMode();
         virtual std::vector<VkQueue>& GetQueues();
+        virtual VkQueue& GetQueue(unsigned int index);
         virtual VkSurfaceKHR& GetSurface();
-        virtual VkSurfaceFormatKHR& GetSurfaceFormat();
+        virtual VkSurfaceFormatKHR& GetFormat();
         virtual VkPresentModeKHR& GetPresentMode();
         virtual VkExtent2D& GetExtent();
-
+        virtual VkSurfaceCapabilitiesKHR& GetCapabilities();
+        
     protected:
         VkInstance m_instance;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
 
+    private:
         VkSurfaceFormatKHR GetSuitableSurfaceFormat() {
             std::vector<VkSurfaceFormatKHR> surfaceFormats;
             {
@@ -74,7 +79,6 @@ namespace uvke {
             return VK_PRESENT_MODE_FIFO_KHR;
         }
 
-    private:
         unsigned int m_queueFamilyIndex;
         bool m_multiQueue;
         std::vector<VkQueue> m_queues;
@@ -82,6 +86,7 @@ namespace uvke {
         VkSurfaceFormatKHR m_surfaceFormat;
         VkPresentModeKHR m_presentMode;
         VkExtent2D m_extent;
+        VkSurfaceCapabilitiesKHR m_surfaceCapabilities;
 
     };
 };

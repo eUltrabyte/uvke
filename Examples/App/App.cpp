@@ -7,7 +7,7 @@ auto main(int argc, char** argv) -> int {
     uvke::Base base(window.GetWindowProps()->title);
     uvke::Renderer renderer(base, window);
 
-    while(window.IsOpen()) {
+    while(window.GetStatus()) {
         window.Update();
         renderer.Render();
     }

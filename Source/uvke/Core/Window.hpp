@@ -19,7 +19,8 @@ namespace uvke {
         vec2u size;
         unsigned style;
 
-        WindowProps(std::string_view a = "uvke Window", const vec2u& b = vec2u(1280, 720), unsigned c = Style::Default) : title(a), size(b), style(c) {  }
+        WindowProps(std::string_view title = "uvke Window", const vec2u& size = vec2u(1280, 720), unsigned style = Style::Default) : title(title), size(size), style(style) {  }
+        ~WindowProps() = default;
     };
 
     class UVKE_API Window {
@@ -27,14 +28,16 @@ namespace uvke {
         Window(const WindowProps& windowProps = WindowProps());
         virtual ~Window();
 
-        virtual void CreateSurface(VkInstance instance, VkSurfaceKHR* surface);
+        virtual void CreatePlatformSurface(VkInstance instance, VkSurfaceKHR* surface);
 
         virtual void Update();
-    
-        virtual bool IsOpen();
+        virtual void Wait();
+
+        virtual void SetWindowProps(const WindowProps& windowProps);
     
         virtual std::shared_ptr<WindowProps> GetWindowProps();
         virtual GLFWwindow* GetWindow();
+        virtual bool GetStatus();
     
     private:
         std::shared_ptr<WindowProps> m_windowProps;

@@ -25,15 +25,14 @@ namespace uvke {
     };
 
     unsigned int GetSupportedVulkan() {
-        unsigned int temporaryInstanceVersion = VK_API_VERSION_1_0;
-        auto temporaryEnumerateInstanceVersion = PFN_vkEnumerateInstanceVersion(vkGetInstanceProcAddr(nullptr, "vkEnumerateInstanceVersion"));
-
-        if(temporaryEnumerateInstanceVersion != nullptr) {
-            temporaryEnumerateInstanceVersion(&temporaryInstanceVersion);
+        unsigned int version = VK_API_VERSION_1_0;
+        auto EnumerateInstanceVersion = PFN_vkEnumerateInstanceVersion(vkGetInstanceProcAddr(nullptr, "vkEnumerateInstanceVersion"));
+        if(EnumerateInstanceVersion != nullptr) {
+            EnumerateInstanceVersion(&version);
         } else {
             return 0;
         }
 
-        return temporaryInstanceVersion;
+        return version;
     }
 };
