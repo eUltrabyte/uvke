@@ -9,10 +9,16 @@ namespace uvke {
         glfwSetErrorCallback(priv::glfwErrorCallback);
 
         SetWindowProps(windowProps);
+
+        UVKE_LOG("Window Created Successfully");
     }
 
     Window::~Window() {
-        glfwDestroyWindow(m_window);
+        if(m_window != nullptr) {
+            glfwDestroyWindow(m_window);
+        }
+
+        UVKE_LOG("Window Destroyed");
     }
 
     void Window::CreatePlatformSurface(VkInstance instance, VkSurfaceKHR* surface) {

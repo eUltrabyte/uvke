@@ -14,7 +14,7 @@
 namespace uvke {
     class UVKE_API Renderer {
     public:
-        Renderer(Base& base, Window& window);
+        Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window);
         virtual ~Renderer();
 
         virtual void Render();
@@ -36,7 +36,7 @@ namespace uvke {
             renderPassBeginInfo.framebuffer = m_framebuffers[index];
             renderPassBeginInfo.renderArea.offset = { 0, 0 };
             renderPassBeginInfo.renderArea.extent = m_surface->GetExtent();
-            VkClearValue clearValue = {{{ 0.0f, 0.0f, 0.0f, 1.0f }}};
+            VkClearValue clearValue = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
             renderPassBeginInfo.clearValueCount = 1;
             renderPassBeginInfo.pClearValues = &clearValue;
 
@@ -71,14 +71,14 @@ namespace uvke {
             UVKE_ASSERT(vkEndCommandBuffer(commandBuffer));
         }
 
-        Base& m_base;
-        Window& m_window;
-        Surface* m_surface;
-        Swapchain* m_swapchain;
-        StagingBuffer* m_stagingBuffer;
-        VertexBuffer* m_vertexBuffer;
-        IndexBuffer* m_indexBuffer;
-        UniformBuffer* m_uniformBuffer;
+        std::shared_ptr<Base> m_base;
+        std::shared_ptr<Window> m_window;
+        std::shared_ptr<Surface> m_surface;
+        std::shared_ptr<Swapchain> m_swapchain;
+        std::shared_ptr<StagingBuffer> m_stagingBuffer;
+        std::shared_ptr<VertexBuffer> m_vertexBuffer;
+        std::shared_ptr<IndexBuffer> m_indexBuffer;
+        std::shared_ptr<UniformBuffer> m_uniformBuffer;
         VkRenderPass m_renderPass;
         VkPipelineLayout m_pipelineLayout;
         VkPipeline m_pipeline;

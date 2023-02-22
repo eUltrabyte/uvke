@@ -42,6 +42,7 @@ set(UVKE_GRAPHICS_SOURCE
 )
 
 set(UVKE_UTILS_SOURCE
+    Source/uvke/Utils/Utils.hpp
     Source/uvke/Utils/Vec2.hpp
     Source/uvke/Utils/Vec3.hpp
     Source/uvke/Utils/Vec4.hpp
@@ -50,7 +51,6 @@ set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Clock.cpp
     Source/uvke/Utils/File.hpp
     Source/uvke/Utils/File.cpp
-    Source/uvke/Utils/Utils.hpp
 )
 
 set(UVKE_SOURCE
