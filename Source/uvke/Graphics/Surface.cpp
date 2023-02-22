@@ -4,10 +4,16 @@ namespace uvke {
     Surface::Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device, Window& window)
         : m_instance(instance), m_physicalDevice(physicalDevice), m_device(device), m_extent({ 0, 0 }) {
         window.CreatePlatformSurface(m_instance, &m_surface);
+
+        UVKE_LOG("Surface Created Successfully");
     }
 
     Surface::~Surface() {
-        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+        if(m_instance != VK_NULL_HANDLE && m_surface != VK_NULL_HANDLE) {
+            vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+        }
+
+        UVKE_LOG("Surface Destroyed");
     }
 
     void Surface::CheckQueues() {

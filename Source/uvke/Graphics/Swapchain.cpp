@@ -69,14 +69,22 @@ namespace uvke {
                 UVKE_ASSERT(vkCreateImageView(m_device, &imageViewCreateInfo, nullptr, &m_imageViews[i]));
             }
         }
+
+        UVKE_LOG("Swapchain Created Successfully");
     }
     
     Swapchain::~Swapchain() {
-        for(auto i = 0; i < m_imageViews.size(); ++i) {
-            vkDestroyImageView(m_device, m_imageViews[i], nullptr);
+        if(m_device != VK_NULL_HANDLE && m_swapchain != VK_NULL_HANDLE) {
+            for(auto i = 0; i < m_imageViews.size(); ++i) {
+                if(m_imageViews[i] != VK_NULL_HANDLE) {
+                    vkDestroyImageView(m_device, m_imageViews[i], nullptr);
+                }
+            }
+
+            vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
         }
 
-        vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+        UVKE_LOG("Swapchain Destroyed");
     }
 
     void Swapchain::Recreate(Window& window, std::vector<VkFramebuffer>& framebuffers, VkRenderPass renderPass) {
@@ -189,6 +197,8 @@ namespace uvke {
                 UVKE_ASSERT(vkCreateFramebuffer(m_device, &framebufferCreateInfo, nullptr, &framebuffers[i]));
             }
         }
+
+        UVKE_LOG("Swapchain Recreated Successfully");
     }
 
     void Swapchain::SetDevice(VkDevice device) {

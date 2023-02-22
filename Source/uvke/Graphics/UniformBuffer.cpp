@@ -98,15 +98,30 @@ namespace uvke {
         writeDescriptorSet.pTexelBufferView = nullptr;
 
         vkUpdateDescriptorSets(m_device, 1, &writeDescriptorSet, 0, nullptr);
+
+        UVKE_LOG("Uniform Buffer Created Successfully");
     }
 
     UniformBuffer::~UniformBuffer() {
-        vkDestroyDescriptorPool(m_device, m_descriptorPool, nullptr);
+        if(m_device != VK_NULL_HANDLE) {
+            if(m_descriptorPool != VK_NULL_HANDLE) {
+                vkDestroyDescriptorPool(m_device, m_descriptorPool, nullptr);
+            }
 
-        vkDestroyBuffer(m_device, m_buffer, nullptr);
-        vkFreeMemory(m_device, m_bufferMemory, nullptr);
+            if(m_buffer != VK_NULL_HANDLE) {
+                vkDestroyBuffer(m_device, m_buffer, nullptr);
+            }
 
-        vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, nullptr);
+            if(m_bufferMemory != VK_NULL_HANDLE) {
+                vkFreeMemory(m_device, m_bufferMemory, nullptr);
+            }
+
+            if(m_descriptorSetLayout != VK_NULL_HANDLE) {
+                vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, nullptr);
+            }
+        }
+
+        UVKE_LOG("Uniform Buffer Destroyed");
     }
 
     void UniformBuffer::Update(const UniformBufferObject& ubo) {

@@ -84,11 +84,20 @@ namespace uvke {
 
             UVKE_ASSERT(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device));
         }
+
+        UVKE_LOG("Base Created Successfully");
     }
 
     Base::~Base() {
-        vkDestroyDevice(m_device, nullptr);
-        vkDestroyInstance(m_instance, nullptr);
+        if(m_device != VK_NULL_HANDLE) {
+            vkDestroyDevice(m_device, nullptr);
+        }
+
+        if(m_instance != VK_NULL_HANDLE) {
+            vkDestroyInstance(m_instance, nullptr);
+        }
+
+        UVKE_LOG("Base Destroyed");
     }
     
     void Base::SetInstance(VkInstance instance) {

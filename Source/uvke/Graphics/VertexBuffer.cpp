@@ -56,11 +56,22 @@ namespace uvke {
         UVKE_ASSERT(vkAllocateMemory(m_device, &memoryAllocateInfo, nullptr, &m_bufferMemory));
 
         vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
+
+        UVKE_LOG("Vertex Buffer Created Successfully");
     }
 
     VertexBuffer::~VertexBuffer() {
-        vkDestroyBuffer(m_device, m_buffer, nullptr);
-        vkFreeMemory(m_device, m_bufferMemory, nullptr);
+        if(m_device != VK_NULL_HANDLE) {
+            if(m_buffer != VK_NULL_HANDLE) {
+                vkDestroyBuffer(m_device, m_buffer, nullptr);
+            }
+
+            if(m_bufferMemory != VK_NULL_HANDLE) {
+                vkFreeMemory(m_device, m_bufferMemory, nullptr);
+            }
+        }
+
+        UVKE_LOG("Vertex Buffer Destroyed");
     }
 
     void VertexBuffer::Bind(VkCommandBuffer commandBuffer) {

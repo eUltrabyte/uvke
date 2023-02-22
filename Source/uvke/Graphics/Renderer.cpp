@@ -2,56 +2,45 @@
 #include "UniformBuffer.hpp"
 
 namespace uvke {
-    Renderer::Renderer(Base& base, Window& window)
+    Renderer::Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
         : m_base(base), m_window(window), m_framebufferRecreated(false) {
-        m_surface = new Surface(m_base.GetInstance(), m_base.GetPhysicalDevice(), m_base.GetDevice(), m_window);
+        m_surface = std::make_shared<Surface>(m_base->GetInstance(), m_base->GetPhysicalDevice(), m_base->GetDevice(), *m_window.get());
 
-        m_surface->SetQueueFamily(m_base.GetQueueFamily());
-        m_surface->SetMultiQueueMode(m_base.IsMultiQueueSupported());
+        m_surface->SetQueueFamily(m_base->GetQueueFamily());
+        m_surface->SetMultiQueueMode(m_base->IsMultiQueueSupported());
         
         {
             m_surface->CheckQueues();
 
-            UVKE_LOG("Queue Family Index - " + std::to_string(m_base.GetQueueFamily()));
+            UVKE_LOG("Queue Family Index - " + std::to_string(m_base->GetQueueFamily()));
 
             VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(m_base.GetPhysicalDevice(), m_base.GetQueueFamily(), m_surface->GetSurface(), &presentSupport);
+            vkGetPhysicalDeviceSurfaceSupportKHR(m_base->GetPhysicalDevice(), m_base->GetQueueFamily(), m_surface->GetSurface(), &presentSupport);
             UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
         }
 
-        m_surface->SetSwapExtent(m_window);
+        m_surface->SetSwapExtent(*m_window.get());
 
         UVKE_LOG("Format - " + std::to_string(m_surface->GetFormat().format));
         UVKE_LOG("Present Mode - " + std::to_string(m_surface->GetPresentMode()));
         UVKE_LOG("Extent - " + std::to_string(m_surface->GetExtent().width) + "/" + std::to_string(m_surface->GetExtent().height));
 
-        m_swapchain = new Swapchain(m_base.GetDevice(), m_surface); 
+        m_swapchain = std::make_shared<Swapchain>(m_base->GetDevice(), m_surface.get());
 
-        Shader shader(m_base.GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
+        Shader shader(m_base->GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
         UVKE_LOG("Shaders Loaded");
 
-        /* m_vertexBuffer = new VertexBuffer(m_physicalDevice, m_device, std::vector<Vertex> {
-            {{ -1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
-            {{ 1.0f, -1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
-            {{ 1.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
-            {{ -1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }},
-        } );
-
-        m_indexBuffer = new IndexBuffer(m_physicalDevice, m_device, std::vector<unsigned int> {
-            0, 1, 2, 2, 3, 0,
-        } ); */
-
-        m_vertexBuffer = new VertexBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), std::vector<Vertex> {
+        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
             {{ -0.5f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
             {{ 0.0f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
             {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
         } );
 
-        m_indexBuffer = new IndexBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), std::vector<unsigned int> {
+        m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
             0, 1, 2,
         } );
 
-        m_uniformBuffer = new UniformBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice());
+        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice());
 
         {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *shader.GetVertexShaderStageCreateInfo(), *shader.GetFragmentShaderStageCreateInfo() };
@@ -183,7 +172,7 @@ namespace uvke {
             renderPassCreateInfo.subpassCount = 1;
             renderPassCreateInfo.pSubpasses = &subpassDescription;
 
-            UVKE_ASSERT(vkCreateRenderPass(m_base.GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
+            UVKE_ASSERT(vkCreateRenderPass(m_base->GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -194,7 +183,7 @@ namespace uvke {
             pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
             pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 
-            UVKE_ASSERT(vkCreatePipelineLayout(m_base.GetDevice(), &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
+            UVKE_ASSERT(vkCreatePipelineLayout(m_base->GetDevice(), &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
             
             VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo { };
             graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -216,7 +205,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base.GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
             UVKE_LOG("Graphics Pipeline Created");
         }
 
@@ -224,50 +213,46 @@ namespace uvke {
             m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
 
             for(auto i = 0; i < m_framebuffers.size(); ++i) {
-                VkImageView imageView[] = { m_swapchain->GetImageView(1) };
-
                 VkFramebufferCreateInfo framebufferCreateInfo { };
                 framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
                 framebufferCreateInfo.pNext = nullptr;
                 framebufferCreateInfo.flags = 0;
                 framebufferCreateInfo.renderPass = m_renderPass;
                 framebufferCreateInfo.attachmentCount = 1;
-                framebufferCreateInfo.pAttachments = imageView;
+                framebufferCreateInfo.pAttachments = &m_swapchain->GetImageView(i);
                 framebufferCreateInfo.width = m_surface->GetExtent().width;
                 framebufferCreateInfo.height = m_surface->GetExtent().height;
                 framebufferCreateInfo.layers = 1;
 
-                UVKE_ASSERT(vkCreateFramebuffer(m_base.GetDevice(), &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
+                UVKE_ASSERT(vkCreateFramebuffer(m_base->GetDevice(), &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
             }
 
             UVKE_LOG("Framebuffers Created");
         }
-
-        m_swapchain->Recreate(m_window, m_framebuffers, m_renderPass);
 
         {
             VkCommandPoolCreateInfo commandPoolCreateInfo { };
             commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
             commandPoolCreateInfo.pNext = nullptr;
             commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            commandPoolCreateInfo.queueFamilyIndex = m_base.GetQueueFamily();
+            commandPoolCreateInfo.queueFamilyIndex = m_base->GetQueueFamily();
 
-            UVKE_ASSERT(vkCreateCommandPool(m_base.GetDevice(), &commandPoolCreateInfo, nullptr, &m_commandPool));
+            UVKE_ASSERT(vkCreateCommandPool(m_base->GetDevice(), &commandPoolCreateInfo, nullptr, &m_commandPool));
         }
 
-        m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_vertexBuffer->GetSize());
+        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
         m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
 
-        delete m_stagingBuffer;
+        m_stagingBuffer.reset();
 
-        m_stagingBuffer = new StagingBuffer(m_base.GetPhysicalDevice(), m_base.GetDevice(), m_indexBuffer->GetSize());
+        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
         m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
 
-        delete m_stagingBuffer;
+        m_stagingBuffer.reset();
 
         {
             VkCommandBufferAllocateInfo commandBufferAllocateInfo { };
@@ -277,7 +262,7 @@ namespace uvke {
             commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
             commandBufferAllocateInfo.commandBufferCount = 1;
 
-            UVKE_ASSERT(vkAllocateCommandBuffers(m_base.GetDevice(), &commandBufferAllocateInfo, &m_commandBuffer));
+            UVKE_ASSERT(vkAllocateCommandBuffers(m_base->GetDevice(), &commandBufferAllocateInfo, &m_commandBuffer));
         }
 
         {
@@ -286,51 +271,51 @@ namespace uvke {
             semaphoreCreateInfo.pNext = nullptr;
             semaphoreCreateInfo.flags = 0;
 
-            UVKE_ASSERT(vkCreateSemaphore(m_base.GetDevice(), &semaphoreCreateInfo, nullptr, &m_availableSemaphore));
-            UVKE_ASSERT(vkCreateSemaphore(m_base.GetDevice(), &semaphoreCreateInfo, nullptr, &m_finishedSemaphore));
+            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_availableSemaphore));
+            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_finishedSemaphore));
 
             VkFenceCreateInfo fenceCreateInfo { };
             fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
             fenceCreateInfo.pNext = nullptr;
             fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-            UVKE_ASSERT(vkCreateFence(m_base.GetDevice(), &fenceCreateInfo, nullptr, &m_fence));
+            UVKE_ASSERT(vkCreateFence(m_base->GetDevice(), &fenceCreateInfo, nullptr, &m_fence));
         }
     }
 
     Renderer::~Renderer() {
-        vkDeviceWaitIdle(m_base.GetDevice());
+        vkDeviceWaitIdle(m_base->GetDevice());
 
-        vkDestroyFence(m_base.GetDevice(), m_fence, nullptr);
-        vkDestroySemaphore(m_base.GetDevice(), m_finishedSemaphore, nullptr);
-        vkDestroySemaphore(m_base.GetDevice(), m_availableSemaphore, nullptr);
+        vkDestroyFence(m_base->GetDevice(), m_fence, nullptr);
+        vkDestroySemaphore(m_base->GetDevice(), m_finishedSemaphore, nullptr);
+        vkDestroySemaphore(m_base->GetDevice(), m_availableSemaphore, nullptr);
 
-        vkDestroyCommandPool(m_base.GetDevice(), m_commandPool, nullptr);
+        vkDestroyCommandPool(m_base->GetDevice(), m_commandPool, nullptr);
 
         for(auto i = 0; i < m_framebuffers.size(); ++i) {
-            vkDestroyFramebuffer(m_base.GetDevice(), m_framebuffers[i], nullptr);
+            vkDestroyFramebuffer(m_base->GetDevice(), m_framebuffers[i], nullptr);
         }
 
-        vkDestroyPipeline(m_base.GetDevice(), m_pipeline, nullptr);
+        vkDestroyPipeline(m_base->GetDevice(), m_pipeline, nullptr);
 
-        vkDestroyPipelineLayout(m_base.GetDevice(), m_pipelineLayout, nullptr);
-        vkDestroyRenderPass(m_base.GetDevice(), m_renderPass, nullptr);
+        vkDestroyPipelineLayout(m_base->GetDevice(), m_pipelineLayout, nullptr);
+        vkDestroyRenderPass(m_base->GetDevice(), m_renderPass, nullptr);
 
-        delete m_uniformBuffer;
-        delete m_indexBuffer;
-        delete m_vertexBuffer;
+        m_uniformBuffer.reset();
+        m_indexBuffer.reset();
+        m_vertexBuffer.reset();
 
-        delete m_swapchain;
-        delete m_surface;
+        m_swapchain.reset();
+        m_surface.reset();
     }
 
     void Renderer::Render() {
         vkQueueWaitIdle(m_surface->GetQueue(1));
 
         unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_base.GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
+        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
-            m_swapchain->Recreate(m_window, m_framebuffers, m_renderPass);
+            m_swapchain->Recreate(*m_window.get(), m_framebuffers, m_renderPass);
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             UVKE_FATAL("Swapchain Acquire Image Error");
         }
@@ -342,8 +327,8 @@ namespace uvke {
 
         ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
 
-        if(glfwGetKey(m_window.GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo.projection = Perspective<float>(Radians(45.0f), (m_window.GetWindowProps()->size.x / m_window.GetWindowProps()->size.y), 0.1f, 1000.0f);
+        if(glfwGetKey(m_window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
+            ubo.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
             ubo.projection.data[1][1] *= -1;
         } else {
             ubo.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
@@ -351,8 +336,8 @@ namespace uvke {
 
         m_uniformBuffer->Update(ubo);
 
-        vkWaitForFences(m_base.GetDevice(), 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
-        vkResetFences(m_base.GetDevice(), 1, &m_fence);
+        vkWaitForFences(m_base->GetDevice(), 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
+        vkResetFences(m_base->GetDevice(), 1, &m_fence);
 
         vkResetCommandBuffer(m_commandBuffer, 0);
         RecordCommandBuffer(m_commandBuffer, index);
@@ -384,7 +369,7 @@ namespace uvke {
         result = vkQueuePresentKHR(m_surface->GetQueue(1), &presentInfo);
         if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferRecreated) {
             m_framebufferRecreated = false;
-            m_swapchain->Recreate(m_window, m_framebuffers, m_renderPass);
+            m_swapchain->Recreate(*m_window.get(), m_framebuffers, m_renderPass);
         } else if(result != VK_SUCCESS) {
             UVKE_FATAL("Framebuffer Recreation Error");
         }

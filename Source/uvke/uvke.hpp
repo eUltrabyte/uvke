@@ -33,8 +33,9 @@
 #include "Core/Window.hpp"
 
 // TODO
-// fix issue with swapchain recreation ( without recreation on init it doesnt work properly )
 // move vulkan pipeline from renderer to pipeline class
+// move vulkan command buffers and command pool from renderer to command buffer class
+// write wrapper around raw pointers ( i hate them )
 // add more fences and frames in flight support
 // change file class to support other types than std::vector<char>
 // somehow fix main ( remove uvke::priv::init and uvke::priv::deinit )
