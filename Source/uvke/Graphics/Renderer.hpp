@@ -10,6 +10,8 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
+#include "Pipeline.hpp"
+#include "Framebuffer.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
@@ -18,6 +20,28 @@ namespace uvke {
         virtual ~Renderer();
 
         virtual void Render();
+
+        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetWindow(std::shared_ptr<Window> window);
+        virtual void SetSurface(std::shared_ptr<Surface> surface);
+        virtual void SetSwapchain(std::shared_ptr<Swapchain> swapchain);
+        virtual void SetStagingBuffer(std::shared_ptr<StagingBuffer> stagingBuffer);
+        virtual void SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer);
+        virtual void SetIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer);
+        virtual void SetUniformBuffer(std::shared_ptr<UniformBuffer> uniformBuffer);
+        virtual void SetPipeline(std::shared_ptr<Pipeline> pipeline);
+        virtual void SetFramebuffer(std::shared_ptr<Framebuffer> framebuffer);
+
+        virtual std::shared_ptr<Base> GetBase();
+        virtual std::shared_ptr<Window> GetWindow();
+        virtual std::shared_ptr<Surface> GetSurface();
+        virtual std::shared_ptr<Swapchain> GetSwapchain();
+        virtual std::shared_ptr<StagingBuffer> GetStagingBuffer();
+        virtual std::shared_ptr<VertexBuffer> GetVertexBuffer();
+        virtual std::shared_ptr<IndexBuffer> GetIndexBuffer();
+        virtual std::shared_ptr<UniformBuffer> GetUniformBuffer();
+        virtual std::shared_ptr<Pipeline> GetPipeline();
+        virtual std::shared_ptr<Framebuffer> GetFramebuffer();
 
     private:
         void RecordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int index) {
@@ -32,8 +56,8 @@ namespace uvke {
             VkRenderPassBeginInfo renderPassBeginInfo { };
             renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
             renderPassBeginInfo.pNext = nullptr;
-            renderPassBeginInfo.renderPass = m_renderPass;
-            renderPassBeginInfo.framebuffer = m_framebuffers[index];
+            renderPassBeginInfo.renderPass = m_pipeline->GetRenderPass();
+            renderPassBeginInfo.framebuffer = m_framebuffer->GetFramebuffers()[index];
             renderPassBeginInfo.renderArea.offset = { 0, 0 };
             renderPassBeginInfo.renderArea.extent = m_surface->GetExtent();
             VkClearValue clearValue = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
@@ -42,7 +66,7 @@ namespace uvke {
 
             vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-            vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+            vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->GetPipeline());
 
             VkViewport viewport { };
             viewport.x = 0.0f;
@@ -62,7 +86,7 @@ namespace uvke {
 
             m_vertexBuffer->Bind(commandBuffer);
             m_indexBuffer->Bind(commandBuffer);
-            m_uniformBuffer->Bind(commandBuffer, m_pipelineLayout);
+            m_uniformBuffer->Bind(commandBuffer, m_pipeline->GetPipelineLayout());
 
             vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
 
@@ -79,10 +103,8 @@ namespace uvke {
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
         std::shared_ptr<IndexBuffer> m_indexBuffer;
         std::shared_ptr<UniformBuffer> m_uniformBuffer;
-        VkRenderPass m_renderPass;
-        VkPipelineLayout m_pipelineLayout;
-        VkPipeline m_pipeline;
-        std::vector<VkFramebuffer> m_framebuffers;
+        std::shared_ptr<Pipeline> m_pipeline;
+        std::shared_ptr<Framebuffer> m_framebuffer;
         VkCommandPool m_commandPool;
         VkCommandBuffer m_commandBuffer;
         VkSemaphore m_availableSemaphore;

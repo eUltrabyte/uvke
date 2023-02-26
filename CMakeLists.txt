@@ -39,6 +39,10 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/IndexBuffer.cpp
     Source/uvke/Graphics/UniformBuffer.hpp
     Source/uvke/Graphics/UniformBuffer.cpp
+    Source/uvke/Graphics/Pipeline.hpp
+    Source/uvke/Graphics/Pipeline.cpp
+    Source/uvke/Graphics/Framebuffer.hpp
+    Source/uvke/Graphics/Framebuffer.cpp
 )
 
 set(UVKE_UTILS_SOURCE

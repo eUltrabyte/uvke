@@ -33,7 +33,6 @@
 #include "Core/Window.hpp"
 
 // TODO
-// move vulkan pipeline from renderer to pipeline class
 // move vulkan command buffers and command pool from renderer to command buffer class
 // write wrapper around raw pointers ( i hate them )
 // add more fences and frames in flight support

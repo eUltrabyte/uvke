@@ -3,41 +3,43 @@
 namespace uvke {
     StagingBuffer::StagingBuffer(VkPhysicalDevice physicalDevice, VkDevice device, unsigned int size)
         : m_physicalDevice(physicalDevice), m_device(device), m_size(size) {
-        VkBufferCreateInfo bufferCreateInfo = { };
-        bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufferCreateInfo.pNext = nullptr;
-        bufferCreateInfo.flags = 0;
-        bufferCreateInfo.size = m_size;
-        bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        bufferCreateInfo.queueFamilyIndexCount = 0;
-        bufferCreateInfo.pQueueFamilyIndices = nullptr;
+        {
+            VkBufferCreateInfo bufferCreateInfo = { };
+            bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            bufferCreateInfo.pNext = nullptr;
+            bufferCreateInfo.flags = 0;
+            bufferCreateInfo.size = m_size;
+            bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+            bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            bufferCreateInfo.queueFamilyIndexCount = 0;
+            bufferCreateInfo.pQueueFamilyIndices = nullptr;
 
-        UVKE_ASSERT(vkCreateBuffer(m_device, &bufferCreateInfo, nullptr, &m_buffer));
+            UVKE_ASSERT(vkCreateBuffer(m_device, &bufferCreateInfo, nullptr, &m_buffer));
 
-        VkMemoryRequirements memoryRequirements { };
-        vkGetBufferMemoryRequirements(m_device, m_buffer, &memoryRequirements);
+            VkMemoryRequirements memoryRequirements { };
+            vkGetBufferMemoryRequirements(m_device, m_buffer, &memoryRequirements);
 
-        VkPhysicalDeviceMemoryProperties memoryProperties { };
-        vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memoryProperties);
+            VkPhysicalDeviceMemoryProperties memoryProperties { };
+            vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memoryProperties);
 
-        unsigned int filter = memoryRequirements.memoryTypeBits;
-        VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        unsigned int index = 0;
-        for(auto i = 0; i < memoryProperties.memoryTypeCount; ++i) {
-            if(filter & (1 << i) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-                index = i;
-                break;
+            unsigned int filter = memoryRequirements.memoryTypeBits;
+            VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+            unsigned int index = 0;
+            for(auto i = 0; i < memoryProperties.memoryTypeCount; ++i) {
+                if(filter & (1 << i) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+                    index = i;
+                    break;
+                }
             }
+
+            VkMemoryAllocateInfo memoryAllocateInfo { };
+            memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+            memoryAllocateInfo.pNext = nullptr;
+            memoryAllocateInfo.allocationSize = memoryRequirements.size;
+            memoryAllocateInfo.memoryTypeIndex = index;
+
+            UVKE_ASSERT(vkAllocateMemory(m_device, &memoryAllocateInfo, nullptr, &m_bufferMemory));
         }
-
-        VkMemoryAllocateInfo memoryAllocateInfo { };
-        memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        memoryAllocateInfo.pNext = nullptr;
-        memoryAllocateInfo.allocationSize = memoryRequirements.size;
-        memoryAllocateInfo.memoryTypeIndex = index;
-
-        UVKE_ASSERT(vkAllocateMemory(m_device, &memoryAllocateInfo, nullptr, &m_bufferMemory));
 
         vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
 
