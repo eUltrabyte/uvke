@@ -101,7 +101,7 @@ namespace uvke {
 
         vkUpdateDescriptorSets(m_device, 1, &writeDescriptorSet, 0, nullptr);
 
-        UVKE_LOG("Uniform Buffer Created Successfully");
+        UVKE_LOG("Uniform Buffer Created");
     }
 
     UniformBuffer::~UniformBuffer() {

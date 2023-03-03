@@ -33,14 +33,11 @@
 #include "Core/Window.hpp"
 
 // TODO
-// move vulkan command buffers and command pool from renderer to command buffer class
-// write wrapper around raw pointers ( i hate them )
-// add more fences and frames in flight support
-// change file class to support other types than std::vector<char>
-// somehow fix main ( remove uvke::priv::init and uvke::priv::deinit )
 // load and render picture
-// add something like vulkan wrapper as alternative for vulkansdk
-// reimplement windows with own library
 // reimplement stb_image with own library
+// add some gui ( imgui or own )
+// add profiler
+// reimplement windows with own library
+// add something like vulkan wrapper as alternative for vulkansdk
 
 #endif

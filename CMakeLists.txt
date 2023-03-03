@@ -20,6 +20,7 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Window.cpp
     Source/uvke/Core/Base.hpp
     Source/uvke/Core/Base.cpp
+    Source/uvke/Core/Entry.hpp
 )
 
 set(UVKE_GRAPHICS_SOURCE
@@ -43,6 +44,10 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Pipeline.cpp
     Source/uvke/Graphics/Framebuffer.hpp
     Source/uvke/Graphics/Framebuffer.cpp
+    Source/uvke/Graphics/CommandBuffer.hpp
+    Source/uvke/Graphics/CommandBuffer.cpp
+    Source/uvke/Graphics/SyncManager.hpp
+    Source/uvke/Graphics/SyncManager.cpp
 )
 
 set(UVKE_UTILS_SOURCE

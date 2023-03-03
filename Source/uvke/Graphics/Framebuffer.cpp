@@ -24,9 +24,15 @@ namespace uvke {
     }
     
     Framebuffer::~Framebuffer() {
-        for(auto i = 0; i < m_framebuffers.size(); ++i) {
-            vkDestroyFramebuffer(m_device, m_framebuffers[i], nullptr);
+        if(m_device != VK_NULL_HANDLE) {
+            for(auto i = 0; i < m_framebuffers.size(); ++i) {
+                if(m_framebuffers[i] != VK_NULL_HANDLE) {
+                    vkDestroyFramebuffer(m_device, m_framebuffers[i], nullptr);
+                }
+            }
         }
+
+        UVKE_LOG("Framebuffers Destroyed");
     }
 
     void Framebuffer::Recreate() {
@@ -88,5 +94,13 @@ namespace uvke {
     
     std::vector<VkFramebuffer>& Framebuffer::GetFramebuffers() {
         return m_framebuffers;
+    }
+
+    VkFramebuffer& Framebuffer::GetFramebuffer(int index) {
+        if(index < 0 || index >= m_framebuffers.size()) {
+            return m_framebuffers[0];
+        } else {
+            return m_framebuffers[index];
+        }
     }
 };

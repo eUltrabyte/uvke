@@ -191,6 +191,8 @@ namespace uvke {
                 vkDestroyRenderPass(m_device, m_renderPass, nullptr);
             }
         }
+
+        UVKE_LOG("Graphics Pipeline Destroyed");
     }
 
     void Pipeline::Recreate() {

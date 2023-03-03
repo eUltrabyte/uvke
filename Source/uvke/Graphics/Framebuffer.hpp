@@ -24,6 +24,7 @@ namespace uvke {
         virtual std::shared_ptr<Swapchain>& GetSwapchain();
         virtual std::shared_ptr<Surface>& GetSurface();
         virtual std::vector<VkFramebuffer>& GetFramebuffers();
+        virtual VkFramebuffer& GetFramebuffer(int index);
 
     protected:
         VkDevice m_device;

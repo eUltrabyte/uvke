@@ -10,7 +10,7 @@ namespace uvke {
 
         SetWindowProps(windowProps);
 
-        UVKE_LOG("Window Created Successfully");
+        UVKE_LOG("Window Created");
     }
 
     Window::~Window() {

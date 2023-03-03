@@ -43,7 +43,7 @@ namespace uvke {
 
         vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
 
-        UVKE_LOG("Staging Buffer Created Successfully");
+        UVKE_LOG("Staging Buffer Created");
     }
 
     StagingBuffer::~StagingBuffer() {

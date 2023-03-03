@@ -59,7 +59,7 @@ namespace uvke {
 
         vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
 
-        UVKE_LOG("Vertex Buffer Created Successfully");
+        UVKE_LOG("Vertex Buffer Created");
     }
 
     VertexBuffer::~VertexBuffer() {

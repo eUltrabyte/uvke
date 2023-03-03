@@ -3,32 +3,22 @@
 
 namespace uvke {
     Renderer::Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
-        : m_base(base), m_window(window), m_framebufferRecreated(false) {
+        : m_base(base), m_window(window) {
         m_surface = std::make_shared<Surface>(m_base->GetInstance(), m_base->GetPhysicalDevice(), m_base->GetDevice(), *m_window.get());
 
         m_surface->SetQueueFamily(m_base->GetQueueFamily());
         m_surface->SetMultiQueueMode(m_base->IsMultiQueueSupported());
         
-        {
-            m_surface->CheckQueues();
-
-            UVKE_LOG("Queue Family Index - " + std::to_string(m_base->GetQueueFamily()));
-
-            VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(m_base->GetPhysicalDevice(), m_base->GetQueueFamily(), m_surface->GetSurface(), &presentSupport);
-            UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
-        }
-
+        m_surface->CheckQueues();
         m_surface->SetSwapExtent(*m_window.get());
 
         UVKE_LOG("Format - " + std::to_string(m_surface->GetFormat().format));
         UVKE_LOG("Present Mode - " + std::to_string(m_surface->GetPresentMode()));
         UVKE_LOG("Extent - " + std::to_string(m_surface->GetExtent().width) + "/" + std::to_string(m_surface->GetExtent().height));
 
-        m_swapchain = std::make_shared<Swapchain>(m_base->GetDevice(), m_surface.get());
+        m_swapchain = std::make_shared<Swapchain>(m_base->GetDevice(), m_surface);
 
-        Shader shader(m_base->GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
-        UVKE_LOG("Shaders Loaded");
+        m_shader = std::make_shared<Shader>(m_base->GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
 
         m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
             {{ -0.5f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
@@ -42,71 +32,37 @@ namespace uvke {
 
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice());
 
-        m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, std::make_shared<Shader>(shader), m_vertexBuffer, m_uniformBuffer);
+        m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_uniformBuffer);
 
         m_framebuffer = std::make_shared<Framebuffer>(m_base->GetDevice(), m_pipeline->GetRenderPass(), m_swapchain, m_surface);
 
-        {
-            VkCommandPoolCreateInfo commandPoolCreateInfo { };
-            commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-            commandPoolCreateInfo.pNext = nullptr;
-            commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            commandPoolCreateInfo.queueFamilyIndex = m_base->GetQueueFamily();
-
-            UVKE_ASSERT(vkCreateCommandPool(m_base->GetDevice(), &commandPoolCreateInfo, nullptr, &m_commandPool));
-        }
+        m_commandBuffer = std::make_shared<CommandBuffer>(m_base->GetDevice(), m_base->GetQueueFamily());
 
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer.reset();
 
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
 
         m_stagingBuffer.reset();
 
-        {
-            VkCommandBufferAllocateInfo commandBufferAllocateInfo { };
-            commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-            commandBufferAllocateInfo.pNext = nullptr;
-            commandBufferAllocateInfo.commandPool = m_commandPool;
-            commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-            commandBufferAllocateInfo.commandBufferCount = 1;
+        m_syncManager = std::make_shared<SyncManager>(m_base->GetDevice());
 
-            UVKE_ASSERT(vkAllocateCommandBuffers(m_base->GetDevice(), &commandBufferAllocateInfo, &m_commandBuffer));
-        }
-
-        {
-            VkSemaphoreCreateInfo semaphoreCreateInfo { };
-            semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-            semaphoreCreateInfo.pNext = nullptr;
-            semaphoreCreateInfo.flags = 0;
-
-            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_availableSemaphore));
-            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_finishedSemaphore));
-
-            VkFenceCreateInfo fenceCreateInfo { };
-            fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-            fenceCreateInfo.pNext = nullptr;
-            fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-            UVKE_ASSERT(vkCreateFence(m_base->GetDevice(), &fenceCreateInfo, nullptr, &m_fence));
-        }
+        UVKE_LOG("Renderer Created");
     }
 
     Renderer::~Renderer() {
-        vkDeviceWaitIdle(m_base->GetDevice());
+        m_syncManager->WaitForDevice();
 
-        vkDestroyFence(m_base->GetDevice(), m_fence, nullptr);
-        vkDestroySemaphore(m_base->GetDevice(), m_finishedSemaphore, nullptr);
-        vkDestroySemaphore(m_base->GetDevice(), m_availableSemaphore, nullptr);
+        m_syncManager.reset();
 
-        vkDestroyCommandPool(m_base->GetDevice(), m_commandPool, nullptr);
+        m_commandBuffer.reset();
 
         m_framebuffer.reset();
 
@@ -116,15 +72,19 @@ namespace uvke {
         m_indexBuffer.reset();
         m_vertexBuffer.reset();
 
+        m_shader.reset();
+
         m_swapchain.reset();
         m_surface.reset();
+
+        UVKE_LOG("Renderer Destroyed");
     }
 
     void Renderer::Render() {
-        vkQueueWaitIdle(m_surface->GetQueue(1));
+        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
 
         unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
+        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
             m_swapchain->Recreate(*m_window.get(), m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -147,39 +107,37 @@ namespace uvke {
 
         m_uniformBuffer->Update(ubo);
 
-        vkWaitForFences(m_base->GetDevice(), 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
-        vkResetFences(m_base->GetDevice(), 1, &m_fence);
+        m_syncManager->WaitForFence(m_syncManager->GetFrame());
+        m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        vkResetCommandBuffer(m_commandBuffer, 0);
-        RecordCommandBuffer(m_commandBuffer, index);
+        m_commandBuffer->Record(m_syncManager->GetFrame(), index, m_surface, m_pipeline, m_framebuffer, m_vertexBuffer, m_indexBuffer, m_uniformBuffer);
         
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submitInfo.pNext = nullptr;
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
         submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = &m_availableSemaphore;
+        submitInfo.pWaitSemaphores = &m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame());
         submitInfo.pWaitDstStageMask = waitStages;
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &m_commandBuffer;
+        submitInfo.pCommandBuffers = &m_commandBuffer->GetCommandBuffer(m_syncManager->GetFrame());
         submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = &m_finishedSemaphore;
+        submitInfo.pSignalSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
 
-        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueue(0), 1, &submitInfo, m_fence));
+        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueue(0), 1, &submitInfo, m_syncManager->GetFence(m_syncManager->GetFrame())));
 
         VkPresentInfoKHR presentInfo { };
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         presentInfo.pNext = nullptr;
         presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_finishedSemaphore;
+        presentInfo.pWaitSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = &m_swapchain->GetSwapchain();
         presentInfo.pImageIndices = &index;
         presentInfo.pResults = nullptr;
 
         result = vkQueuePresentKHR(m_surface->GetQueue(1), &presentInfo);
-        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferRecreated) {
-            m_framebufferRecreated = false;
+        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_swapchain->IsRecreated()) {
             m_swapchain->Recreate(*m_window.get(), m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
         } else if(result != VK_SUCCESS) {
             UVKE_FATAL("Framebuffer Recreation Error");
@@ -188,6 +146,8 @@ namespace uvke {
         if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
             m_clock.Restart();
         }
+
+        m_syncManager->Update();
     }
 
     void Renderer::SetBase(std::shared_ptr<Base> base) {
@@ -229,6 +189,10 @@ namespace uvke {
     void Renderer::SetFramebuffer(std::shared_ptr<Framebuffer> framebuffer) {
         m_framebuffer = framebuffer;
     }
+
+    void Renderer::SetCommandBuffer(std::shared_ptr<CommandBuffer> commandBuffer) {
+        m_commandBuffer = commandBuffer;
+    }
     
     std::shared_ptr<Base> Renderer::GetBase() {
         return m_base;
@@ -268,5 +232,9 @@ namespace uvke {
     
     std::shared_ptr<Framebuffer> Renderer::GetFramebuffer() {
         return m_framebuffer;
+    }
+
+    std::shared_ptr<CommandBuffer> Renderer::GetCommandBuffer() {
+        return m_commandBuffer;
     }
 };
