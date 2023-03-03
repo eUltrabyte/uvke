@@ -1,8 +1,8 @@
 #include "Swapchain.hpp"
 
 namespace uvke {
-    Swapchain::Swapchain(VkDevice device, Surface* surface)
-        : m_device(device), m_surface(surface) {
+    Swapchain::Swapchain(VkDevice device, std::shared_ptr<Surface> surface)
+        : m_device(device), m_surface(surface), m_isRecreated(false) {
         m_imageCount = m_surface->GetCapabilities().minImageCount + 1;
         if(m_surface->GetCapabilities().maxImageCount > 0 && m_imageCount > m_surface->GetCapabilities().maxImageCount) {
             m_imageCount = m_surface->GetCapabilities().maxImageCount;
@@ -70,24 +70,30 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Swapchain Created Successfully");
+        UVKE_LOG("Swapchain Created");
     }
     
     Swapchain::~Swapchain() {
-        if(m_device != VK_NULL_HANDLE && m_swapchain != VK_NULL_HANDLE) {
-            for(auto i = 0; i < m_imageViews.size(); ++i) {
-                if(m_imageViews[i] != VK_NULL_HANDLE) {
+        if(m_device != VK_NULL_HANDLE) {
+            if(m_imageViews.data() != nullptr) {
+                for(auto i = 0; i < m_imageViews.size(); ++i) {
                     vkDestroyImageView(m_device, m_imageViews[i], nullptr);
                 }
             }
 
-            vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+            m_imageViews.clear();
+            m_images.clear();
+
+            if(m_swapchain != VK_NULL_HANDLE) {
+                vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+            }
         }
 
         UVKE_LOG("Swapchain Destroyed");
     }
 
     void Swapchain::Recreate(Window& window, std::vector<VkFramebuffer>& framebuffers, VkRenderPass renderPass) {
+        m_isRecreated = false;
         window.Update();
 
         vec2i size(window.GetWindowProps()->size.x, window.GetWindowProps()->size.y);
@@ -205,7 +211,7 @@ namespace uvke {
         m_device = device;
     }
     
-    void Swapchain::SetSurface(Surface* surface) {
+    void Swapchain::SetSurface(std::shared_ptr<Surface> surface) {
         m_surface = surface;
     }
     
@@ -225,7 +231,7 @@ namespace uvke {
         return m_device;
     }
 
-    Surface* Swapchain::GetSurface() {
+    std::shared_ptr<Surface> Swapchain::GetSurface() {
         return m_surface;
     }
     
@@ -259,5 +265,9 @@ namespace uvke {
         } else {
             return m_imageViews[index];
         }
+    }
+
+    bool& Swapchain::IsRecreated() {
+        return m_isRecreated;
     }
 };

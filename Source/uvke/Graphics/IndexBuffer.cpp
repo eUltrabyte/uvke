@@ -41,7 +41,7 @@ namespace uvke {
 
         vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
 
-        UVKE_LOG("Index Buffer Created Successfully");
+        UVKE_LOG("Index Buffer Created");
     }
 
     IndexBuffer::~IndexBuffer() {

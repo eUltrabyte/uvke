@@ -11,8 +11,20 @@ namespace uvke {
         Fatal,
     };
 
-    extern void Log(std::string_view message, Severity severity = Severity::Debug);
-    extern void Log(std::string_view message, Severity severity, std::string_view filename);
+    class UVKE_API Logger {
+    public:
+        Logger(std::string_view filename);
+        virtual ~Logger();
+
+        virtual void Log(std::string_view message, Severity severity, bool save);
+
+        static void Log(std::string_view message, Severity severity = Severity::Debug);
+        static void Log(std::string_view message, Severity severity, std::string_view filename);
+
+    private:
+        std::ofstream m_file;
+
+    };
 };
 
 #endif

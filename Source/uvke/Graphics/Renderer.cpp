@@ -3,32 +3,22 @@
 
 namespace uvke {
     Renderer::Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
-        : m_base(base), m_window(window), m_framebufferRecreated(false) {
+        : m_base(base), m_window(window) {
         m_surface = std::make_shared<Surface>(m_base->GetInstance(), m_base->GetPhysicalDevice(), m_base->GetDevice(), *m_window.get());
 
         m_surface->SetQueueFamily(m_base->GetQueueFamily());
         m_surface->SetMultiQueueMode(m_base->IsMultiQueueSupported());
         
-        {
-            m_surface->CheckQueues();
-
-            UVKE_LOG("Queue Family Index - " + std::to_string(m_base->GetQueueFamily()));
-
-            VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(m_base->GetPhysicalDevice(), m_base->GetQueueFamily(), m_surface->GetSurface(), &presentSupport);
-            UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
-        }
-
+        m_surface->CheckQueues();
         m_surface->SetSwapExtent(*m_window.get());
 
         UVKE_LOG("Format - " + std::to_string(m_surface->GetFormat().format));
         UVKE_LOG("Present Mode - " + std::to_string(m_surface->GetPresentMode()));
         UVKE_LOG("Extent - " + std::to_string(m_surface->GetExtent().width) + "/" + std::to_string(m_surface->GetExtent().height));
 
-        m_swapchain = std::make_shared<Swapchain>(m_base->GetDevice(), m_surface.get());
+        m_swapchain = std::make_shared<Swapchain>(m_base->GetDevice(), m_surface);
 
-        Shader shader(m_base->GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
-        UVKE_LOG("Shaders Loaded");
+        m_shader = std::make_shared<Shader>(m_base->GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
 
         m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
             {{ -0.5f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
@@ -42,280 +32,61 @@ namespace uvke {
 
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice());
 
-        {
-            VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *shader.GetVertexShaderStageCreateInfo(), *shader.GetFragmentShaderStageCreateInfo() };
+        m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_uniformBuffer);
 
-            std::vector<VkDynamicState> dynamicStates = {
-                VK_DYNAMIC_STATE_VIEWPORT,
-                VK_DYNAMIC_STATE_SCISSOR,
-            };
+        m_framebuffer = std::make_shared<Framebuffer>(m_base->GetDevice(), m_pipeline->GetRenderPass(), m_swapchain, m_surface);
 
-            VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo { };
-            pipelineDynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-            pipelineDynamicStateCreateInfo.pNext = nullptr;
-            pipelineDynamicStateCreateInfo.flags = 0;
-            pipelineDynamicStateCreateInfo.dynamicStateCount = dynamicStates.size();
-            pipelineDynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
-
-            VkPipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo { };
-            pipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-            pipelineVertexInputStateCreateInfo.pNext = nullptr;
-            pipelineVertexInputStateCreateInfo.flags = 0;
-            pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
-            pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = &m_vertexBuffer->GetVertexInputBindingDescription();
-            pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount = m_vertexBuffer->GetVertexInputAttributeDescription().size();
-            pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions = m_vertexBuffer->GetVertexInputAttributeDescription().data();
-
-            VkPipelineInputAssemblyStateCreateInfo pipelineInputAssemblyStateCreateInfo { };
-            pipelineInputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-            pipelineInputAssemblyStateCreateInfo.pNext = nullptr;
-            pipelineInputAssemblyStateCreateInfo.flags = 0;
-            pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-            pipelineInputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
-
-            VkViewport viewport { };
-            viewport.x = 0.0f;
-            viewport.y = 0.0f;
-            viewport.width = m_surface->GetExtent().width;
-            viewport.height = m_surface->GetExtent().height;
-            viewport.minDepth = 0.0f;
-            viewport.maxDepth = 1.0f;
-
-            VkRect2D scissor { };
-            scissor.offset = { 0, 0 };
-            scissor.extent = m_surface->GetExtent();
-
-            VkPipelineViewportStateCreateInfo pipelineViewportStateCreateInfo { };
-            pipelineViewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-            pipelineViewportStateCreateInfo.pNext = nullptr;
-            pipelineViewportStateCreateInfo.flags = 0;
-            pipelineViewportStateCreateInfo.viewportCount = 1;
-            pipelineViewportStateCreateInfo.pViewports = &viewport;
-            pipelineViewportStateCreateInfo.scissorCount = 1;
-            pipelineViewportStateCreateInfo.pScissors = &scissor;
-
-            VkPipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo { };
-            pipelineRasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-            pipelineRasterizationStateCreateInfo.pNext = nullptr;
-            pipelineRasterizationStateCreateInfo.flags = 0;
-            pipelineRasterizationStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
-            pipelineRasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
-            pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
-            pipelineRasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE;
-            pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
-            pipelineRasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
-            pipelineRasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
-            pipelineRasterizationStateCreateInfo.depthBiasClamp = 0.0f;
-            pipelineRasterizationStateCreateInfo.depthBiasSlopeFactor = 0.0f;
-
-            VkPipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo { };
-            pipelineMultisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-            pipelineMultisampleStateCreateInfo.pNext = nullptr;
-            pipelineMultisampleStateCreateInfo.flags = 0;
-            pipelineMultisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
-            pipelineMultisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-            pipelineMultisampleStateCreateInfo.minSampleShading = 1.0f;
-            pipelineMultisampleStateCreateInfo.pSampleMask = nullptr;
-            pipelineMultisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE;
-            pipelineMultisampleStateCreateInfo.alphaToOneEnable = VK_FALSE;
-
-            VkPipelineColorBlendAttachmentState pipelineColorBlendAttachmentState { };
-            pipelineColorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-            pipelineColorBlendAttachmentState.blendEnable = VK_TRUE;
-            pipelineColorBlendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-            pipelineColorBlendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-            pipelineColorBlendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
-            pipelineColorBlendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-            pipelineColorBlendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-            pipelineColorBlendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
-
-            VkPipelineColorBlendStateCreateInfo pipelineColorBlendStateCreateInfo { };
-            pipelineColorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-            pipelineColorBlendStateCreateInfo.pNext = nullptr;
-            pipelineColorBlendStateCreateInfo.flags = 0;
-            pipelineColorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
-            pipelineColorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY;
-            pipelineColorBlendStateCreateInfo.attachmentCount = 1;
-            pipelineColorBlendStateCreateInfo.pAttachments = &pipelineColorBlendAttachmentState;
-            pipelineColorBlendStateCreateInfo.blendConstants[0] = 0.0f;
-            pipelineColorBlendStateCreateInfo.blendConstants[1] = 0.0f;
-            pipelineColorBlendStateCreateInfo.blendConstants[2] = 0.0f;
-            pipelineColorBlendStateCreateInfo.blendConstants[3] = 0.0f;
-
-            VkAttachmentDescription attachmentDescription { };
-            attachmentDescription.format = m_surface->GetFormat().format;
-            attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
-            attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-            attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-            attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-            attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-            attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-            attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-            VkAttachmentReference attachmentReference { };
-            attachmentReference.attachment = 0;
-            attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            
-            VkSubpassDescription subpassDescription { };
-            subpassDescription.flags = 0;
-            subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-            subpassDescription.colorAttachmentCount = 1;
-            subpassDescription.pColorAttachments = &attachmentReference;
-
-            VkRenderPassCreateInfo renderPassCreateInfo { };
-            renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-            renderPassCreateInfo.pNext = nullptr;
-            renderPassCreateInfo.flags = 0;
-            renderPassCreateInfo.attachmentCount = 1;
-            renderPassCreateInfo.pAttachments = &attachmentDescription;
-            renderPassCreateInfo.subpassCount = 1;
-            renderPassCreateInfo.pSubpasses = &subpassDescription;
-
-            UVKE_ASSERT(vkCreateRenderPass(m_base->GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
-
-            VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
-            pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-            pipelineLayoutCreateInfo.pNext = nullptr;
-            pipelineLayoutCreateInfo.flags = 0;
-            pipelineLayoutCreateInfo.setLayoutCount = 1;
-            pipelineLayoutCreateInfo.pSetLayouts = &m_uniformBuffer->GetDescriptorSetLayout();
-            pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
-            pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
-
-            UVKE_ASSERT(vkCreatePipelineLayout(m_base->GetDevice(), &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
-            
-            VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo { };
-            graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-            graphicsPipelineCreateInfo.pNext = nullptr;
-            graphicsPipelineCreateInfo.flags = 0;
-            graphicsPipelineCreateInfo.stageCount = 2;
-            graphicsPipelineCreateInfo.pStages = pipelineShaderStageCreateInfos;
-            graphicsPipelineCreateInfo.pVertexInputState = &pipelineVertexInputStateCreateInfo;
-            graphicsPipelineCreateInfo.pInputAssemblyState = &pipelineInputAssemblyStateCreateInfo;
-            graphicsPipelineCreateInfo.pViewportState = &pipelineViewportStateCreateInfo;
-            graphicsPipelineCreateInfo.pRasterizationState = &pipelineRasterizationStateCreateInfo;
-            graphicsPipelineCreateInfo.pMultisampleState = &pipelineMultisampleStateCreateInfo;
-            graphicsPipelineCreateInfo.pDepthStencilState = nullptr;
-            graphicsPipelineCreateInfo.pColorBlendState = &pipelineColorBlendStateCreateInfo;
-            graphicsPipelineCreateInfo.pDynamicState = &pipelineDynamicStateCreateInfo;
-            graphicsPipelineCreateInfo.layout = m_pipelineLayout;
-            graphicsPipelineCreateInfo.renderPass = m_renderPass;
-            graphicsPipelineCreateInfo.subpass = 0;
-            graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
-            graphicsPipelineCreateInfo.basePipelineIndex = -1;
-
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
-            UVKE_LOG("Graphics Pipeline Created");
-        }
-
-        {
-            m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
-
-            for(auto i = 0; i < m_framebuffers.size(); ++i) {
-                VkFramebufferCreateInfo framebufferCreateInfo { };
-                framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-                framebufferCreateInfo.pNext = nullptr;
-                framebufferCreateInfo.flags = 0;
-                framebufferCreateInfo.renderPass = m_renderPass;
-                framebufferCreateInfo.attachmentCount = 1;
-                framebufferCreateInfo.pAttachments = &m_swapchain->GetImageView(i);
-                framebufferCreateInfo.width = m_surface->GetExtent().width;
-                framebufferCreateInfo.height = m_surface->GetExtent().height;
-                framebufferCreateInfo.layers = 1;
-
-                UVKE_ASSERT(vkCreateFramebuffer(m_base->GetDevice(), &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
-            }
-
-            UVKE_LOG("Framebuffers Created");
-        }
-
-        {
-            VkCommandPoolCreateInfo commandPoolCreateInfo { };
-            commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-            commandPoolCreateInfo.pNext = nullptr;
-            commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            commandPoolCreateInfo.queueFamilyIndex = m_base->GetQueueFamily();
-
-            UVKE_ASSERT(vkCreateCommandPool(m_base->GetDevice(), &commandPoolCreateInfo, nullptr, &m_commandPool));
-        }
+        m_commandBuffer = std::make_shared<CommandBuffer>(m_base->GetDevice(), m_base->GetQueueFamily());
 
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
 
         m_stagingBuffer.reset();
 
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer->GetSize());
 
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandPool, m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
+        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
 
         m_stagingBuffer.reset();
 
-        {
-            VkCommandBufferAllocateInfo commandBufferAllocateInfo { };
-            commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-            commandBufferAllocateInfo.pNext = nullptr;
-            commandBufferAllocateInfo.commandPool = m_commandPool;
-            commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-            commandBufferAllocateInfo.commandBufferCount = 1;
+        m_syncManager = std::make_shared<SyncManager>(m_base->GetDevice());
 
-            UVKE_ASSERT(vkAllocateCommandBuffers(m_base->GetDevice(), &commandBufferAllocateInfo, &m_commandBuffer));
-        }
-
-        {
-            VkSemaphoreCreateInfo semaphoreCreateInfo { };
-            semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-            semaphoreCreateInfo.pNext = nullptr;
-            semaphoreCreateInfo.flags = 0;
-
-            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_availableSemaphore));
-            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_finishedSemaphore));
-
-            VkFenceCreateInfo fenceCreateInfo { };
-            fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-            fenceCreateInfo.pNext = nullptr;
-            fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-            UVKE_ASSERT(vkCreateFence(m_base->GetDevice(), &fenceCreateInfo, nullptr, &m_fence));
-        }
+        UVKE_LOG("Renderer Created");
     }
 
     Renderer::~Renderer() {
-        vkDeviceWaitIdle(m_base->GetDevice());
+        m_syncManager->WaitForDevice();
 
-        vkDestroyFence(m_base->GetDevice(), m_fence, nullptr);
-        vkDestroySemaphore(m_base->GetDevice(), m_finishedSemaphore, nullptr);
-        vkDestroySemaphore(m_base->GetDevice(), m_availableSemaphore, nullptr);
+        m_syncManager.reset();
 
-        vkDestroyCommandPool(m_base->GetDevice(), m_commandPool, nullptr);
+        m_commandBuffer.reset();
 
-        for(auto i = 0; i < m_framebuffers.size(); ++i) {
-            vkDestroyFramebuffer(m_base->GetDevice(), m_framebuffers[i], nullptr);
-        }
+        m_framebuffer.reset();
 
-        vkDestroyPipeline(m_base->GetDevice(), m_pipeline, nullptr);
-
-        vkDestroyPipelineLayout(m_base->GetDevice(), m_pipelineLayout, nullptr);
-        vkDestroyRenderPass(m_base->GetDevice(), m_renderPass, nullptr);
+        m_pipeline.reset();
 
         m_uniformBuffer.reset();
         m_indexBuffer.reset();
         m_vertexBuffer.reset();
 
+        m_shader.reset();
+
         m_swapchain.reset();
         m_surface.reset();
+
+        UVKE_LOG("Renderer Destroyed");
     }
 
     void Renderer::Render() {
-        vkQueueWaitIdle(m_surface->GetQueue(1));
+        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
 
         unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_availableSemaphore, VK_NULL_HANDLE, &index);
+        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
-            m_swapchain->Recreate(*m_window.get(), m_framebuffers, m_renderPass);
+            m_swapchain->Recreate(*m_window.get(), m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             UVKE_FATAL("Swapchain Acquire Image Error");
         }
@@ -336,40 +107,38 @@ namespace uvke {
 
         m_uniformBuffer->Update(ubo);
 
-        vkWaitForFences(m_base->GetDevice(), 1, &m_fence, VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
-        vkResetFences(m_base->GetDevice(), 1, &m_fence);
+        m_syncManager->WaitForFence(m_syncManager->GetFrame());
+        m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        vkResetCommandBuffer(m_commandBuffer, 0);
-        RecordCommandBuffer(m_commandBuffer, index);
+        m_commandBuffer->Record(m_syncManager->GetFrame(), index, m_surface, m_pipeline, m_framebuffer, m_vertexBuffer, m_indexBuffer, m_uniformBuffer);
         
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submitInfo.pNext = nullptr;
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
         submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = &m_availableSemaphore;
+        submitInfo.pWaitSemaphores = &m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame());
         submitInfo.pWaitDstStageMask = waitStages;
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &m_commandBuffer;
+        submitInfo.pCommandBuffers = &m_commandBuffer->GetCommandBuffer(m_syncManager->GetFrame());
         submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = &m_finishedSemaphore;
+        submitInfo.pSignalSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
 
-        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueue(0), 1, &submitInfo, m_fence));
+        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueue(0), 1, &submitInfo, m_syncManager->GetFence(m_syncManager->GetFrame())));
 
         VkPresentInfoKHR presentInfo { };
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         presentInfo.pNext = nullptr;
         presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_finishedSemaphore;
+        presentInfo.pWaitSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = &m_swapchain->GetSwapchain();
         presentInfo.pImageIndices = &index;
         presentInfo.pResults = nullptr;
 
         result = vkQueuePresentKHR(m_surface->GetQueue(1), &presentInfo);
-        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferRecreated) {
-            m_framebufferRecreated = false;
-            m_swapchain->Recreate(*m_window.get(), m_framebuffers, m_renderPass);
+        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_swapchain->IsRecreated()) {
+            m_swapchain->Recreate(*m_window.get(), m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
         } else if(result != VK_SUCCESS) {
             UVKE_FATAL("Framebuffer Recreation Error");
         }
@@ -377,5 +146,95 @@ namespace uvke {
         if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
             m_clock.Restart();
         }
+
+        m_syncManager->Update();
+    }
+
+    void Renderer::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
+    }
+    
+    void Renderer::SetWindow(std::shared_ptr<Window> window) {
+        m_window = window;
+    }
+    
+    void Renderer::SetSurface(std::shared_ptr<Surface> surface) {
+        m_surface = surface;
+    }
+    
+    void Renderer::SetSwapchain(std::shared_ptr<Swapchain> swapchain) {
+        m_swapchain = swapchain;
+    }
+    
+    void Renderer::SetStagingBuffer(std::shared_ptr<StagingBuffer> stagingBuffer) {
+        m_stagingBuffer = stagingBuffer;
+    }
+    
+    void Renderer::SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) {
+        m_vertexBuffer = vertexBuffer;
+    }
+    
+    void Renderer::SetIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) {
+        m_indexBuffer = indexBuffer;
+    }
+    
+    void Renderer::SetUniformBuffer(std::shared_ptr<UniformBuffer> uniformBuffer) {
+        m_uniformBuffer = uniformBuffer;
+    }
+    
+    void Renderer::SetPipeline(std::shared_ptr<Pipeline> pipeline) {
+        m_pipeline = pipeline;
+    }
+    
+    void Renderer::SetFramebuffer(std::shared_ptr<Framebuffer> framebuffer) {
+        m_framebuffer = framebuffer;
+    }
+
+    void Renderer::SetCommandBuffer(std::shared_ptr<CommandBuffer> commandBuffer) {
+        m_commandBuffer = commandBuffer;
+    }
+    
+    std::shared_ptr<Base> Renderer::GetBase() {
+        return m_base;
+    }
+    
+    std::shared_ptr<Window> Renderer::GetWindow() {
+        return m_window;
+    }
+    
+    std::shared_ptr<Surface> Renderer::GetSurface() {
+        return m_surface;
+    }
+    
+    std::shared_ptr<Swapchain> Renderer::GetSwapchain() {
+        return m_swapchain;
+    }
+    
+    std::shared_ptr<StagingBuffer> Renderer::GetStagingBuffer() {
+        return m_stagingBuffer;
+    }
+    
+    std::shared_ptr<VertexBuffer> Renderer::GetVertexBuffer() {
+        return m_vertexBuffer;
+    }
+    
+    std::shared_ptr<IndexBuffer> Renderer::GetIndexBuffer() {
+        return m_indexBuffer;
+    }
+    
+    std::shared_ptr<UniformBuffer> Renderer::GetUniformBuffer() {
+        return m_uniformBuffer;
+    }
+    
+    std::shared_ptr<Pipeline> Renderer::GetPipeline() {
+        return m_pipeline;
+    }
+    
+    std::shared_ptr<Framebuffer> Renderer::GetFramebuffer() {
+        return m_framebuffer;
+    }
+
+    std::shared_ptr<CommandBuffer> Renderer::GetCommandBuffer() {
+        return m_commandBuffer;
     }
 };

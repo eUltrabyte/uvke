@@ -5,13 +5,15 @@ namespace uvke {
         : m_instance(instance), m_physicalDevice(physicalDevice), m_device(device), m_extent({ 0, 0 }) {
         window.CreatePlatformSurface(m_instance, &m_surface);
 
-        UVKE_LOG("Surface Created Successfully");
+        UVKE_LOG("Surface Created");
     }
 
     Surface::~Surface() {
         if(m_instance != VK_NULL_HANDLE && m_surface != VK_NULL_HANDLE) {
             vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
         }
+
+        m_queues.clear();
 
         UVKE_LOG("Surface Destroyed");
     }
@@ -30,6 +32,12 @@ namespace uvke {
 
         m_surfaceFormat = GetSuitableSurfaceFormat();
         m_presentMode = GetSuitablePresentMode();
+
+        UVKE_LOG("Queue Family Index - " + std::to_string(m_queueFamilyIndex));
+
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, m_queueFamilyIndex, m_surface, &presentSupport);
+        UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
     }
 
     void Surface::SetInstance(VkInstance instance) {
