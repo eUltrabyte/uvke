@@ -14,6 +14,7 @@
 #include "Framebuffer.hpp"
 #include "CommandBuffer.hpp"
 #include "SyncManager.hpp"
+#include "Texture.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
@@ -60,6 +61,9 @@ namespace uvke {
         std::shared_ptr<Pipeline> m_pipeline;
         std::shared_ptr<Framebuffer> m_framebuffer;
         std::shared_ptr<CommandBuffer> m_commandBuffer;
+        std::shared_ptr<Texture> m_texture;
+        VkImageView m_imageView;
+        VkSampler m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
         Clock m_clock;
 

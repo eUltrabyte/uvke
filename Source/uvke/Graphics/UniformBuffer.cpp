@@ -1,22 +1,31 @@
 #include "UniformBuffer.hpp"
 
 namespace uvke {
-    UniformBuffer::UniformBuffer(VkPhysicalDevice physicalDevice, VkDevice device)
+    UniformBuffer::UniformBuffer(VkPhysicalDevice physicalDevice, VkDevice device, VkImageView imageView, VkSampler sampler)
         : m_physicalDevice(physicalDevice), m_device(device) {
         {
-            m_descriptorSetLayoutBinding = { };
-            m_descriptorSetLayoutBinding.binding = 0;
-            m_descriptorSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            m_descriptorSetLayoutBinding.descriptorCount = 1;
-            m_descriptorSetLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-            m_descriptorSetLayoutBinding.pImmutableSamplers = nullptr;
+            VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = { };
+            descriptorSetLayoutBinding.binding = 0;
+            descriptorSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorSetLayoutBinding.descriptorCount = 1;
+            descriptorSetLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+            descriptorSetLayoutBinding.pImmutableSamplers = nullptr;
+
+            VkDescriptorSetLayoutBinding samplerSetLayoutBinding = { };
+            samplerSetLayoutBinding.binding = 1;
+            samplerSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            samplerSetLayoutBinding.descriptorCount = 1;
+            samplerSetLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            samplerSetLayoutBinding.pImmutableSamplers = nullptr;
+
+            m_descriptorSetLayoutBindings = { descriptorSetLayoutBinding, samplerSetLayoutBinding };
 
             VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo { };
             descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
             descriptorSetLayoutCreateInfo.pNext = nullptr;
             descriptorSetLayoutCreateInfo.flags = 0;
-            descriptorSetLayoutCreateInfo.bindingCount = 1;
-            descriptorSetLayoutCreateInfo.pBindings = &m_descriptorSetLayoutBinding;
+            descriptorSetLayoutCreateInfo.bindingCount = m_descriptorSetLayoutBindings.size();
+            descriptorSetLayoutCreateInfo.pBindings = m_descriptorSetLayoutBindings.data();
 
             UVKE_ASSERT(vkCreateDescriptorSetLayout(m_device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout));
 
@@ -42,10 +51,10 @@ namespace uvke {
             VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
             unsigned int index = 0;
             for(auto i = 0; i < memoryProperties.memoryTypeCount; ++i) {
-            if(filter & (1 << i) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-                index = i;
-                break;
-            }
+                if(filter & (1 << i) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+                    index = i;
+                    break;
+                }
             }
 
             VkMemoryAllocateInfo memoryAllocateInfo { };
@@ -58,48 +67,69 @@ namespace uvke {
 
             vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
 
-            VkDescriptorPoolSize descriptorPoolSize { };
-            descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorPoolSize.descriptorCount = 1;
+            unsigned int frames = 2;
+            m_descriptorSets.resize(frames);
+            std::array<VkDescriptorPoolSize, 2> descriptorPoolSizes { };
+            descriptorPoolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorPoolSizes[0].descriptorCount = frames;
+            descriptorPoolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorPoolSizes[1].descriptorCount = frames;
 
             VkDescriptorPoolCreateInfo descriptorPoolCreateInfo { };
             descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
             descriptorPoolCreateInfo.pNext = nullptr;
             descriptorPoolCreateInfo.flags = 0;
-            descriptorPoolCreateInfo.poolSizeCount = 1;
-            descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
-            descriptorPoolCreateInfo.maxSets = 1;
+            descriptorPoolCreateInfo.poolSizeCount = descriptorPoolSizes.size();
+            descriptorPoolCreateInfo.pPoolSizes = descriptorPoolSizes.data();
+            descriptorPoolCreateInfo.maxSets = frames;
 
             UVKE_ASSERT(vkCreateDescriptorPool(m_device, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool));
 
-            VkDescriptorSetLayout descriptorSetLayout = m_descriptorSetLayout;
+            std::vector<VkDescriptorSetLayout> descriptorSetLayouts(2, m_descriptorSetLayout);
             VkDescriptorSetAllocateInfo descriptorSetAllocateInfo { };
             descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
             descriptorSetAllocateInfo.pNext = nullptr;
             descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
-            descriptorSetAllocateInfo.descriptorSetCount = 1;
-            descriptorSetAllocateInfo.pSetLayouts = &descriptorSetLayout;
+            descriptorSetAllocateInfo.descriptorSetCount = m_descriptorSets.size();
+            descriptorSetAllocateInfo.pSetLayouts = descriptorSetLayouts.data();
 
-            UVKE_ASSERT(vkAllocateDescriptorSets(m_device, &descriptorSetAllocateInfo, &m_descriptorSet));
+            UVKE_ASSERT(vkAllocateDescriptorSets(m_device, &descriptorSetAllocateInfo, m_descriptorSets.data()));
         }
 
-        VkDescriptorBufferInfo descriptorBufferInfo { };
-        descriptorBufferInfo.buffer = m_buffer;
-        descriptorBufferInfo.offset = 0;
-        descriptorBufferInfo.range = sizeof(UniformBufferObject);
+        std::array<VkWriteDescriptorSet, 2> writeDescriptorSets { };
+        for(auto i = 0; i < 2; ++i) {
+            VkDescriptorBufferInfo descriptorBufferInfo { };
+            descriptorBufferInfo.buffer = m_buffer;
+            descriptorBufferInfo.offset = 0;
+            descriptorBufferInfo.range = sizeof(UniformBufferObject);
 
-        VkWriteDescriptorSet writeDescriptorSet { };
-        writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        writeDescriptorSet.dstSet = m_descriptorSet;
-        writeDescriptorSet.dstBinding = 0;
-        writeDescriptorSet.dstArrayElement = 0;
-        writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        writeDescriptorSet.descriptorCount = 1;
-        writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-        writeDescriptorSet.pImageInfo = nullptr;
-        writeDescriptorSet.pTexelBufferView = nullptr;
+            VkDescriptorImageInfo descriptorImageInfo { };
+            descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            descriptorImageInfo.imageView = imageView;
+            descriptorImageInfo.sampler = sampler;
 
-        vkUpdateDescriptorSets(m_device, 1, &writeDescriptorSet, 0, nullptr);
+            writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            writeDescriptorSets[0].dstSet = m_descriptorSets[i];
+            writeDescriptorSets[0].dstBinding = 0;
+            writeDescriptorSets[0].dstArrayElement = 0;
+            writeDescriptorSets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            writeDescriptorSets[0].descriptorCount = 1;
+            writeDescriptorSets[0].pBufferInfo = &descriptorBufferInfo;
+            writeDescriptorSets[0].pImageInfo = nullptr;
+            writeDescriptorSets[0].pTexelBufferView = nullptr;
+
+            writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            writeDescriptorSets[1].dstSet = m_descriptorSets[i];
+            writeDescriptorSets[1].dstBinding = 1;
+            writeDescriptorSets[1].dstArrayElement = 0;
+            writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            writeDescriptorSets[1].descriptorCount = 1;
+            writeDescriptorSets[1].pBufferInfo = nullptr;
+            writeDescriptorSets[1].pImageInfo = &descriptorImageInfo;
+            writeDescriptorSets[1].pTexelBufferView = nullptr;
+
+            vkUpdateDescriptorSets(m_device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, nullptr);
+        }
 
         UVKE_LOG("Uniform Buffer Created");
     }
@@ -133,8 +163,8 @@ namespace uvke {
         vkUnmapMemory(m_device, m_bufferMemory);
     }
 
-    void UniformBuffer::Bind(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) {
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+    void UniformBuffer::Bind(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) {
+        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &m_descriptorSets[frame], 0, nullptr);
     }
 
     VkDescriptorSetLayout& UniformBuffer::GetDescriptorSetLayout() {
@@ -145,8 +175,8 @@ namespace uvke {
         return m_descriptorPool;
     }
 
-    VkDescriptorSet& UniformBuffer::GetDescriptorSet() {
-        return m_descriptorSet;
+    std::vector<VkDescriptorSet>& UniformBuffer::GetDescriptorSets() {
+        return m_descriptorSets;
     }
 
     unsigned int UniformBuffer::GetSize() {

@@ -17,6 +17,8 @@ namespace uvke {
         virtual ~CommandBuffer();
 
         virtual void Record(unsigned int frame, unsigned int index, std::shared_ptr<Surface> surface, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, std::shared_ptr<UniformBuffer> uniformBuffer);
+        virtual VkCommandBuffer Begin();
+        virtual void End(VkCommandBuffer commandBuffer, VkQueue queue);
 
         virtual void SetDevice(VkDevice device);
         virtual void SetCommandPool(VkCommandPool commandPool);

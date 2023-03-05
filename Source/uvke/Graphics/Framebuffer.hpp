@@ -9,7 +9,7 @@
 namespace uvke {
     class UVKE_API Framebuffer {
     public:
-        Framebuffer(VkDevice device, VkRenderPass renderPass, std::shared_ptr<Swapchain> swapchain, std::shared_ptr<Surface> surface);
+        Framebuffer(VkDevice device = nullptr, VkRenderPass renderPass = nullptr, std::shared_ptr<Swapchain> swapchain = nullptr, std::shared_ptr<Surface> surface = nullptr);
         virtual ~Framebuffer();
 
         virtual void Recreate();

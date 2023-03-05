@@ -7,7 +7,7 @@
 namespace uvke {
     class UVKE_API SyncManager {
     public:
-        SyncManager(VkDevice device);
+        SyncManager(VkDevice device = nullptr);
         virtual ~SyncManager();
 
         virtual void Update();

@@ -92,16 +92,16 @@ namespace uvke {
         UVKE_LOG("Swapchain Destroyed");
     }
 
-    void Swapchain::Recreate(Window& window, std::vector<VkFramebuffer>& framebuffers, VkRenderPass renderPass) {
+    void Swapchain::Recreate(std::shared_ptr<Window> window, std::vector<VkFramebuffer>& framebuffers, VkRenderPass renderPass) {
         m_isRecreated = false;
-        window.Update();
+        window->Update();
 
-        vec2i size(window.GetWindowProps()->size.x, window.GetWindowProps()->size.y);
+        vec2i size(window->GetWindowProps()->size.x, window->GetWindowProps()->size.y);
         for(; size.x == 0 || size.y == 0 ;) {
-            window.Update();
-            size = vec2i(window.GetWindowProps()->size.x, window.GetWindowProps()->size.y);
+            window->Update();
+            size = vec2i(window->GetWindowProps()->size.x, window->GetWindowProps()->size.y);
             m_surface->SetSwapExtent(window);
-            window.Wait();
+            window->Wait();
         }
 
         if(size.x != 0 || size.y != 0) {

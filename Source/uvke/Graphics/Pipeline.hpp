@@ -11,7 +11,7 @@
 namespace uvke {
     class UVKE_API Pipeline {
     public:
-        Pipeline(VkDevice device, std::shared_ptr<Surface> surface, std::shared_ptr<Shader> shader, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<UniformBuffer> uniformBuffer);
+        Pipeline(VkDevice device = nullptr, std::shared_ptr<Surface> surface = nullptr, std::shared_ptr<Shader> shader = nullptr, std::shared_ptr<VertexBuffer> vertexBuffer = nullptr, std::shared_ptr<UniformBuffer> uniformBuffer = nullptr);
         virtual ~Pipeline();
 
         virtual void Recreate();

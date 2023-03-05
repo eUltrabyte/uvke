@@ -7,7 +7,8 @@
 namespace uvke {
     struct Vertex {
         vec3f position;
-        vec4f color;
+        vec3f color;
+        vec2f texCoord;
     };
 
     class UVKE_API VertexBuffer {
@@ -19,7 +20,7 @@ namespace uvke {
 
         virtual std::vector<Vertex>& GetVertices();
         virtual VkVertexInputBindingDescription& GetVertexInputBindingDescription();
-        virtual std::array<VkVertexInputAttributeDescription, 2>& GetVertexInputAttributeDescription();
+        virtual std::array<VkVertexInputAttributeDescription, 3>& GetVertexInputAttributeDescription();
         virtual unsigned int GetSize();
         virtual VkBuffer& GetBuffer();
 
@@ -30,7 +31,7 @@ namespace uvke {
     private:
         std::vector<Vertex> m_vertices;
         VkVertexInputBindingDescription m_vertexInputBindingDescription;
-        std::array<VkVertexInputAttributeDescription, 2> m_vertexInputAttributeDescription;
+        std::array<VkVertexInputAttributeDescription, 3> m_vertexInputAttributeDescription;
         VkBuffer m_buffer;
         VkDeviceMemory m_bufferMemory;
 

@@ -33,7 +33,8 @@
 #include "Core/Window.hpp"
 
 // TODO
-// load and render picture
+// move sampler and image view to sampler class
+// asset manager class
 // reimplement stb_image with own library
 // add some gui ( imgui or own )
 // add profiler

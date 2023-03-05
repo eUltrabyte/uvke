@@ -1,9 +1,9 @@
 #include "Surface.hpp"
 
 namespace uvke {
-    Surface::Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device, Window& window)
+    Surface::Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device, std::shared_ptr<Window> window)
         : m_instance(instance), m_physicalDevice(physicalDevice), m_device(device), m_extent({ 0, 0 }) {
-        window.CreatePlatformSurface(m_instance, &m_surface);
+        window->CreatePlatformSurface(m_instance, &m_surface);
 
         UVKE_LOG("Surface Created");
     }
@@ -76,15 +76,15 @@ namespace uvke {
         m_extent = extent;
     }
 
-    void Surface::SetSwapExtent(Window& window) {
+    void Surface::SetSwapExtent(std::shared_ptr<Window> window) {
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &m_surfaceCapabilities);
 
         if(m_surfaceCapabilities.currentExtent.width != std::numeric_limits<unsigned int>::infinity() || m_surfaceCapabilities.currentExtent.height != std::numeric_limits<unsigned int>::infinity()) {
             m_extent = m_surfaceCapabilities.currentExtent;
         } else {
-            window.Update();
-            m_extent.width = std::clamp(static_cast<unsigned int>(window.GetWindowProps()->size.x), m_surfaceCapabilities.minImageExtent.width, m_surfaceCapabilities.maxImageExtent.width);
-            m_extent.height = std::clamp(static_cast<unsigned int>(window.GetWindowProps()->size.y), m_surfaceCapabilities.minImageExtent.height, m_surfaceCapabilities.maxImageExtent.height);
+            window->Update();
+            m_extent.width = std::clamp(static_cast<unsigned int>(window->GetWindowProps()->size.x), m_surfaceCapabilities.minImageExtent.width, m_surfaceCapabilities.maxImageExtent.width);
+            m_extent.height = std::clamp(static_cast<unsigned int>(window->GetWindowProps()->size.y), m_surfaceCapabilities.minImageExtent.height, m_surfaceCapabilities.maxImageExtent.height);
         }
     }
 

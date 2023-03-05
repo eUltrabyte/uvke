@@ -48,6 +48,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/CommandBuffer.cpp
     Source/uvke/Graphics/SyncManager.hpp
     Source/uvke/Graphics/SyncManager.cpp
+    Source/uvke/Graphics/Texture.hpp
+    Source/uvke/Graphics/Texture.cpp
 )
 
 set(UVKE_UTILS_SOURCE
@@ -117,4 +119,5 @@ file(COPY Resource/ DESTINATION Resource/)
 
 if(UVKE_EXAMPLES)
     add_subdirectory(Examples/App)
+    file(COPY Resource/ DESTINATION Examples/App/Resource/)
 endif()
