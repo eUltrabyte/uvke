@@ -85,11 +85,61 @@ namespace uvke {
         m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer1->GetBuffer(), m_indexBuffer1->GetSize());
         m_stagingBuffer.reset();
 
+        std::vector<VkDescriptorPoolSize> poolSizes = {
+            { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+        };
+
+        VkDescriptorPoolCreateInfo pool_info = {};
+        pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        pool_info.maxSets = 1000;
+        pool_info.poolSizeCount = poolSizes.size();
+        pool_info.pPoolSizes = poolSizes.data();
+
+        UVKE_ASSERT(vkCreateDescriptorPool(m_base->GetDevice(), &pool_info, nullptr, &m_imguiPool));
+
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.IniFilename = nullptr;
+
+        ImGui_ImplGlfw_InitForVulkan(m_window->GetWindow(), true);
+
+        ImGui_ImplVulkan_InitInfo imguiVulkanInitInfo = { };
+        imguiVulkanInitInfo.Instance = m_base->GetInstance();
+        imguiVulkanInitInfo.PhysicalDevice = m_base->GetPhysicalDevice();
+        imguiVulkanInitInfo.Device = m_base->GetDevice();
+        imguiVulkanInitInfo.Queue = m_surface->GetQueue(0);
+        imguiVulkanInitInfo.DescriptorPool = m_imguiPool;
+        imguiVulkanInitInfo.MinImageCount = 3;
+        imguiVulkanInitInfo.ImageCount = 3;
+        imguiVulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+        ImGui_ImplVulkan_Init(&imguiVulkanInitInfo, m_pipeline->GetRenderPass());
+
+        VkCommandBuffer commandBuffer = m_commandBuffer->Begin();
+        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+        m_commandBuffer->End(commandBuffer, m_surface->GetQueue(0));
+
+        ImGui_ImplVulkan_DestroyFontUploadObjects();
+
         UVKE_LOG("Renderer Created");
     }
 
     Renderer::~Renderer() {
         m_syncManager->WaitForDevice();
+
+        vkDestroyDescriptorPool(m_base->GetDevice(), m_imguiPool, nullptr);
+        ImGui_ImplVulkan_Shutdown();
 
         m_syncManager.reset();
 

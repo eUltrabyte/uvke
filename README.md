@@ -16,6 +16,8 @@
 
 [stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) - Image loading/decoding from file/memory: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
 
+[imgui](https://github.com/ocornut/imgui) - Bloat-free graphical user interface library for C++. It outputs optimized vertex buffers that you can render anytime in your 3D-pipeline-enabled application. It is fast, portable, renderer agnostic, and self-contained (no external dependencies).
+
 ### Installation
 ```bash
 git clone https://github.com/eUltrabyte/uvke.git
