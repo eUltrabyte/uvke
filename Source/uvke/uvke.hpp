@@ -33,8 +33,8 @@
 #include "Core/Window.hpp"
 
 // TODO
-// move sampler and image view to sampler class
 // asset manager class
+// add multi rendering support?
 // reimplement stb_image with own library
 // add some gui ( imgui or own )
 // add profiler

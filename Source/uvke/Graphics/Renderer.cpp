@@ -21,9 +21,9 @@ namespace uvke {
 
         m_commandBuffer = std::make_shared<CommandBuffer>(m_base->GetDevice(), m_base->GetQueueFamily());
 
-        m_texture = std::make_shared<Texture>(m_base->GetPhysicalDevice(), m_base->GetDevice(), "Resource/uvke.png");
+        m_texture = std::make_shared<Texture>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_surface, "Resource/uvke.png");
 
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * m_texture->GetChannel()));
+        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * 4));
         m_stagingBuffer->Map(m_texture->GetPixels());
         m_texture->Allocate();
 
@@ -33,69 +33,20 @@ namespace uvke {
 
         m_stagingBuffer.reset();
 
-        {
-            VkImageViewCreateInfo imageViewCreateInfo { };
-            imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            imageViewCreateInfo.pNext = nullptr;
-            imageViewCreateInfo.flags = 0;
-            imageViewCreateInfo.image = m_texture->GetImage();
-            imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            imageViewCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-            imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-            imageViewCreateInfo.subresourceRange.levelCount = 1;
-            imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-            imageViewCreateInfo.subresourceRange.layerCount = 1;
-
-            UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageView));
-        }
-
-        {
-            VkPhysicalDeviceFeatures physicalDeviceFeatures { };
-            vkGetPhysicalDeviceFeatures(m_base->GetPhysicalDevice(), &physicalDeviceFeatures);
-
-            VkPhysicalDeviceProperties physicalDeviceProperties { };
-            vkGetPhysicalDeviceProperties(m_base->GetPhysicalDevice(), &physicalDeviceProperties);
-
-            VkSamplerCreateInfo samplerCreateInfo { };
-            samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-            samplerCreateInfo.pNext = nullptr;
-            samplerCreateInfo.flags = 0;
-            samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
-            samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
-            samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-
-            if(physicalDeviceFeatures.samplerAnisotropy) {
-                samplerCreateInfo.anisotropyEnable = VK_TRUE;
-                samplerCreateInfo.maxAnisotropy = physicalDeviceProperties.limits.maxSamplerAnisotropy;
-            } else {
-                samplerCreateInfo.anisotropyEnable = VK_FALSE;
-                samplerCreateInfo.maxAnisotropy = 1.0f;
-            }
-
-            samplerCreateInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-            samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
-            samplerCreateInfo.compareEnable = VK_FALSE;
-            samplerCreateInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-            samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-
-            UVKE_ASSERT(vkCreateSampler(m_base->GetDevice(), &samplerCreateInfo, nullptr, &m_sampler));
-        }
+        m_sampler = std::make_shared<Sampler>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_texture);
 
         m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            { { -0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { 0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { -0.4f, -0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
+            { { 0.4f, -0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
+            { { 0.4f, 0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+            { { -0.4f, 0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
         } );
 
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
             0, 1, 2, 2, 3, 0
         } );
 
-        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_imageView, m_sampler);
+        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
 
         m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_uniformBuffer);
 
@@ -121,8 +72,7 @@ namespace uvke {
 
         m_syncManager.reset();
 
-        vkDestroySampler(m_base->GetDevice(), m_sampler, nullptr);
-        vkDestroyImageView(m_base->GetDevice(), m_imageView, nullptr);
+        m_sampler.reset();
 
         m_texture.reset();
 
@@ -157,13 +107,13 @@ namespace uvke {
         
         UniformBufferObject ubo { };
         ubo.model = Identity<float>();
-        ubo.model = Scale<float>(ubo.model, vec3f(2.0f, 2.0f, 2.0f));
+        // ubo.model = Scale<float>(ubo.model, vec3f(1.0f, 1.0f, 1.0f));
         // ubo.model = Rotate<float>(ubo.model, vec3f(0.0f, 0.0f, 1.0f), std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::steady_clock::now() - m_clock.GetStart()).count() * Radians(90.0f) * 4);
 
         ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
 
         if(glfwGetKey(m_window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
+            ubo.projection = Perspective<float>(Radians(70.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
             ubo.projection.data[1][1] *= -1;
         } else {
             ubo.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
