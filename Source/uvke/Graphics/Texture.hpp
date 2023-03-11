@@ -10,7 +10,7 @@
 namespace uvke {
     class UVKE_API Texture {
     public:
-        Texture(VkPhysicalDevice physicalDevice = nullptr, VkDevice device = nullptr, std::shared_ptr<Surface> surface = nullptr, std::string_view filename = "");
+        Texture(VkPhysicalDevice physicalDevice = nullptr, VkDevice device = nullptr, std::string_view filename = "");
         virtual ~Texture();
 
         virtual void Allocate();

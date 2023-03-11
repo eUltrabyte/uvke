@@ -41,7 +41,7 @@ namespace uvke {
         UVKE_LOG("Command Buffer Destroyed");
     }
 
-    void CommandBuffer::Record(unsigned int frame, unsigned int index, std::shared_ptr<Surface> surface, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, std::shared_ptr<UniformBuffer> uniformBuffer) {
+    void CommandBuffer::Record(unsigned int frame, unsigned int index, std::shared_ptr<Surface> surface, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers) {
         vkResetCommandBuffer(m_commandBuffers[frame], 0);
 
         VkCommandBufferBeginInfo commandBufferBeginInfo { };
@@ -83,11 +83,24 @@ namespace uvke {
 
         vkCmdSetScissor(m_commandBuffers[frame], 0, 1, &scissor);
 
-        vertexBuffer->Bind(m_commandBuffers[frame]);
-        indexBuffer->Bind(m_commandBuffers[frame]);
-        uniformBuffer->Bind(m_commandBuffers[frame], pipeline->GetPipelineLayout(), frame);
+        auto objects = (vertexBuffers.size() + indexBuffers.size() + uniformBuffers.size()) / 3;
+        for(auto i = 0; i < vertexBuffers.size(); ++i) {
+            vertexBuffers[i]->Bind(m_commandBuffers[frame]);
+            indexBuffers[i]->Bind(m_commandBuffers[frame]);
+            uniformBuffers[i]->Bind(m_commandBuffers[frame], pipeline->GetPipelineLayout(), frame);
 
-        vkCmdDrawIndexed(m_commandBuffers[frame], indexBuffer->GetIndices().size(), 1, 0, 0, 0);
+            vkCmdDrawIndexed(m_commandBuffers[frame], indexBuffers[i]->GetIndices().size(), 1, 0, 0, 0);
+        }
+
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::ShowDemoWindow();
+
+        ImGui::Render();
+
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_commandBuffers[frame]);
 
         vkCmdEndRenderPass(m_commandBuffers[frame]);
 

@@ -58,6 +58,8 @@ namespace uvke {
         std::shared_ptr<StagingBuffer> m_stagingBuffer;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
         std::shared_ptr<IndexBuffer> m_indexBuffer;
+        std::shared_ptr<VertexBuffer> m_vertexBuffer1;
+        std::shared_ptr<IndexBuffer> m_indexBuffer1;
         std::shared_ptr<UniformBuffer> m_uniformBuffer;
         std::shared_ptr<Pipeline> m_pipeline;
         std::shared_ptr<Framebuffer> m_framebuffer;
@@ -66,6 +68,7 @@ namespace uvke {
         std::shared_ptr<Sampler> m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
         Clock m_clock;
+        VkDescriptorPool m_imguiPool;
 
     };
 };

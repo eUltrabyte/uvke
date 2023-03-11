@@ -173,11 +173,6 @@ namespace uvke {
     }
     
     Pipeline::~Pipeline() {
-        m_surface.reset();
-        m_shader.reset();
-        m_vertexBuffer.reset();
-        m_uniformBuffer.reset();
-        
         if(m_device != VK_NULL_HANDLE) {
             if(m_pipeline != VK_NULL_HANDLE) {
                 vkDestroyPipeline(m_device, m_pipeline, nullptr);
@@ -197,6 +192,10 @@ namespace uvke {
 
     void Pipeline::Recreate() {
         {
+            vkDestroyPipeline(m_device, m_pipeline, nullptr);
+            vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
+            vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *m_shader->GetVertexShaderStageCreateInfo(), *m_shader->GetFragmentShaderStageCreateInfo() };
 
             std::vector<VkDynamicState> dynamicStates = {

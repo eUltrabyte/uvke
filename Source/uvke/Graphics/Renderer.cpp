@@ -21,7 +21,7 @@ namespace uvke {
 
         m_commandBuffer = std::make_shared<CommandBuffer>(m_base->GetDevice(), m_base->GetQueueFamily());
 
-        m_texture = std::make_shared<Texture>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_surface, "Resource/uvke.png");
+        m_texture = std::make_shared<Texture>(m_base->GetPhysicalDevice(), m_base->GetDevice(), "Resource/uvke.png");
 
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * 4));
         m_stagingBuffer->Map(m_texture->GetPixels());
@@ -43,7 +43,18 @@ namespace uvke {
         } );
 
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
-            0, 1, 2, 2, 3, 0
+            0, 1, 2, 2, 3, 0,
+        } );
+
+        m_vertexBuffer1 = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
+            { { -0.2f, -0.15f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
+            { { 0.2f, -0.15f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
+            { { 0.2f, 0.15f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
+            { { -0.2f, 0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+        } );
+
+        m_indexBuffer1 = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
+            0, 1, 2, 2, 3, 0,
         } );
 
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
@@ -64,11 +75,71 @@ namespace uvke {
         m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
         m_stagingBuffer.reset();
 
+        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer1->GetSize());
+        m_stagingBuffer->Map(m_vertexBuffer1->GetVertices().data());
+        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer1->GetBuffer(), m_vertexBuffer1->GetSize());
+        m_stagingBuffer.reset();
+
+        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer1->GetSize());
+        m_stagingBuffer->Map(m_indexBuffer1->GetIndices().data());
+        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer1->GetBuffer(), m_indexBuffer1->GetSize());
+        m_stagingBuffer.reset();
+
+        std::vector<VkDescriptorPoolSize> poolSizes = {
+            { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+        };
+
+        VkDescriptorPoolCreateInfo pool_info = {};
+        pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        pool_info.maxSets = 1000;
+        pool_info.poolSizeCount = poolSizes.size();
+        pool_info.pPoolSizes = poolSizes.data();
+
+        UVKE_ASSERT(vkCreateDescriptorPool(m_base->GetDevice(), &pool_info, nullptr, &m_imguiPool));
+
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.IniFilename = nullptr;
+
+        ImGui_ImplGlfw_InitForVulkan(m_window->GetWindow(), true);
+
+        ImGui_ImplVulkan_InitInfo imguiVulkanInitInfo = { };
+        imguiVulkanInitInfo.Instance = m_base->GetInstance();
+        imguiVulkanInitInfo.PhysicalDevice = m_base->GetPhysicalDevice();
+        imguiVulkanInitInfo.Device = m_base->GetDevice();
+        imguiVulkanInitInfo.Queue = m_surface->GetQueue(0);
+        imguiVulkanInitInfo.DescriptorPool = m_imguiPool;
+        imguiVulkanInitInfo.MinImageCount = 3;
+        imguiVulkanInitInfo.ImageCount = 3;
+        imguiVulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+        ImGui_ImplVulkan_Init(&imguiVulkanInitInfo, m_pipeline->GetRenderPass());
+
+        VkCommandBuffer commandBuffer = m_commandBuffer->Begin();
+        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+        m_commandBuffer->End(commandBuffer, m_surface->GetQueue(0));
+
+        ImGui_ImplVulkan_DestroyFontUploadObjects();
+
         UVKE_LOG("Renderer Created");
     }
 
     Renderer::~Renderer() {
         m_syncManager->WaitForDevice();
+
+        vkDestroyDescriptorPool(m_base->GetDevice(), m_imguiPool, nullptr);
+        ImGui_ImplVulkan_Shutdown();
 
         m_syncManager.reset();
 
@@ -124,7 +195,7 @@ namespace uvke {
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_commandBuffer->Record(m_syncManager->GetFrame(), index, m_surface, m_pipeline, m_framebuffer, m_vertexBuffer, m_indexBuffer, m_uniformBuffer);
+        m_commandBuffer->Record(m_syncManager->GetFrame(), index, m_surface, m_pipeline, m_framebuffer, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer });
         
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

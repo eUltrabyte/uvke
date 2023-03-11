@@ -29,6 +29,10 @@
     #include <Windows.h>
 #endif
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
+
 namespace uvke {
     namespace priv {
         extern int UVKE_API Init();

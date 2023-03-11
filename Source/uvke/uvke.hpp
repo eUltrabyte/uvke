@@ -33,10 +33,11 @@
 #include "Core/Window.hpp"
 
 // TODO
+// add multi object rendering support?
+// add multi threading support
 // asset manager class
-// add multi rendering support?
 // reimplement stb_image with own library
-// add some gui ( imgui or own )
+// reimplement imgui with own library
 // add profiler
 // reimplement windows with own library
 // add something like vulkan wrapper as alternative for vulkansdk

@@ -16,7 +16,7 @@ namespace uvke {
         CommandBuffer(VkDevice device, unsigned int queueFamilyIndex);
         virtual ~CommandBuffer();
 
-        virtual void Record(unsigned int frame, unsigned int index, std::shared_ptr<Surface> surface, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, std::shared_ptr<UniformBuffer> uniformBuffer);
+        virtual void Record(unsigned int frame, unsigned int index, std::shared_ptr<Surface> surface, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers);
         virtual VkCommandBuffer Begin();
         virtual void End(VkCommandBuffer commandBuffer, VkQueue queue);
 
