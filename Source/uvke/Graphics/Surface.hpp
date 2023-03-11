@@ -8,7 +8,7 @@
 namespace uvke {
     class UVKE_API Surface {
     public:
-        Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device, Window& window);
+        Surface(VkInstance instance = nullptr, VkPhysicalDevice physicalDevice = nullptr, VkDevice device = nullptr, std::shared_ptr<Window> window = nullptr);
         virtual ~Surface();
 
         virtual void CheckQueues();
@@ -22,7 +22,7 @@ namespace uvke {
         virtual void SetSurfaceFormat(VkSurfaceFormatKHR surfaceFormat);
         virtual void SetPresentMode(VkPresentModeKHR presentMode);
         virtual void SetExtent(VkExtent2D extent);
-        virtual void SetSwapExtent(Window& window);
+        virtual void SetSwapExtent(std::shared_ptr<Window> window);
 
         virtual VkInstance& GetInstance();
         virtual VkPhysicalDevice& GetPhysicalDevice();

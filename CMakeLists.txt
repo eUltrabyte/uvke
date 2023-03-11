@@ -4,7 +4,7 @@ project(uvke)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(Thirdparty)
 
@@ -46,6 +46,10 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Framebuffer.cpp
     Source/uvke/Graphics/CommandBuffer.hpp
     Source/uvke/Graphics/CommandBuffer.cpp
+    Source/uvke/Graphics/Texture.hpp
+    Source/uvke/Graphics/Texture.cpp
+    Source/uvke/Graphics/Sampler.hpp
+    Source/uvke/Graphics/Sampler.cpp
     Source/uvke/Graphics/SyncManager.hpp
     Source/uvke/Graphics/SyncManager.cpp
 )
@@ -117,4 +121,5 @@ file(COPY Resource/ DESTINATION Resource/)
 
 if(UVKE_EXAMPLES)
     add_subdirectory(Examples/App)
+    file(COPY Resource/ DESTINATION Examples/App/Resource/)
 endif()

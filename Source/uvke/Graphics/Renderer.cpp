@@ -1,16 +1,15 @@
 #include "Renderer.hpp"
-#include "UniformBuffer.hpp"
 
 namespace uvke {
     Renderer::Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
         : m_base(base), m_window(window) {
-        m_surface = std::make_shared<Surface>(m_base->GetInstance(), m_base->GetPhysicalDevice(), m_base->GetDevice(), *m_window.get());
+        m_surface = std::make_shared<Surface>(m_base->GetInstance(), m_base->GetPhysicalDevice(), m_base->GetDevice(), m_window);
 
         m_surface->SetQueueFamily(m_base->GetQueueFamily());
         m_surface->SetMultiQueueMode(m_base->IsMultiQueueSupported());
         
         m_surface->CheckQueues();
-        m_surface->SetSwapExtent(*m_window.get());
+        m_surface->SetSwapExtent(m_window);
 
         UVKE_LOG("Format - " + std::to_string(m_surface->GetFormat().format));
         UVKE_LOG("Present Mode - " + std::to_string(m_surface->GetPresentMode()));
@@ -20,39 +19,50 @@ namespace uvke {
 
         m_shader = std::make_shared<Shader>(m_base->GetDevice(), File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
 
+        m_commandBuffer = std::make_shared<CommandBuffer>(m_base->GetDevice(), m_base->GetQueueFamily());
+
+        m_texture = std::make_shared<Texture>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_surface, "Resource/uvke.png");
+
+        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * 4));
+        m_stagingBuffer->Map(m_texture->GetPixels());
+        m_texture->Allocate();
+
+        m_texture->LayoutTransition(m_commandBuffer, m_surface->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        m_texture->CopyFromBuffer(m_commandBuffer, m_surface->GetQueue(0), m_stagingBuffer->GetBuffer());
+        m_texture->LayoutTransition(m_commandBuffer, m_surface->GetQueue(0), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        m_stagingBuffer.reset();
+
+        m_sampler = std::make_shared<Sampler>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_texture);
+
         m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            {{ -0.5f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }},
-            {{ 0.0f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }},
-            {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }},
+            { { -0.4f, -0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
+            { { 0.4f, -0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
+            { { 0.4f, 0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+            { { -0.4f, 0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
         } );
 
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
-            0, 1, 2,
+            0, 1, 2, 2, 3, 0
         } );
 
-        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice());
+        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
 
         m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_uniformBuffer);
 
         m_framebuffer = std::make_shared<Framebuffer>(m_base->GetDevice(), m_pipeline->GetRenderPass(), m_swapchain, m_surface);
 
-        m_commandBuffer = std::make_shared<CommandBuffer>(m_base->GetDevice(), m_base->GetQueueFamily());
+        m_syncManager = std::make_shared<SyncManager>(m_base->GetDevice());
 
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer->GetSize());
-
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
         m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
-
         m_stagingBuffer.reset();
 
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer->GetSize());
-
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
         m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
-
         m_stagingBuffer.reset();
-
-        m_syncManager = std::make_shared<SyncManager>(m_base->GetDevice());
 
         UVKE_LOG("Renderer Created");
     }
@@ -61,6 +71,10 @@ namespace uvke {
         m_syncManager->WaitForDevice();
 
         m_syncManager.reset();
+
+        m_sampler.reset();
+
+        m_texture.reset();
 
         m_commandBuffer.reset();
 
@@ -86,20 +100,20 @@ namespace uvke {
         unsigned int index = 0;
         VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
-            m_swapchain->Recreate(*m_window.get(), m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
+            m_swapchain->Recreate(m_window, m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             UVKE_FATAL("Swapchain Acquire Image Error");
         }
         
         UniformBufferObject ubo { };
         ubo.model = Identity<float>();
-        ubo.model = Scale<float>(ubo.model, vec3f(2.0f, 2.0f, 2.0f));
-        ubo.model = Rotate<float>(ubo.model, vec3f(0.0f, 0.0f, 1.0f), std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::steady_clock::now() - m_clock.GetStart()).count() * Radians(90.0f) * 4);
+        // ubo.model = Scale<float>(ubo.model, vec3f(1.0f, 1.0f, 1.0f));
+        // ubo.model = Rotate<float>(ubo.model, vec3f(0.0f, 0.0f, 1.0f), std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::steady_clock::now() - m_clock.GetStart()).count() * Radians(90.0f) * 4);
 
         ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
 
         if(glfwGetKey(m_window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
+            ubo.projection = Perspective<float>(Radians(70.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
             ubo.projection.data[1][1] *= -1;
         } else {
             ubo.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
@@ -138,7 +152,7 @@ namespace uvke {
 
         result = vkQueuePresentKHR(m_surface->GetQueue(1), &presentInfo);
         if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_swapchain->IsRecreated()) {
-            m_swapchain->Recreate(*m_window.get(), m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
+            m_swapchain->Recreate(m_window, m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
         } else if(result != VK_SUCCESS) {
             UVKE_FATAL("Framebuffer Recreation Error");
         }

@@ -9,10 +9,10 @@
 namespace uvke {
     class UVKE_API Swapchain {
     public:
-        Swapchain(VkDevice device, std::shared_ptr<Surface> surface);
+        Swapchain(VkDevice device = nullptr, std::shared_ptr<Surface> surface = nullptr);
         virtual ~Swapchain();
 
-        virtual void Recreate(Window& window, std::vector<VkFramebuffer>& framebuffers, VkRenderPass renderPass);
+        virtual void Recreate(std::shared_ptr<Window> window, std::vector<VkFramebuffer>& framebuffers, VkRenderPass renderPass);
 
         virtual void SetDevice(VkDevice device);
         virtual void SetSurface(std::shared_ptr<Surface> surface);

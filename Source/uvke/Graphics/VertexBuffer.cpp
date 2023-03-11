@@ -17,8 +17,13 @@ namespace uvke {
 
             m_vertexInputAttributeDescription[1].binding = 0;
             m_vertexInputAttributeDescription[1].location = 1;
-            m_vertexInputAttributeDescription[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            m_vertexInputAttributeDescription[1].format = VK_FORMAT_R32G32B32_SFLOAT;
             m_vertexInputAttributeDescription[1].offset = offsetof(Vertex, Vertex::color);
+
+            m_vertexInputAttributeDescription[2].binding = 0;
+            m_vertexInputAttributeDescription[2].location = 2;
+            m_vertexInputAttributeDescription[2].format = VK_FORMAT_R32G32_SFLOAT;
+            m_vertexInputAttributeDescription[2].offset = offsetof(Vertex, Vertex::texCoord);
 
             VkBufferCreateInfo bufferCreateInfo = { };
             bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -89,7 +94,7 @@ namespace uvke {
         return m_vertexInputBindingDescription;
     }
     
-    std::array<VkVertexInputAttributeDescription, 2>& VertexBuffer::GetVertexInputAttributeDescription() {
+    std::array<VkVertexInputAttributeDescription, 3>& VertexBuffer::GetVertexInputAttributeDescription() {
         return m_vertexInputAttributeDescription;
     }
 

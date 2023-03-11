@@ -57,7 +57,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Staging Buffer Desroyed");
+        UVKE_LOG("Staging Buffer Destroyed");
     }
 
     void StagingBuffer::Map(void* data) {

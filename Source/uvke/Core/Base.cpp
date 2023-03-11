@@ -85,7 +85,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device));
         }
 
-        UVKE_LOG("Base Created Successfully");
+        UVKE_LOG("Base Created");
     }
 
     Base::~Base() {
