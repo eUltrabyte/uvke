@@ -21,7 +21,7 @@ namespace uvke {
 
         m_commandBuffer = std::make_shared<CommandBuffer>(m_base->GetDevice(), m_base->GetQueueFamily());
 
-        m_texture = std::make_shared<Texture>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_surface, "Resource/uvke.png");
+        m_texture = std::make_shared<Texture>(m_base->GetPhysicalDevice(), m_base->GetDevice(), "Resource/uvke.png");
 
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * 4));
         m_stagingBuffer->Map(m_texture->GetPixels());
@@ -43,7 +43,18 @@ namespace uvke {
         } );
 
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
-            0, 1, 2, 2, 3, 0
+            0, 1, 2, 2, 3, 0,
+        } );
+
+        m_vertexBuffer1 = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
+            { { -0.2f, -0.15f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
+            { { 0.2f, -0.15f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
+            { { 0.2f, 0.15f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
+            { { -0.2f, 0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+        } );
+
+        m_indexBuffer1 = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
+            0, 1, 2, 2, 3, 0,
         } );
 
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
@@ -62,6 +73,16 @@ namespace uvke {
         m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer->GetSize());
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
         m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
+        m_stagingBuffer.reset();
+
+        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer1->GetSize());
+        m_stagingBuffer->Map(m_vertexBuffer1->GetVertices().data());
+        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer1->GetBuffer(), m_vertexBuffer1->GetSize());
+        m_stagingBuffer.reset();
+
+        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer1->GetSize());
+        m_stagingBuffer->Map(m_indexBuffer1->GetIndices().data());
+        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer1->GetBuffer(), m_indexBuffer1->GetSize());
         m_stagingBuffer.reset();
 
         UVKE_LOG("Renderer Created");
@@ -124,7 +145,7 @@ namespace uvke {
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_commandBuffer->Record(m_syncManager->GetFrame(), index, m_surface, m_pipeline, m_framebuffer, m_vertexBuffer, m_indexBuffer, m_uniformBuffer);
+        m_commandBuffer->Record(m_syncManager->GetFrame(), index, m_surface, m_pipeline, m_framebuffer, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer });
         
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

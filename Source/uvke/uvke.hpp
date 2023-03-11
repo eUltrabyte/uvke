@@ -33,8 +33,8 @@
 #include "Core/Window.hpp"
 
 // TODO
-// asset manager class
 // add multi rendering support?
+// asset manager class
 // reimplement stb_image with own library
 // add some gui ( imgui or own )
 // add profiler

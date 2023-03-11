@@ -4,7 +4,7 @@
 #include <stb/stb_image.h>
 
 namespace uvke {
-    Texture::Texture(VkPhysicalDevice physicalDevice, VkDevice device, std::shared_ptr<Surface> surface, std::string_view filename)
+    Texture::Texture(VkPhysicalDevice physicalDevice, VkDevice device, std::string_view filename)
         : m_physicalDevice(physicalDevice), m_device(device) {
         vec2i size = { 0, 0 };
         m_pixels = stbi_load(filename.data(), &size.x, &size.y, &m_channel, STBI_rgb_alpha);
@@ -19,7 +19,7 @@ namespace uvke {
         imageCreateInfo.extent = { m_size.x, m_size.y, 1 };
         imageCreateInfo.mipLevels = 1;
         imageCreateInfo.arrayLayers = 1;
-        imageCreateInfo.format = surface->GetFormat().format;
+        imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
         imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
