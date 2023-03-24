@@ -33,6 +33,7 @@
 #include "Core/Window.hpp"
 
 // TODO
+// events handling window ( something like sdl or sfml )
 // add multi object rendering support?
 // add multi threading support
 // asset manager class

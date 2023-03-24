@@ -92,7 +92,7 @@ namespace uvke {
             vkCmdDrawIndexed(m_commandBuffers[frame], indexBuffers[i]->GetIndices().size(), 1, 0, 0, 0);
         }
 
-        ImGui_ImplVulkan_NewFrame();
+        /* ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
@@ -100,7 +100,7 @@ namespace uvke {
 
         ImGui::Render();
 
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_commandBuffers[frame]);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_commandBuffers[frame]); */
 
         vkCmdEndRenderPass(m_commandBuffers[frame]);
 
