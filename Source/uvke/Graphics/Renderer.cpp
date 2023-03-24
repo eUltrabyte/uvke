@@ -85,7 +85,7 @@ namespace uvke {
         m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer1->GetBuffer(), m_indexBuffer1->GetSize());
         m_stagingBuffer.reset();
 
-        std::vector<VkDescriptorPoolSize> poolSizes = {
+        /* std::vector<VkDescriptorPoolSize> poolSizes = {
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
             { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
@@ -130,7 +130,7 @@ namespace uvke {
         ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
         m_commandBuffer->End(commandBuffer, m_surface->GetQueue(0));
 
-        ImGui_ImplVulkan_DestroyFontUploadObjects();
+        ImGui_ImplVulkan_DestroyFontUploadObjects(); */
 
         UVKE_LOG("Renderer Created");
     }
@@ -138,8 +138,8 @@ namespace uvke {
     Renderer::~Renderer() {
         m_syncManager->WaitForDevice();
 
-        vkDestroyDescriptorPool(m_base->GetDevice(), m_imguiPool, nullptr);
-        ImGui_ImplVulkan_Shutdown();
+        /* vkDestroyDescriptorPool(m_base->GetDevice(), m_imguiPool, nullptr);
+        ImGui_ImplVulkan_Shutdown(); */
 
         m_syncManager.reset();
 

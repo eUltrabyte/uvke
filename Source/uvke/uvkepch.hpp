@@ -12,7 +12,6 @@
 #include <string_view>
 #include <vector>
 #include <thread>
-#include <span>
 #include <future>
 #include <map>
 #include <unordered_map>
@@ -25,7 +24,6 @@
 #include <functional>
 #include <memory>
 #include <iomanip>
-#include <ranges>
 #include <complex>
 
 #include <cmath>

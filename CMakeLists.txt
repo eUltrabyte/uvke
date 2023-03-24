@@ -10,7 +10,23 @@ include_directories(Thirdparty)
 
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
-find_package(imgui REQUIRED)
+
+if(WIN32)
+    set(UVKE_LIBRARIES
+        glfw
+        Vulkan::Vulkan
+    )
+else()
+    find_package(X11 REQUIRED)
+
+    set(UVKE_LIBRARIES
+        glfw
+        Vulkan::Vulkan
+        X11::X11
+        X11::Xau
+        dl
+    )
+endif()
 
 set(UVKE_CORE_SOURCE
     Source/uvke/Core/Platform.hpp
@@ -116,7 +132,7 @@ add_dependencies(uvke uvke-Shaders)
 target_precompile_headers(${PROJECT_NAME} PUBLIC Source/uvke/uvkepch.hpp Source/uvke/uvkepch.cpp)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw Vulkan::Vulkan imgui::imgui)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${UVKE_LIBRARIES})
 
 file(COPY Resource/ DESTINATION Resource/)
 

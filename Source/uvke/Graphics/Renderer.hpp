@@ -68,7 +68,7 @@ namespace uvke {
         std::shared_ptr<Sampler> m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
         Clock m_clock;
-        VkDescriptorPool m_imguiPool;
+        // VkDescriptorPool m_imguiPool;
 
     };
 };
