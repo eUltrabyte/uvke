@@ -1,0 +1,13 @@
+- events handling window ( something like sdl or sfml )
+- add profiler
+- more mathematic functions
+- add multi object rendering support?
+- job manager ( job queue and job priorities )
+- add multi threading support
+- add audio support
+- asset manager class
+- own file format for textures, audio, etc
+- reimplement stb_image with own library
+- reimplement imgui with own library
+- reimplement windows with own library
+- add something like vulkan wrapper as alternative for vulkansdk ( with win32, x11, xcb, wayland and android support )

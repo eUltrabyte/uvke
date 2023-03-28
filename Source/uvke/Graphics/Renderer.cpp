@@ -184,7 +184,7 @@ namespace uvke {
         ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
 
         if(glfwGetKey(m_window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo.projection = Perspective<float>(Radians(70.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
+            ubo.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
             ubo.projection.data[1][1] *= -1;
         } else {
             ubo.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);

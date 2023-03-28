@@ -33,6 +33,8 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Platform.cpp
     Source/uvke/Core/Logger.hpp
     Source/uvke/Core/Logger.cpp
+    Source/uvke/Core/Event.hpp
+    Source/uvke/Core/Event.cpp
     Source/uvke/Core/Window.hpp
     Source/uvke/Core/Window.cpp
     Source/uvke/Core/Base.hpp

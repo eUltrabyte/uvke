@@ -4,6 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
+#include "../Core/Window.hpp"
 #include "Surface.hpp"
 #include "Swapchain.hpp"
 #include "StagingBuffer.hpp"
