@@ -9,7 +9,7 @@ uvke::App* Create(int argc, char** argv) {
     uvke::Event event;
     while(window.GetStatus()) {
         window.PollEvents(event);
-        switch(event.GetType()) {
+        /* switch(event.GetType()) {
             case uvke::EventType::Closed: { UVKE_LOG("Event - Closed"); } break;
             case uvke::EventType::Resized: { UVKE_LOG("Event - Resized - " + std::to_string(event.GetSize().x) + "/" + std::to_string(event.GetSize().y)); } break;
             case uvke::EventType::Focused: { UVKE_LOG("Event - Focused - " + std::to_string(event.GetFocused())); } break;
@@ -21,7 +21,7 @@ uvke::App* Create(int argc, char** argv) {
             case uvke::EventType::MouseMoved: { UVKE_LOG("Event - MouseMoved - " + std::to_string(event.GetPosition().x) + "/" + std::to_string(event.GetPosition().y)); } break;
             case uvke::EventType::ButtonPressed: { UVKE_LOG("Event - ButtonPressed - " + std::to_string(event.GetMouse().x) + "/" + std::to_string(event.GetMouse().y)); } break;
             case uvke::EventType::ButtonReleased: { UVKE_LOG("Event - ButtonReleased - " + std::to_string(event.GetMouse().x) + "/" + std::to_string(event.GetMouse().y)); } break;
-        }
+        } */
 
         window.Update();
         renderer.Render();

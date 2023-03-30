@@ -1,6 +1,5 @@
-- events handling window ( something like sdl or sfml )
 - add profiler
-- more mathematic functions
+- more mathematic functions and tests with them vs standard implementation ( time, precision and result )
 - add multi object rendering support?
 - job manager ( job queue and job priorities )
 - add multi threading support

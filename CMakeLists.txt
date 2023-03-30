@@ -88,9 +88,6 @@ set(UVKE_UTILS_SOURCE
 set(UVKE_SOURCE
     Source/uvke/uvke.hpp
     Source/uvke/uvke.cpp
-    ${UVKE_CORE_SOURCE}
-    ${UVKE_GRAPHICS_SOURCE}
-    ${UVKE_UTILS_SOURCE}
 )
 
 if(WIN32)
@@ -124,17 +121,31 @@ if(UVKE_SHARED_LIBRARY)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_SHARED_BUILD")
     endif()
 
+    add_library(${PROJECT_NAME}-Core SHARED ${UVKE_CORE_SOURCE})
+    add_library(${PROJECT_NAME}-Utils SHARED ${UVKE_UTILS_SOURCE})
+    add_library(${PROJECT_NAME}-Graphics SHARED ${UVKE_GRAPHICS_SOURCE})
+
     add_library(${PROJECT_NAME} SHARED ${UVKE_SOURCE})
 else()
+    add_library(${PROJECT_NAME}-Core STATIC ${UVKE_CORE_SOURCE})
+    add_library(${PROJECT_NAME}-Utils STATIC ${UVKE_UTILS_SOURCE})
+    add_library(${PROJECT_NAME}-Graphics STATIC ${UVKE_GRAPHICS_SOURCE})
+
     add_library(${PROJECT_NAME} STATIC ${UVKE_SOURCE})
 endif()
 
 add_dependencies(uvke uvke-Shaders)
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC Source/uvke/uvkepch.hpp Source/uvke/uvkepch.cpp)
+target_compile_definitions(${PROJECT_NAME}-Core PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
+target_compile_definitions(${PROJECT_NAME}-Utils PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
+target_compile_definitions(${PROJECT_NAME}-Graphics PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-Core PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-Utils PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-Graphics PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics)
 
 file(COPY Resource/ DESTINATION Resource/)
 

@@ -4,8 +4,10 @@
 
 namespace uvke {
     namespace priv {
-        static const float PI = 3.141592653f;
-        static const float ACCURENCY = 0.00000001f;
+        inline static const float PI = 3.141592653f;
+        inline static const float ONEQTRPI = 0.7853981632f;
+        inline static const float THRQTRPI = 2.3561944897f;
+        inline static const float ACCURENCY = 0.00000001f;
     };
 
     template<typename T>
@@ -94,6 +96,28 @@ namespace uvke {
         static_assert(std::is_arithmetic_v<U>, "uvke Lerp Type Is Not Arithmetic As Expected");
         static_assert(std::is_arithmetic_v<O>, "uvke Lerp Type Is Not Arithmetic As Expected");
         return x + (static_cast<T>(y) - x) * static_cast<T>(fraction);
+    }
+
+    template<typename T>
+    constexpr float Atan(const T& x, const T& y) {
+        static_assert(std::is_arithmetic_v<T>, "uvke Atan Type Is Not Arithmetic As Expected");
+        float angle = 0.0f;
+        float z = 0.0f;
+        float current = Abs<float>(x) + 1e-10f;
+        if(y < 0.0f) {
+            z = (y + current) / (y - current);
+            angle = priv::THRQTRPI;
+        } else {
+            z = (y - current) / (y + current);
+            angle = priv::ONEQTRPI;
+        }
+
+        angle += (0.1963f * z * z - 0.9817f) * z;
+        if(x < 0.0f) {
+            return -angle;
+        } else {
+            return angle;
+        }
     }
 };
 
