@@ -364,6 +364,72 @@ namespace uvke {
         UVKE_LOG("Graphics Pipeline Recreated");
     }
 
+    void Pipeline::Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers) {
+        vkResetCommandBuffer(commandBuffer->GetCommandBuffer(frame), 0);
+
+        VkCommandBufferBeginInfo commandBufferBeginInfo { };
+        commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        commandBufferBeginInfo.pNext = nullptr;
+        commandBufferBeginInfo.flags = 0;
+        commandBufferBeginInfo.pInheritanceInfo = nullptr;
+
+        UVKE_ASSERT(vkBeginCommandBuffer(commandBuffer->GetCommandBuffer(frame), &commandBufferBeginInfo));
+
+        VkRenderPassBeginInfo renderPassBeginInfo { };
+        renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassBeginInfo.pNext = nullptr;
+        renderPassBeginInfo.renderPass = m_renderPass;
+        renderPassBeginInfo.framebuffer = framebuffer->GetFramebuffer(index);
+        renderPassBeginInfo.renderArea.offset = { 0, 0 };
+        renderPassBeginInfo.renderArea.extent = m_surface->GetExtent();
+        VkClearValue clearValue = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+        renderPassBeginInfo.clearValueCount = 1;
+        renderPassBeginInfo.pClearValues = &clearValue;
+
+        vkCmdBeginRenderPass(commandBuffer->GetCommandBuffer(frame), &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+
+        VkViewport viewport { };
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = m_surface->GetExtent().width;
+        viewport.height = m_surface->GetExtent().height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+
+        vkCmdSetViewport(commandBuffer->GetCommandBuffer(frame), 0, 1, &viewport);
+
+        VkRect2D scissor { };
+        scissor.offset = { 0, 0 };
+        scissor.extent = m_surface->GetExtent();
+
+        vkCmdSetScissor(commandBuffer->GetCommandBuffer(frame), 0, 1, &scissor);
+
+        auto objects = (vertexBuffers.size() + indexBuffers.size() + uniformBuffers.size()) / 3;
+        for(auto i = 0; i < vertexBuffers.size(); ++i) {
+            vertexBuffers[i]->Bind(commandBuffer->GetCommandBuffer(frame));
+            indexBuffers[i]->Bind(commandBuffer->GetCommandBuffer(frame));
+            uniformBuffers[i]->Bind(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
+
+            vkCmdDrawIndexed(commandBuffer->GetCommandBuffer(frame), indexBuffers[i]->GetIndices().size(), 1, 0, 0, 0);
+        }
+
+        /* ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::ShowDemoWindow();
+
+        ImGui::Render();
+
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer->GetCommandBuffer(frame)); */
+
+        vkCmdEndRenderPass(commandBuffer->GetCommandBuffer(frame));
+
+        UVKE_ASSERT(vkEndCommandBuffer(commandBuffer->GetCommandBuffer(frame)));
+    }
+
     void Pipeline::SetDevice(VkDevice device) {
         m_device = device;
     }

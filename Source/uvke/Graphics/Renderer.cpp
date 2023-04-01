@@ -166,10 +166,12 @@ namespace uvke {
     }
 
     void Renderer::Render() {
+        // UVKE_LOG("Render Time - " + std::to_string(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count()) + "ms");
+
         m_syncManager->WaitForQueue(m_surface->GetQueue(1));
 
         unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
+        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
             m_swapchain->Recreate(m_window, m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -195,8 +197,8 @@ namespace uvke {
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_commandBuffer->Record(m_syncManager->GetFrame(), index, m_surface, m_pipeline, m_framebuffer, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer });
-        
+        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer });
+
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submitInfo.pNext = nullptr;
@@ -233,6 +235,7 @@ namespace uvke {
         }
 
         m_syncManager->Update();
+        m_frameClock.Restart();
     }
 
     void Renderer::SetBase(std::shared_ptr<Base> base) {
@@ -278,6 +281,18 @@ namespace uvke {
     void Renderer::SetCommandBuffer(std::shared_ptr<CommandBuffer> commandBuffer) {
         m_commandBuffer = commandBuffer;
     }
+
+    void Renderer::SetTexture(std::shared_ptr<Texture> texture) {
+        m_texture = texture;
+    }
+    
+    void Renderer::SetSampler(std::shared_ptr<Sampler> sampler) {
+        m_sampler = sampler;
+    }
+    
+    void Renderer::SetSyncManager(std::shared_ptr<SyncManager> syncManager) {
+        m_syncManager = syncManager;
+    }
     
     std::shared_ptr<Base> Renderer::GetBase() {
         return m_base;
@@ -321,5 +336,17 @@ namespace uvke {
 
     std::shared_ptr<CommandBuffer> Renderer::GetCommandBuffer() {
         return m_commandBuffer;
+    }
+
+    std::shared_ptr<Texture> Renderer::GetTexture() {
+        return m_texture;
+    }
+    
+    std::shared_ptr<Sampler> Renderer::GetSampler() {
+        return m_sampler;
+    }
+    
+    std::shared_ptr<SyncManager> Renderer::GetSyncManager() {
+        return m_syncManager;
     }
 };

@@ -4,6 +4,8 @@
 
 #include "../uvke.hpp"
 #include "Surface.hpp"
+#include "Framebuffer.hpp"
+#include "CommandBuffer.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
@@ -15,6 +17,7 @@ namespace uvke {
         virtual ~Pipeline();
 
         virtual void Recreate();
+        virtual void Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers);
 
         virtual void SetDevice(VkDevice device);
         virtual void SetRenderPass(VkRenderPass renderPass);

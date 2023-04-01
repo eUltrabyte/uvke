@@ -37,6 +37,9 @@ namespace uvke {
         virtual void SetPipeline(std::shared_ptr<Pipeline> pipeline);
         virtual void SetFramebuffer(std::shared_ptr<Framebuffer> framebuffer);
         virtual void SetCommandBuffer(std::shared_ptr<CommandBuffer> commandBuffer);
+        virtual void SetTexture(std::shared_ptr<Texture> texture);
+        virtual void SetSampler(std::shared_ptr<Sampler> sampler);
+        virtual void SetSyncManager(std::shared_ptr<SyncManager> syncManager);
 
         virtual std::shared_ptr<Base> GetBase();
         virtual std::shared_ptr<Window> GetWindow();
@@ -49,6 +52,9 @@ namespace uvke {
         virtual std::shared_ptr<Pipeline> GetPipeline();
         virtual std::shared_ptr<Framebuffer> GetFramebuffer();
         virtual std::shared_ptr<CommandBuffer> GetCommandBuffer();
+        virtual std::shared_ptr<Texture> GetTexture();
+        virtual std::shared_ptr<Sampler> GetSampler();
+        virtual std::shared_ptr<SyncManager> GetSyncManager();
 
     private:
         std::shared_ptr<Base> m_base;
@@ -69,6 +75,7 @@ namespace uvke {
         std::shared_ptr<Sampler> m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
         Clock m_clock;
+        Clock m_frameClock;
         // VkDescriptorPool m_imguiPool;
 
     };
