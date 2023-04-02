@@ -1,4 +1,5 @@
 - add multi object rendering support?
+- fix mat4x4 rotate
 - job manager ( job queue and job priorities )
 - add multi threading support
 - add audio support

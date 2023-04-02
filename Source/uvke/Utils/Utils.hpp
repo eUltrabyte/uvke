@@ -11,13 +11,13 @@ namespace uvke {
     };
 
     template<typename T>
-    constexpr float Abs(const T& value) {
+    inline constexpr float Abs(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Abs Type Is Not Arithmetic As Expected");
         return value < 0 ? -value : value;
     }
 
     template<typename T>
-    constexpr float Pow(const T& value, int power) {
+    inline constexpr float Pow(const T& value, int power) {
         static_assert(std::is_arithmetic_v<T>, "uvke Pow Type Is Not Arithmetic As Expected");
         if(power == 0) { return 1.0f; }
 
@@ -34,7 +34,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr float Rsqrt(const T& value) {
+    inline constexpr float Rsqrt(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Rsqrt Type Is Not Arithmetic As Expected");
         float current = value;
         long x = *(long*)&current;
@@ -45,13 +45,13 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr float Sqrt(const T& value) {
+    inline constexpr float Sqrt(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Sqrt Type Is Not Arithmetic As Expected");
         return 1.0f / Rsqrt<T>(value);
     }
 
     template<typename T>
-    constexpr float Sin(const T& value) {
+    inline constexpr float Sin(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Sin Type Is Not Arithmetic As Expected");
         float current = value;
         float accurency = 1.0f;
@@ -69,13 +69,13 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr float Arcsin(const T& value) {
+    inline constexpr float Arcsin(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Arcsin Type Is Not Arithmetic As Expected");
         return Pow(Sin(value), -1);
     }
 
     template<typename T>
-    constexpr float Cos(const T& value) {
+    inline constexpr float Cos(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Cos Type Is Not Arithmetic As Expected");
         float current = 1.0f;
         float accurency = 1.0f;
@@ -89,50 +89,50 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr float Arccos(const T& value) {
+    inline constexpr float Arccos(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Arccos Type Is Not Arithmetic As Expected");
         return Pow(Cos(value), -1);
     }
 
     template<typename T>
-    constexpr float Tan(const T& value) {
+    inline constexpr float Tan(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Tan Type Is Not Arithmetic As Expected");
         return Sin(value) / Cos(value);
     }
 
     template<typename T>
-    constexpr float Arctan(const T& value) {
+    inline constexpr float Arctan(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Arctan Type Is Not Arithmetic As Expected");
         return Pow(Tan(value), -1);
     }
 
     template<typename T>
-    constexpr float Cot(const T& value) {
+    inline constexpr float Cot(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Cot Type Is Not Arithmetic As Expected");
         float current = priv::PI - value;
         return Sin(current) / Cos(current);
     }
 
     template<typename T>
-    constexpr float Arccot(const T& value) {
+    inline constexpr float Arccot(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke Arccot Type Is Not Arithmetic As Expected");
         return Pow(Cot(value), -1);
     }
 
     template<typename T>
-    constexpr float Radians(const T& degrees) {
+    inline constexpr float Radians(const T& degrees) {
         static_assert(std::is_arithmetic_v<T>, "uvke Radians Type Is Not Arithmetic As Expected");
         return degrees / 180.0f * priv::PI;
     }
 
     template<typename T>
-    constexpr float Degrees(const T& radians) {
+    inline constexpr float Degrees(const T& radians) {
         static_assert(std::is_arithmetic_v<T>, "uvke Degrees Type Is Not Arithmetic As Expected");
         return radians * 180.0f / priv::PI;
     }
 
     template<typename T, typename U, typename O>
-    constexpr float Lerp(const T& x, const U& y, const O& fraction) {
+    inline constexpr float Lerp(const T& x, const U& y, const O& fraction) {
         static_assert(std::is_arithmetic_v<T>, "uvke Lerp Type Is Not Arithmetic As Expected");
         static_assert(std::is_arithmetic_v<U>, "uvke Lerp Type Is Not Arithmetic As Expected");
         static_assert(std::is_arithmetic_v<O>, "uvke Lerp Type Is Not Arithmetic As Expected");
@@ -140,7 +140,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr float Atan(const T& x, const T& y) {
+    inline constexpr float Atan(const T& x, const T& y) {
         static_assert(std::is_arithmetic_v<T>, "uvke Atan Type Is Not Arithmetic As Expected");
         float angle = 0.0f;
         float z = 0.0f;

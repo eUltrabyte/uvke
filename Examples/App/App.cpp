@@ -2,7 +2,7 @@
 #include <uvke/Core/Entry.hpp>
 
 uvke::App* Create(int argc, char** argv) {
-    uvke::Window window(uvke::WindowProps("uvke Test", { 1280, 720 }, uvke::Style::Default));
+    uvke::Window window(uvke::WindowProps("uvke App", { 1280, 720 }, uvke::Style::Default));
     uvke::Base base(window.GetWindowProps()->title);
     uvke::Renderer renderer(std::make_shared<uvke::Base>(base), std::make_shared<uvke::Window>(window));
 

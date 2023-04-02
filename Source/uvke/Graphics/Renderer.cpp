@@ -36,28 +36,29 @@ namespace uvke {
         m_sampler = std::make_shared<Sampler>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_texture);
 
         m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            { { -0.4f, -0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { 0.4f, -0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { 0.4f, 0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -0.4f, 0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { -0.2f, -0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
+            { { 0.2f, -0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
+            { { 0.2f, 0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+            { { -0.2f, 0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
         } );
 
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
             0, 1, 2, 2, 3, 0,
         } );
 
+        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
+
         m_vertexBuffer1 = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            { { -0.2f, -0.15f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
-            { { 0.2f, -0.15f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
-            { { 0.2f, 0.15f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -0.2f, 0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { 0.0f, -0.2f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.5f, 0.0f } },
+            { { 0.2f, 0.2f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
+            { { -0.2f, 0.2f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
         } );
 
         m_indexBuffer1 = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
-            0, 1, 2, 2, 3, 0,
+            0, 1, 2,
         } );
 
-        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
+        m_uniformBuffer1 = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
 
         m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_uniformBuffer);
 
@@ -180,6 +181,7 @@ namespace uvke {
         
         UniformBufferObject ubo { };
         ubo.model = Identity<float>();
+        ubo.model = Translate<float>(ubo.model, vec3f(0.5f, 0.0f, 0.0f));
         // ubo.model = Scale<float>(ubo.model, vec3f(1.0f, 1.0f, 1.0f));
         // ubo.model = Rotate<float>(ubo.model, vec3f(0.0f, 0.0f, 1.0f), std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::steady_clock::now() - m_clock.GetStart()).count() * Radians(90.0f) * 4);
 
@@ -194,10 +196,25 @@ namespace uvke {
 
         m_uniformBuffer->Update(ubo);
 
+        UniformBufferObject ubo1 { };
+        ubo1.model = Identity<float>();
+        ubo1.model = Translate<float>(ubo1.model, vec3f(-0.5f, 0.0f, 0.0f));
+
+        ubo1.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
+
+        if(glfwGetKey(m_window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
+            ubo1.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
+            ubo1.projection.data[1][1] *= -1;
+        } else {
+            ubo1.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
+        }
+
+        m_uniformBuffer1->Update(ubo1);
+
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer });
+        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer1 });
 
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
