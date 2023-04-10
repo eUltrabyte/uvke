@@ -364,7 +364,7 @@ namespace uvke {
         UVKE_LOG("Graphics Pipeline Recreated");
     }
 
-    void Pipeline::Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers) {
+    void Pipeline::Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers, std::shared_ptr<Interface> interfaces) {
         vkResetCommandBuffer(commandBuffer->GetCommandBuffer(frame), 0);
 
         VkCommandBufferBeginInfo commandBufferBeginInfo { };
@@ -424,6 +424,8 @@ namespace uvke {
         ImGui::Render();
 
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer->GetCommandBuffer(frame)); */
+
+        interfaces->Render(commandBuffer, frame);
 
         vkCmdEndRenderPass(commandBuffer->GetCommandBuffer(frame));
 

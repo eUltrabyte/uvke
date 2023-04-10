@@ -1,4 +1,7 @@
-- add multi object rendering support?
+- add multi object rendering support
+- add changing vertex array primitive types
+- add presentation class
+- add scene class
 - fix mat4x4 rotate
 - job manager ( job queue and job priorities )
 - add multi threading support

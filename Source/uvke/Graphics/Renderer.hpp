@@ -17,6 +17,7 @@
 #include "Texture.hpp"
 #include "Sampler.hpp"
 #include "SyncManager.hpp"
+#include "Interface.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
@@ -75,6 +76,7 @@ namespace uvke {
         std::shared_ptr<Texture> m_texture;
         std::shared_ptr<Sampler> m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
+        std::shared_ptr<Interface> m_interface;
         Clock m_clock;
         Clock m_frameClock;
         // VkDescriptorPool m_imguiPool;

@@ -10,11 +10,13 @@ include_directories(Thirdparty)
 
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
+find_package(imgui REQUIRED)
 
 if(WIN32)
     set(UVKE_LIBRARIES
         glfw
         Vulkan::Vulkan
+        imgui::imgui
     )
 else()
     find_package(X11 REQUIRED)
@@ -22,6 +24,7 @@ else()
     set(UVKE_LIBRARIES
         glfw
         Vulkan::Vulkan
+        imgui::imgui
         X11::X11
         X11::Xau
         dl
@@ -71,6 +74,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Sampler.cpp
     Source/uvke/Graphics/SyncManager.hpp
     Source/uvke/Graphics/SyncManager.cpp
+    Source/uvke/Graphics/Interface.hpp
+    Source/uvke/Graphics/Interface.cpp
 )
 
 set(UVKE_UTILS_SOURCE

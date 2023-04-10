@@ -9,6 +9,7 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
+#include "Interface.hpp"
 
 namespace uvke {
     class UVKE_API Pipeline {
@@ -17,7 +18,7 @@ namespace uvke {
         virtual ~Pipeline();
 
         virtual void Recreate();
-        virtual void Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers);
+        virtual void Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers, std::shared_ptr<Interface> interfaces);
 
         virtual void SetDevice(VkDevice device);
         virtual void SetRenderPass(VkRenderPass renderPass);

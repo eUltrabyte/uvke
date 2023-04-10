@@ -86,6 +86,8 @@ namespace uvke {
         m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer1->GetBuffer(), m_indexBuffer1->GetSize());
         m_stagingBuffer.reset();
 
+        m_interface = std::make_shared<Interface>(m_base, m_window, m_surface, m_commandBuffer, m_pipeline->GetRenderPass());
+
         /* std::vector<VkDescriptorPoolSize> poolSizes = {
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
@@ -141,6 +143,8 @@ namespace uvke {
 
         /* vkDestroyDescriptorPool(m_base->GetDevice(), m_imguiPool, nullptr);
         ImGui_ImplVulkan_Shutdown(); */
+
+        m_interface.reset();
 
         m_syncManager.reset();
 
@@ -214,7 +218,8 @@ namespace uvke {
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer1 });
+        m_interface->SetRenderTime(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count());
+        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer1 }, m_interface);
 
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
