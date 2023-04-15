@@ -1,10 +1,15 @@
 #include <uvke/Graphics/Renderer.hpp>
+#include <uvke/Graphics/Sprite.hpp>
 #include <uvke/Core/Entry.hpp>
 
 uvke::App* Create(int argc, char** argv) {
     uvke::Window window(uvke::WindowProps("uvke App", { 1280, 720 }, uvke::Style::Default));
     uvke::Base base(window.GetWindowProps()->title);
     uvke::Renderer renderer(std::make_shared<uvke::Base>(base), std::make_shared<uvke::Window>(window));
+
+    uvke::Sprite sprite({ 0.2f, 0.2f });
+    sprite.Create(std::make_shared<uvke::Renderer>(renderer));
+    renderer.Push(std::make_shared<uvke::Sprite>(sprite));
 
     uvke::Event event;
     while(window.GetStatus()) {

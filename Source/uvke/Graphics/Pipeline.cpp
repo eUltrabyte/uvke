@@ -364,7 +364,7 @@ namespace uvke {
         UVKE_LOG("Graphics Pipeline Recreated");
     }
 
-    void Pipeline::Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers, std::shared_ptr<Interface> interfaces) {
+    void Pipeline::Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<Renderable>> renderables, std::shared_ptr<Interface> interfaces) {
         vkResetCommandBuffer(commandBuffer->GetCommandBuffer(frame), 0);
 
         VkCommandBufferBeginInfo commandBufferBeginInfo { };
@@ -406,13 +406,8 @@ namespace uvke {
 
         vkCmdSetScissor(commandBuffer->GetCommandBuffer(frame), 0, 1, &scissor);
 
-        auto objects = (vertexBuffers.size() + indexBuffers.size() + uniformBuffers.size()) / 3;
-        for(auto i = 0; i < vertexBuffers.size(); ++i) {
-            vertexBuffers[i]->Bind(commandBuffer->GetCommandBuffer(frame));
-            indexBuffers[i]->Bind(commandBuffer->GetCommandBuffer(frame));
-            uniformBuffers[i]->Bind(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
-
-            vkCmdDrawIndexed(commandBuffer->GetCommandBuffer(frame), indexBuffers[i]->GetIndices().size(), 1, 0, 0, 0);
+        for(auto i = 0; i < renderables.size(); ++i) {
+            renderables[i]->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
         }
 
         /* ImGui_ImplVulkan_NewFrame();

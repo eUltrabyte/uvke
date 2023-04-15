@@ -77,6 +77,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Interface.hpp
     Source/uvke/Graphics/Interface.cpp
     Source/uvke/Graphics/Renderable.hpp
+    Source/uvke/Graphics/Sprite.hpp
+    Source/uvke/Graphics/Sprite.cpp
 )
 
 set(UVKE_UTILS_SOURCE

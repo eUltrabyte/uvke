@@ -36,55 +36,22 @@ namespace uvke {
         m_sampler = std::make_shared<Sampler>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_texture);
 
         m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            { { -0.2f, -0.2f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { 0.2f, -0.2f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { 0.2f, 0.2f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -0.2f, 0.2f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
-        } );
-
-        m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
-            0, 1, 2, 2, 3, 0,
-        } );
-
-        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
-
-        m_vertexBuffer1 = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
             { { 0.0f, -0.2f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.5f, 0.0f } },
             { { 0.2f, 0.2f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
             { { -0.2f, 0.2f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
         } );
 
-        m_indexBuffer1 = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
+        m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
             0, 1, 2,
         } );
 
-        m_uniformBuffer1 = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
+        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
 
         m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_uniformBuffer);
 
         m_framebuffer = std::make_shared<Framebuffer>(m_base->GetDevice(), m_pipeline->GetRenderPass(), m_swapchain, m_surface);
 
         m_syncManager = std::make_shared<SyncManager>(m_base->GetDevice());
-
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer->GetSize());
-        m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
-        m_stagingBuffer.reset();
-
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer->GetSize());
-        m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
-        m_stagingBuffer.reset();
-
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer1->GetSize());
-        m_stagingBuffer->Map(m_vertexBuffer1->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer1->GetBuffer(), m_vertexBuffer1->GetSize());
-        m_stagingBuffer.reset();
-
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer1->GetSize());
-        m_stagingBuffer->Map(m_indexBuffer1->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer1->GetBuffer(), m_indexBuffer1->GetSize());
-        m_stagingBuffer.reset();
 
         m_interface = std::make_shared<Interface>(m_base, m_window, m_surface, m_commandBuffer, m_pipeline->GetRenderPass());
         m_interface->SetFPS(0);
@@ -109,9 +76,7 @@ namespace uvke {
 
         m_pipeline.reset();
 
-        m_uniformBuffer1.reset();
-        m_indexBuffer1.reset();
-        m_vertexBuffer1.reset();
+        m_renderables.clear();
 
         m_uniformBuffer.reset();
         m_indexBuffer.reset();
@@ -153,26 +118,15 @@ namespace uvke {
 
         m_uniformBuffer->Update(ubo);
 
-        UniformBufferObject ubo1 { };
-        ubo1.model = Identity<float>();
-        ubo1.model = Translate<float>(ubo1.model, vec3f(-0.5f, 0.0f, 0.0f));
-
-        ubo1.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
-
-        if(m_window->GetKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo1.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
-            ubo1.projection.data[1][1] *= -1;
-        } else {
-            ubo1.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
+        for(auto i = 0; i < m_renderables.size(); ++i) {
+            m_renderables[i]->Update(m_window);
         }
-
-        m_uniformBuffer1->Update(ubo1);
 
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
         m_interface->SetRenderTime(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count());
-        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer1 }, m_interface);
+        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, m_renderables, m_interface);
 
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -214,6 +168,14 @@ namespace uvke {
         m_syncManager->Update();
         m_frameClock.Restart();
         ++m_fps;
+    }
+
+    void Renderer::Push(std::shared_ptr<Renderable> renderable) {
+        m_renderables.emplace_back(renderable);
+    }
+
+    void Renderer::Erase() {
+        m_renderables.erase(m_renderables.begin());
     }
 
     void Renderer::SetBase(std::shared_ptr<Base> base) {

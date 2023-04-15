@@ -27,6 +27,8 @@ namespace uvke {
         virtual ~Renderer();
 
         virtual void Render();
+        virtual void Push(std::shared_ptr<Renderable> renderable);
+        virtual void Erase();
 
         virtual void SetBase(std::shared_ptr<Base> base);
         virtual void SetWindow(std::shared_ptr<Window> window);
@@ -68,9 +70,7 @@ namespace uvke {
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
         std::shared_ptr<IndexBuffer> m_indexBuffer;
         std::shared_ptr<UniformBuffer> m_uniformBuffer;
-        std::shared_ptr<VertexBuffer> m_vertexBuffer1;
-        std::shared_ptr<IndexBuffer> m_indexBuffer1;
-        std::shared_ptr<UniformBuffer> m_uniformBuffer1;
+        std::vector<std::shared_ptr<Renderable>> m_renderables;
         std::shared_ptr<Pipeline> m_pipeline;
         std::shared_ptr<Framebuffer> m_framebuffer;
         std::shared_ptr<CommandBuffer> m_commandBuffer;
