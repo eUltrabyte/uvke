@@ -18,6 +18,7 @@
 #include "Sampler.hpp"
 #include "SyncManager.hpp"
 #include "Interface.hpp"
+#include "Renderable.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
@@ -79,7 +80,7 @@ namespace uvke {
         std::shared_ptr<Interface> m_interface;
         Clock m_clock;
         Clock m_frameClock;
-        // VkDescriptorPool m_imguiPool;
+        int m_fps;
 
     };
 };

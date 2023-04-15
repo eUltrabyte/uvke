@@ -76,6 +76,7 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/SyncManager.cpp
     Source/uvke/Graphics/Interface.hpp
     Source/uvke/Graphics/Interface.cpp
+    Source/uvke/Graphics/Renderable.hpp
 )
 
 set(UVKE_UTILS_SOURCE

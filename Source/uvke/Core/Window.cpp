@@ -143,4 +143,12 @@ namespace uvke {
     Event& Window::GetEvent() {
         return m_event;
     }
+
+    int Window::GetKey(int key) {
+        return glfwGetKey(m_window, key);
+    }
+
+    int Window::GetButton(int button) {
+        return glfwGetMouseButton(m_window, button);
+    }
 };

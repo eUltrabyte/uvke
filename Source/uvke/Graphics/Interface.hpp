@@ -17,6 +17,7 @@ namespace uvke {
         virtual void Render(std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame);
 
         virtual void SetRenderTime(float renderTime);
+        virtual void SetFPS(int fps);
 
     protected:
         std::shared_ptr<Base> m_base;
@@ -24,6 +25,7 @@ namespace uvke {
     private:
         VkDescriptorPool m_descriptorPool;
         float m_renderTime;
+        int m_fps;
 
     };
 };

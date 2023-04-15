@@ -41,6 +41,8 @@ namespace uvke {
         virtual GLFWwindow* GetWindow();
         virtual bool GetStatus();
         virtual Event& GetEvent();
+        virtual int GetKey(int key);
+        virtual int GetButton(int button);
     
     private:
         std::shared_ptr<WindowProps> m_windowProps;

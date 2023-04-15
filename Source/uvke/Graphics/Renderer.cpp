@@ -2,7 +2,7 @@
 
 namespace uvke {
     Renderer::Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
-        : m_base(base), m_window(window) {
+        : m_base(base), m_window(window), m_fps(0) {
         m_surface = std::make_shared<Surface>(m_base->GetInstance(), m_base->GetPhysicalDevice(), m_base->GetDevice(), m_window);
 
         m_surface->SetQueueFamily(m_base->GetQueueFamily());
@@ -36,10 +36,10 @@ namespace uvke {
         m_sampler = std::make_shared<Sampler>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_texture);
 
         m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            { { -0.2f, -0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { 0.2f, -0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { 0.2f, 0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -0.2f, 0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { -0.2f, -0.2f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
+            { { 0.2f, -0.2f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
+            { { 0.2f, 0.2f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+            { { -0.2f, 0.2f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
         } );
 
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
@@ -87,62 +87,13 @@ namespace uvke {
         m_stagingBuffer.reset();
 
         m_interface = std::make_shared<Interface>(m_base, m_window, m_surface, m_commandBuffer, m_pipeline->GetRenderPass());
-
-        /* std::vector<VkDescriptorPoolSize> poolSizes = {
-            { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
-        };
-
-        VkDescriptorPoolCreateInfo pool_info = {};
-        pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool_info.maxSets = 1000;
-        pool_info.poolSizeCount = poolSizes.size();
-        pool_info.pPoolSizes = poolSizes.data();
-
-        UVKE_ASSERT(vkCreateDescriptorPool(m_base->GetDevice(), &pool_info, nullptr, &m_imguiPool));
-
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-        io.IniFilename = nullptr;
-
-        ImGui_ImplGlfw_InitForVulkan(m_window->GetWindow(), true);
-
-        ImGui_ImplVulkan_InitInfo imguiVulkanInitInfo = { };
-        imguiVulkanInitInfo.Instance = m_base->GetInstance();
-        imguiVulkanInitInfo.PhysicalDevice = m_base->GetPhysicalDevice();
-        imguiVulkanInitInfo.Device = m_base->GetDevice();
-        imguiVulkanInitInfo.Queue = m_surface->GetQueue(0);
-        imguiVulkanInitInfo.DescriptorPool = m_imguiPool;
-        imguiVulkanInitInfo.MinImageCount = 3;
-        imguiVulkanInitInfo.ImageCount = 3;
-        imguiVulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-
-        ImGui_ImplVulkan_Init(&imguiVulkanInitInfo, m_pipeline->GetRenderPass());
-
-        VkCommandBuffer commandBuffer = m_commandBuffer->Begin();
-        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-        m_commandBuffer->End(commandBuffer, m_surface->GetQueue(0));
-
-        ImGui_ImplVulkan_DestroyFontUploadObjects(); */
+        m_interface->SetFPS(0);
 
         UVKE_LOG("Renderer Created");
     }
 
     Renderer::~Renderer() {
         m_syncManager->WaitForDevice();
-
-        /* vkDestroyDescriptorPool(m_base->GetDevice(), m_imguiPool, nullptr);
-        ImGui_ImplVulkan_Shutdown(); */
 
         m_interface.reset();
 
@@ -158,6 +109,10 @@ namespace uvke {
 
         m_pipeline.reset();
 
+        m_uniformBuffer1.reset();
+        m_indexBuffer1.reset();
+        m_vertexBuffer1.reset();
+
         m_uniformBuffer.reset();
         m_indexBuffer.reset();
         m_vertexBuffer.reset();
@@ -171,8 +126,6 @@ namespace uvke {
     }
 
     void Renderer::Render() {
-        // UVKE_LOG("Render Time - " + std::to_string(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count()) + "ms");
-
         m_syncManager->WaitForQueue(m_surface->GetQueue(1));
 
         unsigned int index = 0;
@@ -191,7 +144,7 @@ namespace uvke {
 
         ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
 
-        if(glfwGetKey(m_window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
+        if(m_window->GetKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
             ubo.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
             ubo.projection.data[1][1] *= -1;
         } else {
@@ -206,7 +159,7 @@ namespace uvke {
 
         ubo1.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
 
-        if(glfwGetKey(m_window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
+        if(m_window->GetKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
             ubo1.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
             ubo1.projection.data[1][1] *= -1;
         } else {
@@ -254,10 +207,13 @@ namespace uvke {
 
         if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
             m_clock.Restart();
+            m_interface->SetFPS(m_fps);
+            m_fps = 0;
         }
 
         m_syncManager->Update();
         m_frameClock.Restart();
+        ++m_fps;
     }
 
     void Renderer::SetBase(std::shared_ptr<Base> base) {

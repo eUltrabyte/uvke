@@ -69,6 +69,7 @@ Interface::Interface(std::shared_ptr<Base> base, std::shared_ptr<Window> window,
         ImGui::Begin("Stats");
 
         ImGui::Text("Render Time: %fms", m_renderTime);
+        ImGui::Text("FPS: %i", m_fps);
 
         ImGui::End();
 
@@ -78,5 +79,9 @@ Interface::Interface(std::shared_ptr<Base> base, std::shared_ptr<Window> window,
 
     void Interface::SetRenderTime(float renderTime) {
         m_renderTime = renderTime;
+    }
+
+    void Interface::SetFPS(int fps) {
+        m_fps = fps;
     }
 };
