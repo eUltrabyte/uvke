@@ -7,7 +7,8 @@ uvke::App* Create(int argc, char** argv) {
     uvke::Base base(window.GetWindowProps()->title);
     uvke::Renderer renderer(std::make_shared<uvke::Base>(base), std::make_shared<uvke::Window>(window));
 
-    uvke::Sprite sprite({ 0.2f, 0.2f });
+    uvke::Sprite sprite({ 0.2f, 0.15f });
+    sprite.SetPosition({ 0.0f, 0.0f });
     sprite.Create(std::make_shared<uvke::Renderer>(renderer));
     renderer.Push(std::make_shared<uvke::Sprite>(sprite));
 

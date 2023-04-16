@@ -1,8 +1,9 @@
-- add multi object rendering support
+- make global descriptor set layout
+- camera class
 - add changing vertex array primitive types
 - add presentation class
 - add scene class
-- fix mat4x4 rotate
+- fix mat4x4 rotate ( and other functions to just work )
 - job manager ( job queue and job priorities )
 - add multi threading support
 - add audio support

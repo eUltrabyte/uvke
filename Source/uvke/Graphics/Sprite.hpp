@@ -20,10 +20,22 @@ namespace uvke {
         virtual void Update(std::shared_ptr<Window> window) override;
         virtual void Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) override;
 
+        virtual void SetPosition(const vec2f& position);
+        virtual void SetScale(const vec2f& scale);
+        virtual void SetVertices(const std::vector<Vertex>& vertices);
+        virtual void SetIndices(const std::vector<unsigned int>& indices);
+
+        virtual vec2f& GetPosition();
+        virtual vec2f& GetScale();
         virtual std::vector<Vertex>& GetVertices();
         virtual std::vector<unsigned int>& GetIndices();
+        virtual std::shared_ptr<VertexBuffer> GetVertexBuffer();
+        virtual std::shared_ptr<IndexBuffer> GetIndexBuffer();
+        virtual std::shared_ptr<UniformBuffer> GetUniformBuffer();
 
     private:
+        vec2f m_position;
+        vec2f m_scale;
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
