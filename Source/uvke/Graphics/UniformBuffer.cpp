@@ -69,9 +69,11 @@ namespace uvke {
 
             unsigned int frames = 2;
             m_descriptorSets.resize(frames);
+            
             std::array<VkDescriptorPoolSize, 2> descriptorPoolSizes { };
             descriptorPoolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorPoolSizes[0].descriptorCount = frames;
+
             descriptorPoolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             descriptorPoolSizes[1].descriptorCount = frames;
 

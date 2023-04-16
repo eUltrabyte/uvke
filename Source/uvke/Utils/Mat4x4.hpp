@@ -365,7 +365,7 @@ namespace uvke {
     using mat4x4l = mat4x4<long>;
 
     template<typename T>
-    constexpr mat4x4<T> Identity() {
+    inline constexpr mat4x4<T> Identity() {
         mat4x4<T> result;
         result.data[0][0] = 1;
         result.data[1][1] = 1;
@@ -375,7 +375,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr mat4x4<T> Perspective(const T& fov, const T& aspect, const T& zNear, const T& zFar) {
+    inline constexpr mat4x4<T> Perspective(const T& fov, const T& aspect, const T& zNear, const T& zFar) {
         T half = 1 / Tan<T>(fov);
 
         mat4x4<T> result;
@@ -388,7 +388,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr mat4x4<T> Ortho(const T& left, const T& right, const T& bottom, const T& top, const T& zNear, const T& zFar) {
+    inline constexpr mat4x4<T> Ortho(const T& left, const T& right, const T& bottom, const T& top, const T& zNear, const T& zFar) {
         mat4x4<T> result;
         result.data[0][0] = 2 / (right - left);
         result.data[1][1] = 2 / (bottom - top);
@@ -402,7 +402,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr mat4x4<T> LookAt(const vec3<T>& eye, const vec3<T>& center, const vec3<T>& up) {
+    inline constexpr mat4x4<T> LookAt(const vec3<T>& eye, const vec3<T>& center, const vec3<T>& up) {
         vec3<T> normalized = Normalize<T>(vec3<T>(center.x - eye.x, center.y - eye.y, center.z - eye.z));
         vec3<T> normalizedCrossProduct = Normalize<T>(CrossProduct<T, T>(normalized, up));
         vec3<T> crossProduct = CrossProduct<T, T>(normalizedCrossProduct, normalized);
@@ -425,7 +425,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr mat4x4<T> Scale(const mat4x4<T>& matrix, const vec3<T>& scale) {
+    inline constexpr mat4x4<T> Scale(const mat4x4<T>& matrix, const vec3<T>& scale) {
         mat4x4<T> result = Identity<T>();
         result.data[0][0] = scale.x;
         result.data[1][1] = scale.y;
@@ -436,27 +436,31 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr mat4x4<T> Rotate(const mat4x4<T>& matrix, const vec3<T>& direction, const T& angle) {
+    inline constexpr mat4x4<T> Rotate(const mat4x4<T>& matrix, const vec3<T>& direction, const T& angle) {
         T cosinus = Cos<T>(angle);
         T sinus = Sin<T>(angle);
         vec3<T> axis = Normalize<T>(direction);
+        float calculation = 1.0f - cosinus;
 
         mat4x4<T> result;
-        result.data[0][0] = cosinus + (1.0f - cosinus) * axis.x * axis.x;
-        result.data[0][1] = (1.0f - cosinus) * axis.x * axis.y + sinus * axis.z;
-        result.data[0][2] = (1.0f - cosinus) * axis.x * axis.z + sinus * axis.y;
+        result.data[0][0] = cosinus + calculation * axis.x * axis.x;
+        result.data[0][1] = calculation * axis.x * axis.y + sinus * axis.z;
+        result.data[0][2] = calculation * axis.x * axis.z - sinus * axis.y;
         result.data[0][3] = 0.0f;
 
-        result.data[1][0] = (1.0f - cosinus) * axis.y * axis.x - sinus * axis.z;
-        result.data[1][1] = cosinus + (1.0f - cosinus) * axis.y * axis.y;
-        result.data[1][2] = (1.0f - cosinus) * axis.y * axis.z + sinus * axis.x;
+        result.data[1][0] = calculation * axis.y * axis.x - sinus * axis.z;
+        result.data[1][1] = cosinus + calculation * axis.y * axis.y;
+        result.data[1][2] = calculation * axis.y * axis.z + sinus * axis.x;
         result.data[1][3] = 0.0f;
 
-        result.data[2][0] = (1.0f - cosinus) * axis.z * axis.x + sinus * axis.y;
-        result.data[2][1] = (1.0f - cosinus) * axis.z * axis.y - sinus * axis.x;
-        result.data[2][2] = cosinus + (1.0f - cosinus) * axis.z * axis.z;
+        result.data[2][0] = calculation * axis.z * axis.x + sinus * axis.y;
+        result.data[2][1] = calculation * axis.z * axis.y - sinus * axis.x;
+        result.data[2][2] = cosinus + calculation * axis.z * axis.z;
         result.data[2][3] = 0.0f;
 
+        result.data[3][0] = 0.0f;
+        result.data[3][1] = 0.0f;
+        result.data[3][2] = 0.0f;
         result.data[3][3] = 1.0f;
 
         result *= matrix;
@@ -464,7 +468,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr mat4x4<T> Translate(const mat4x4<T>& matrix, const vec3<T>& translation) {
+    inline constexpr mat4x4<T> Translate(const mat4x4<T>& matrix, const vec3<T>& translation) {
         mat4x4<T> result = matrix;
         result.data[3][0] = matrix.data[0][0] * translation.x + matrix.data[1][0] * translation.y + matrix.data[2][0] * translation.z + matrix.data[3][0];
         result.data[3][1] = matrix.data[0][1] * translation.x + matrix.data[1][1] * translation.y + matrix.data[2][1] * translation.z + matrix.data[3][1];
@@ -475,7 +479,7 @@ namespace uvke {
     }
 
     template<typename T>
-    constexpr mat4x4<T> Inverse(const mat4x4<T>& matrix) {
+    inline constexpr mat4x4<T> Inverse(const mat4x4<T>& matrix) {
         mat4x4<T> result;
         for(int x = 0; x < result.data.size(); ++x) {
             for(int y = 0; y < result.data[x].size(); ++y) {

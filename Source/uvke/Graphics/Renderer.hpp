@@ -4,6 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
+#include "../Core/Window.hpp"
 #include "Surface.hpp"
 #include "Swapchain.hpp"
 #include "StagingBuffer.hpp"
@@ -16,6 +17,8 @@
 #include "Texture.hpp"
 #include "Sampler.hpp"
 #include "SyncManager.hpp"
+#include "Interface.hpp"
+#include "Renderable.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
@@ -24,6 +27,8 @@ namespace uvke {
         virtual ~Renderer();
 
         virtual void Render();
+        virtual void Push(std::shared_ptr<Renderable> renderable);
+        virtual void Erase();
 
         virtual void SetBase(std::shared_ptr<Base> base);
         virtual void SetWindow(std::shared_ptr<Window> window);
@@ -36,6 +41,9 @@ namespace uvke {
         virtual void SetPipeline(std::shared_ptr<Pipeline> pipeline);
         virtual void SetFramebuffer(std::shared_ptr<Framebuffer> framebuffer);
         virtual void SetCommandBuffer(std::shared_ptr<CommandBuffer> commandBuffer);
+        virtual void SetTexture(std::shared_ptr<Texture> texture);
+        virtual void SetSampler(std::shared_ptr<Sampler> sampler);
+        virtual void SetSyncManager(std::shared_ptr<SyncManager> syncManager);
 
         virtual std::shared_ptr<Base> GetBase();
         virtual std::shared_ptr<Window> GetWindow();
@@ -48,6 +56,9 @@ namespace uvke {
         virtual std::shared_ptr<Pipeline> GetPipeline();
         virtual std::shared_ptr<Framebuffer> GetFramebuffer();
         virtual std::shared_ptr<CommandBuffer> GetCommandBuffer();
+        virtual std::shared_ptr<Texture> GetTexture();
+        virtual std::shared_ptr<Sampler> GetSampler();
+        virtual std::shared_ptr<SyncManager> GetSyncManager();
 
     private:
         std::shared_ptr<Base> m_base;
@@ -58,17 +69,18 @@ namespace uvke {
         std::shared_ptr<StagingBuffer> m_stagingBuffer;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
         std::shared_ptr<IndexBuffer> m_indexBuffer;
-        std::shared_ptr<VertexBuffer> m_vertexBuffer1;
-        std::shared_ptr<IndexBuffer> m_indexBuffer1;
         std::shared_ptr<UniformBuffer> m_uniformBuffer;
+        std::vector<std::shared_ptr<Renderable>> m_renderables;
         std::shared_ptr<Pipeline> m_pipeline;
         std::shared_ptr<Framebuffer> m_framebuffer;
         std::shared_ptr<CommandBuffer> m_commandBuffer;
         std::shared_ptr<Texture> m_texture;
         std::shared_ptr<Sampler> m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
+        std::shared_ptr<Interface> m_interface;
         Clock m_clock;
-        // VkDescriptorPool m_imguiPool;
+        Clock m_frameClock;
+        int m_fps;
 
     };
 };

@@ -3,12 +3,6 @@
 #define UVKE_COMMAND_BUFFER_HEADER
 
 #include "../uvke.hpp"
-#include "Surface.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
-#include "UniformBuffer.hpp"
-#include "Pipeline.hpp"
-#include "Framebuffer.hpp"
 
 namespace uvke {
     class UVKE_API CommandBuffer {
@@ -16,7 +10,6 @@ namespace uvke {
         CommandBuffer(VkDevice device, unsigned int queueFamilyIndex);
         virtual ~CommandBuffer();
 
-        virtual void Record(unsigned int frame, unsigned int index, std::shared_ptr<Surface> surface, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer, std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers, std::vector<std::shared_ptr<IndexBuffer>> indexBuffers, std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers);
         virtual VkCommandBuffer Begin();
         virtual void End(VkCommandBuffer commandBuffer, VkQueue queue);
 

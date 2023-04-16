@@ -10,11 +10,13 @@ include_directories(Thirdparty)
 
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
+find_package(imgui REQUIRED)
 
 if(WIN32)
     set(UVKE_LIBRARIES
         glfw
         Vulkan::Vulkan
+        imgui::imgui
     )
 else()
     find_package(X11 REQUIRED)
@@ -22,6 +24,7 @@ else()
     set(UVKE_LIBRARIES
         glfw
         Vulkan::Vulkan
+        imgui::imgui
         X11::X11
         X11::Xau
         dl
@@ -33,6 +36,8 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Platform.cpp
     Source/uvke/Core/Logger.hpp
     Source/uvke/Core/Logger.cpp
+    Source/uvke/Core/Event.hpp
+    Source/uvke/Core/Event.cpp
     Source/uvke/Core/Window.hpp
     Source/uvke/Core/Window.cpp
     Source/uvke/Core/Base.hpp
@@ -69,6 +74,11 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Sampler.cpp
     Source/uvke/Graphics/SyncManager.hpp
     Source/uvke/Graphics/SyncManager.cpp
+    Source/uvke/Graphics/Interface.hpp
+    Source/uvke/Graphics/Interface.cpp
+    Source/uvke/Graphics/Renderable.hpp
+    Source/uvke/Graphics/Sprite.hpp
+    Source/uvke/Graphics/Sprite.cpp
 )
 
 set(UVKE_UTILS_SOURCE
@@ -86,9 +96,6 @@ set(UVKE_UTILS_SOURCE
 set(UVKE_SOURCE
     Source/uvke/uvke.hpp
     Source/uvke/uvke.cpp
-    ${UVKE_CORE_SOURCE}
-    ${UVKE_GRAPHICS_SOURCE}
-    ${UVKE_UTILS_SOURCE}
 )
 
 if(WIN32)
@@ -122,17 +129,31 @@ if(UVKE_SHARED_LIBRARY)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_SHARED_BUILD")
     endif()
 
+    add_library(${PROJECT_NAME}-Core SHARED ${UVKE_CORE_SOURCE})
+    add_library(${PROJECT_NAME}-Utils SHARED ${UVKE_UTILS_SOURCE})
+    add_library(${PROJECT_NAME}-Graphics SHARED ${UVKE_GRAPHICS_SOURCE})
+
     add_library(${PROJECT_NAME} SHARED ${UVKE_SOURCE})
 else()
+    add_library(${PROJECT_NAME}-Core STATIC ${UVKE_CORE_SOURCE})
+    add_library(${PROJECT_NAME}-Utils STATIC ${UVKE_UTILS_SOURCE})
+    add_library(${PROJECT_NAME}-Graphics STATIC ${UVKE_GRAPHICS_SOURCE})
+
     add_library(${PROJECT_NAME} STATIC ${UVKE_SOURCE})
 endif()
 
 add_dependencies(uvke uvke-Shaders)
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC Source/uvke/uvkepch.hpp Source/uvke/uvkepch.cpp)
+target_compile_definitions(${PROJECT_NAME}-Core PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
+target_compile_definitions(${PROJECT_NAME}-Utils PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
+target_compile_definitions(${PROJECT_NAME}-Graphics PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-Core PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-Utils PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-Graphics PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics)
 
 file(COPY Resource/ DESTINATION Resource/)
 

@@ -30,17 +30,4 @@
 #include "Utils/Clock.hpp"
 #include "Utils/File.hpp"
 
-#include "Core/Window.hpp"
-
-// TODO
-// events handling window ( something like sdl or sfml )
-// add multi object rendering support?
-// add multi threading support
-// asset manager class
-// reimplement stb_image with own library
-// reimplement imgui with own library
-// add profiler
-// reimplement windows with own library
-// add something like vulkan wrapper as alternative for vulkansdk
-
 #endif

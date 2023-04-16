@@ -2,6 +2,8 @@
 #ifndef UVKE_ENTRY_HEADER
 #define UVKE_ENTRY_HEADER
 
+#include "../uvke.hpp"
+
 namespace uvke {
     using App = char;
 };

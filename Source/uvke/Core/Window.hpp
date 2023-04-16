@@ -3,6 +3,7 @@
 #define UVKE_WINDOW_HEADER
 
 #include "../uvke.hpp"
+#include "Event.hpp"
 
 namespace uvke {
     enum UVKE_API Style {
@@ -30,6 +31,7 @@ namespace uvke {
 
         virtual void CreatePlatformSurface(VkInstance instance, VkSurfaceKHR* surface);
 
+        virtual void PollEvents(Event& event);
         virtual void Update();
         virtual void Wait();
 
@@ -38,10 +40,14 @@ namespace uvke {
         virtual std::shared_ptr<WindowProps> GetWindowProps();
         virtual GLFWwindow* GetWindow();
         virtual bool GetStatus();
+        virtual Event& GetEvent();
+        virtual int GetKey(int key);
+        virtual int GetButton(int button);
     
     private:
         std::shared_ptr<WindowProps> m_windowProps;
         GLFWwindow* m_window;
+        Event m_event;
     
     };
 };

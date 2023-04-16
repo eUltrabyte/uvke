@@ -2,7 +2,7 @@
 
 namespace uvke {
     Renderer::Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
-        : m_base(base), m_window(window) {
+        : m_base(base), m_window(window), m_fps(0) {
         m_surface = std::make_shared<Surface>(m_base->GetInstance(), m_base->GetPhysicalDevice(), m_base->GetDevice(), m_window);
 
         m_surface->SetQueueFamily(m_base->GetQueueFamily());
@@ -35,27 +35,9 @@ namespace uvke {
 
         m_sampler = std::make_shared<Sampler>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_texture);
 
-        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            { { -0.4f, -0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { 0.4f, -0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { 0.4f, 0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -0.4f, 0.3f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
-        } );
+        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
 
-        m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
-            0, 1, 2, 2, 3, 0,
-        } );
-
-        m_vertexBuffer1 = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            { { -0.2f, -0.15f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
-            { { 0.2f, -0.15f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
-            { { 0.2f, 0.15f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -0.2f, 0.15f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
-        } );
-
-        m_indexBuffer1 = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
-            0, 1, 2, 2, 3, 0,
-        } );
+        m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> { 0 } );
 
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
 
@@ -65,72 +47,8 @@ namespace uvke {
 
         m_syncManager = std::make_shared<SyncManager>(m_base->GetDevice());
 
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer->GetSize());
-        m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
-        m_stagingBuffer.reset();
-
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer->GetSize());
-        m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
-        m_stagingBuffer.reset();
-
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_vertexBuffer1->GetSize());
-        m_stagingBuffer->Map(m_vertexBuffer1->GetVertices().data());
-        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_vertexBuffer1->GetBuffer(), m_vertexBuffer1->GetSize());
-        m_stagingBuffer.reset();
-
-        m_stagingBuffer = std::make_shared<StagingBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_indexBuffer1->GetSize());
-        m_stagingBuffer->Map(m_indexBuffer1->GetIndices().data());
-        m_stagingBuffer->Copy(m_commandBuffer->GetCommandPool(), m_surface->GetQueue(0), m_indexBuffer1->GetBuffer(), m_indexBuffer1->GetSize());
-        m_stagingBuffer.reset();
-
-        /* std::vector<VkDescriptorPoolSize> poolSizes = {
-            { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
-        };
-
-        VkDescriptorPoolCreateInfo pool_info = {};
-        pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool_info.maxSets = 1000;
-        pool_info.poolSizeCount = poolSizes.size();
-        pool_info.pPoolSizes = poolSizes.data();
-
-        UVKE_ASSERT(vkCreateDescriptorPool(m_base->GetDevice(), &pool_info, nullptr, &m_imguiPool));
-
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-        io.IniFilename = nullptr;
-
-        ImGui_ImplGlfw_InitForVulkan(m_window->GetWindow(), true);
-
-        ImGui_ImplVulkan_InitInfo imguiVulkanInitInfo = { };
-        imguiVulkanInitInfo.Instance = m_base->GetInstance();
-        imguiVulkanInitInfo.PhysicalDevice = m_base->GetPhysicalDevice();
-        imguiVulkanInitInfo.Device = m_base->GetDevice();
-        imguiVulkanInitInfo.Queue = m_surface->GetQueue(0);
-        imguiVulkanInitInfo.DescriptorPool = m_imguiPool;
-        imguiVulkanInitInfo.MinImageCount = 3;
-        imguiVulkanInitInfo.ImageCount = 3;
-        imguiVulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-
-        ImGui_ImplVulkan_Init(&imguiVulkanInitInfo, m_pipeline->GetRenderPass());
-
-        VkCommandBuffer commandBuffer = m_commandBuffer->Begin();
-        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-        m_commandBuffer->End(commandBuffer, m_surface->GetQueue(0));
-
-        ImGui_ImplVulkan_DestroyFontUploadObjects(); */
+        m_interface = std::make_shared<Interface>(m_base, m_window, m_surface, m_commandBuffer, m_pipeline->GetRenderPass());
+        m_interface->SetFPS(0);
 
         UVKE_LOG("Renderer Created");
     }
@@ -138,8 +56,7 @@ namespace uvke {
     Renderer::~Renderer() {
         m_syncManager->WaitForDevice();
 
-        /* vkDestroyDescriptorPool(m_base->GetDevice(), m_imguiPool, nullptr);
-        ImGui_ImplVulkan_Shutdown(); */
+        m_interface.reset();
 
         m_syncManager.reset();
 
@@ -152,6 +69,8 @@ namespace uvke {
         m_framebuffer.reset();
 
         m_pipeline.reset();
+
+        m_renderables.clear();
 
         m_uniformBuffer.reset();
         m_indexBuffer.reset();
@@ -169,34 +88,23 @@ namespace uvke {
         m_syncManager->WaitForQueue(m_surface->GetQueue(1));
 
         unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<unsigned long long>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
+        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
             m_swapchain->Recreate(m_window, m_framebuffer->GetFramebuffers(), m_pipeline->GetRenderPass());
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             UVKE_FATAL("Swapchain Acquire Image Error");
         }
-        
-        UniformBufferObject ubo { };
-        ubo.model = Identity<float>();
-        // ubo.model = Scale<float>(ubo.model, vec3f(1.0f, 1.0f, 1.0f));
-        // ubo.model = Rotate<float>(ubo.model, vec3f(0.0f, 0.0f, 1.0f), std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::steady_clock::now() - m_clock.GetStart()).count() * Radians(90.0f) * 4);
 
-        ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
-
-        if(glfwGetKey(m_window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo.projection = Perspective<float>(Radians(70.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
-            ubo.projection.data[1][1] *= -1;
-        } else {
-            ubo.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
+        for(auto i = 0; i < m_renderables.size(); ++i) {
+            m_renderables[i]->Update(m_window);
         }
-
-        m_uniformBuffer->Update(ubo);
 
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_commandBuffer->Record(m_syncManager->GetFrame(), index, m_surface, m_pipeline, m_framebuffer, { m_vertexBuffer, m_vertexBuffer1 }, { m_indexBuffer, m_indexBuffer1 }, { m_uniformBuffer, m_uniformBuffer });
-        
+        m_interface->SetRenderTime(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count());
+        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, m_renderables, m_interface);
+
         VkSubmitInfo submitInfo { };
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submitInfo.pNext = nullptr;
@@ -230,9 +138,21 @@ namespace uvke {
 
         if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
             m_clock.Restart();
+            m_interface->SetFPS(m_fps);
+            m_fps = 0;
         }
 
         m_syncManager->Update();
+        m_frameClock.Restart();
+        ++m_fps;
+    }
+
+    void Renderer::Push(std::shared_ptr<Renderable> renderable) {
+        m_renderables.emplace_back(renderable);
+    }
+
+    void Renderer::Erase() {
+        m_renderables.erase(m_renderables.begin());
     }
 
     void Renderer::SetBase(std::shared_ptr<Base> base) {
@@ -278,6 +198,18 @@ namespace uvke {
     void Renderer::SetCommandBuffer(std::shared_ptr<CommandBuffer> commandBuffer) {
         m_commandBuffer = commandBuffer;
     }
+
+    void Renderer::SetTexture(std::shared_ptr<Texture> texture) {
+        m_texture = texture;
+    }
+    
+    void Renderer::SetSampler(std::shared_ptr<Sampler> sampler) {
+        m_sampler = sampler;
+    }
+    
+    void Renderer::SetSyncManager(std::shared_ptr<SyncManager> syncManager) {
+        m_syncManager = syncManager;
+    }
     
     std::shared_ptr<Base> Renderer::GetBase() {
         return m_base;
@@ -321,5 +253,17 @@ namespace uvke {
 
     std::shared_ptr<CommandBuffer> Renderer::GetCommandBuffer() {
         return m_commandBuffer;
+    }
+
+    std::shared_ptr<Texture> Renderer::GetTexture() {
+        return m_texture;
+    }
+    
+    std::shared_ptr<Sampler> Renderer::GetSampler() {
+        return m_sampler;
+    }
+    
+    std::shared_ptr<SyncManager> Renderer::GetSyncManager() {
+        return m_syncManager;
     }
 };
