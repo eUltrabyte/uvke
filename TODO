@@ -1,6 +1,6 @@
-- make global descriptor set layout
-- camera class
-- add changing vertex array primitive types
+- move descriptor set and descriptor set layout to class
+- add camera class
+- add support other primitive types
 - add presentation class
 - add scene class
 - fix mat4x4 rotate ( and other functions to just work )

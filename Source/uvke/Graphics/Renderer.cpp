@@ -35,15 +35,9 @@ namespace uvke {
 
         m_sampler = std::make_shared<Sampler>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_texture);
 
-        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> {
-            { { 0.0f, -0.2f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.5f, 0.0f } },
-            { { 0.2f, 0.2f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
-            { { -0.2f, 0.2f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
-        } );
+        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
 
-        m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> {
-            0, 1, 2,
-        } );
+        m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> { 0 } );
 
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
 
@@ -100,23 +94,6 @@ namespace uvke {
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             UVKE_FATAL("Swapchain Acquire Image Error");
         }
-        
-        UniformBufferObject ubo { };
-        ubo.model = Identity<float>();
-        ubo.model = Translate<float>(ubo.model, vec3f(0.5f, 0.0f, 0.0f));
-        // ubo.model = Scale<float>(ubo.model, vec3f(1.0f, 1.0f, 1.0f));
-        // ubo.model = Rotate<float>(ubo.model, vec3f(0.0f, 0.0f, 1.0f), std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::steady_clock::now() - m_clock.GetStart()).count() * Radians(90.0f) * 4);
-
-        ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
-
-        if(m_window->GetKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo.projection = Perspective<float>(Radians(45.0f), (m_window->GetWindowProps()->size.x / m_window->GetWindowProps()->size.y), 0.1f, 1000.0f);
-            ubo.projection.data[1][1] *= -1;
-        } else {
-            ubo.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
-        }
-
-        m_uniformBuffer->Update(ubo);
 
         for(auto i = 0; i < m_renderables.size(); ++i) {
             m_renderables[i]->Update(m_window);
