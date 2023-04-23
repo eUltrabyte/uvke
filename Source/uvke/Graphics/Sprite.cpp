@@ -24,7 +24,7 @@ namespace uvke {
     void Sprite::Create(std::shared_ptr<Renderer> renderer) {
         m_vertexBuffer = std::make_shared<VertexBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_vertices);
         m_indexBuffer = std::make_shared<IndexBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_indices);
-        m_uniformBuffer = std::make_shared<UniformBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), renderer->GetSampler()->GetImageView(), renderer->GetSampler()->GetSampler());
+        m_uniformBuffer = std::make_shared<UniformBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), renderer->GetSampler()->GetImageView(), renderer->GetSampler()->GetSampler(), renderer->GetDescriptor()->GetDescriptorSetLayout());
 
         std::shared_ptr<StagingBuffer> m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_vertexBuffer->GetSize());
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());

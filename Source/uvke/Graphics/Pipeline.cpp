@@ -1,8 +1,8 @@
 #include "Pipeline.hpp"
 
 namespace uvke {
-    Pipeline::Pipeline(VkDevice device, std::shared_ptr<Surface> surface, std::shared_ptr<Shader> shader, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<UniformBuffer> uniformBuffer)
-        : m_device(device), m_surface(surface), m_shader(shader), m_vertexBuffer(vertexBuffer), m_uniformBuffer(uniformBuffer) {
+    Pipeline::Pipeline(VkDevice device, std::shared_ptr<Surface> surface, std::shared_ptr<Shader> shader, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<Descriptor> descriptor)
+        : m_device(device), m_surface(surface), m_shader(shader), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
         {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *m_shader->GetVertexShaderStageCreateInfo(), *m_shader->GetFragmentShaderStageCreateInfo() };
 
@@ -140,7 +140,7 @@ namespace uvke {
             pipelineLayoutCreateInfo.pNext = nullptr;
             pipelineLayoutCreateInfo.flags = 0;
             pipelineLayoutCreateInfo.setLayoutCount = 1;
-            pipelineLayoutCreateInfo.pSetLayouts = &m_uniformBuffer->GetDescriptorSetLayout();
+            pipelineLayoutCreateInfo.pSetLayouts = &descriptor->GetDescriptorSetLayout();
             pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
             pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 
@@ -332,7 +332,7 @@ namespace uvke {
             pipelineLayoutCreateInfo.pNext = nullptr;
             pipelineLayoutCreateInfo.flags = 0;
             pipelineLayoutCreateInfo.setLayoutCount = 1;
-            pipelineLayoutCreateInfo.pSetLayouts = &m_uniformBuffer->GetDescriptorSetLayout();
+            pipelineLayoutCreateInfo.pSetLayouts = &m_descriptor->GetDescriptorSetLayout();
             pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
             pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 
@@ -459,8 +459,8 @@ namespace uvke {
         return m_vertexBuffer;
     }
     
-    std::shared_ptr<UniformBuffer> Pipeline::GetUniformBuffer() {
-        return m_uniformBuffer;
+    std::shared_ptr<Descriptor> Pipeline::GetDescriptor() {
+        return m_descriptor;
     }
     
     VkRenderPass& Pipeline::GetRenderPass() {

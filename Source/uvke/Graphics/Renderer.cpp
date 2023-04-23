@@ -39,9 +39,11 @@ namespace uvke {
 
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), std::vector<unsigned int> { 0 } );
 
-        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler());
+        m_descriptor = std::make_shared<Descriptor>(m_base->GetDevice());
 
-        m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_uniformBuffer);
+        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler(), m_descriptor->GetDescriptorSetLayout());
+
+        m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_descriptor);
 
         m_framebuffer = std::make_shared<Framebuffer>(m_base->GetDevice(), m_pipeline->GetRenderPass(), m_swapchain, m_surface);
 
@@ -73,7 +75,11 @@ namespace uvke {
         m_renderables.clear();
 
         m_uniformBuffer.reset();
+        
+        m_descriptor.reset();
+
         m_indexBuffer.reset();
+
         m_vertexBuffer.reset();
 
         m_shader.reset();
@@ -237,6 +243,10 @@ namespace uvke {
     
     std::shared_ptr<IndexBuffer> Renderer::GetIndexBuffer() {
         return m_indexBuffer;
+    }
+
+    std::shared_ptr<Descriptor> Renderer::GetDescriptor() {
+        return m_descriptor;
     }
     
     std::shared_ptr<UniformBuffer> Renderer::GetUniformBuffer() {

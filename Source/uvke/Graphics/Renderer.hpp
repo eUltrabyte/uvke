@@ -10,6 +10,7 @@
 #include "StagingBuffer.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
+#include "Descriptor.hpp"
 #include "UniformBuffer.hpp"
 #include "Pipeline.hpp"
 #include "Framebuffer.hpp"
@@ -52,6 +53,7 @@ namespace uvke {
         virtual std::shared_ptr<StagingBuffer> GetStagingBuffer();
         virtual std::shared_ptr<VertexBuffer> GetVertexBuffer();
         virtual std::shared_ptr<IndexBuffer> GetIndexBuffer();
+        virtual std::shared_ptr<Descriptor> GetDescriptor();
         virtual std::shared_ptr<UniformBuffer> GetUniformBuffer();
         virtual std::shared_ptr<Pipeline> GetPipeline();
         virtual std::shared_ptr<Framebuffer> GetFramebuffer();
@@ -69,6 +71,7 @@ namespace uvke {
         std::shared_ptr<StagingBuffer> m_stagingBuffer;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
         std::shared_ptr<IndexBuffer> m_indexBuffer;
+        std::shared_ptr<Descriptor> m_descriptor;
         std::shared_ptr<UniformBuffer> m_uniformBuffer;
         std::vector<std::shared_ptr<Renderable>> m_renderables;
         std::shared_ptr<Pipeline> m_pipeline;

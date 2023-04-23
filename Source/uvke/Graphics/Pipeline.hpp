@@ -8,6 +8,7 @@
 #include "CommandBuffer.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
+#include "Descriptor.hpp"
 #include "UniformBuffer.hpp"
 #include "Interface.hpp"
 #include "Renderable.hpp"
@@ -15,7 +16,7 @@
 namespace uvke {
     class UVKE_API Pipeline {
     public:
-        Pipeline(VkDevice device = nullptr, std::shared_ptr<Surface> surface = nullptr, std::shared_ptr<Shader> shader = nullptr, std::shared_ptr<VertexBuffer> vertexBuffer = nullptr, std::shared_ptr<UniformBuffer> uniformBuffer = nullptr);
+        Pipeline(VkDevice device = nullptr, std::shared_ptr<Surface> surface = nullptr, std::shared_ptr<Shader> shader = nullptr, std::shared_ptr<VertexBuffer> vertexBuffer = nullptr, std::shared_ptr<Descriptor> descriptor = nullptr);
         virtual ~Pipeline();
 
         virtual void Recreate();
@@ -30,7 +31,7 @@ namespace uvke {
         virtual std::shared_ptr<Surface> GetSurface();
         virtual std::shared_ptr<Shader> GetShader();
         virtual std::shared_ptr<VertexBuffer> GetVertexBuffer();
-        virtual std::shared_ptr<UniformBuffer> GetUniformBuffer();
+        virtual std::shared_ptr<Descriptor> GetDescriptor();
         virtual VkRenderPass& GetRenderPass();
         virtual VkPipelineLayout& GetPipelineLayout();
         virtual VkPipeline& GetPipeline();
@@ -40,7 +41,7 @@ namespace uvke {
         std::shared_ptr<Surface> m_surface;
         std::shared_ptr<Shader> m_shader;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
-        std::shared_ptr<UniformBuffer> m_uniformBuffer;
+        std::shared_ptr<Descriptor> m_descriptor;
 
     private:
         VkRenderPass m_renderPass;

@@ -1,4 +1,4 @@
-- move descriptor set and descriptor set layout to class
+- repair classes ( change all vulkan types ( VkDevice etc ) to classes having them ( Base etc ))
 - add camera class
 - add support other primitive types
 - add presentation class

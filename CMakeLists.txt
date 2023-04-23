@@ -60,6 +60,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/VertexBuffer.cpp
     Source/uvke/Graphics/IndexBuffer.hpp
     Source/uvke/Graphics/IndexBuffer.cpp
+    Source/uvke/Graphics/Descriptor.hpp
+    Source/uvke/Graphics/Descriptor.cpp
     Source/uvke/Graphics/UniformBuffer.hpp
     Source/uvke/Graphics/UniformBuffer.cpp
     Source/uvke/Graphics/Pipeline.hpp
