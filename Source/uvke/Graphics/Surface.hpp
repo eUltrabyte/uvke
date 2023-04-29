@@ -3,19 +3,18 @@
 #define UVKE_SURFACE_HEADER
 
 #include "../uvke.hpp"
+#include "../Core/Base.hpp"
 #include "../Core/Window.hpp"
 
 namespace uvke {
     class UVKE_API Surface {
     public:
-        Surface(VkInstance instance = nullptr, VkPhysicalDevice physicalDevice = nullptr, VkDevice device = nullptr, std::shared_ptr<Window> window = nullptr);
+        Surface(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Window> window = nullptr);
         virtual ~Surface();
 
         virtual void CheckQueues();
 
-        virtual void SetInstance(VkInstance instance);
-        virtual void SetPhysicalDevice(VkPhysicalDevice physicalDevice);
-        virtual void SetDevice(VkDevice device);
+        virtual void SetBase(std::shared_ptr<Base> base);
         virtual void SetQueueFamily(unsigned int queueFamilyIndex);
         virtual void SetMultiQueueMode(bool multiQueue);
         virtual void SetSurface(VkSurfaceKHR surface);
@@ -24,9 +23,7 @@ namespace uvke {
         virtual void SetExtent(VkExtent2D extent);
         virtual void SetSwapExtent(std::shared_ptr<Window> window);
 
-        virtual VkInstance& GetInstance();
-        virtual VkPhysicalDevice& GetPhysicalDevice();
-        virtual VkDevice& GetDevice();
+        virtual std::shared_ptr<Base> GetBase();
         virtual unsigned int GetQueueFamily();
         virtual bool IsMultiQueueMode();
         virtual std::vector<VkQueue>& GetQueues();
@@ -38,18 +35,16 @@ namespace uvke {
         virtual VkSurfaceCapabilitiesKHR& GetCapabilities();
         
     protected:
-        VkInstance m_instance;
-        VkPhysicalDevice m_physicalDevice;
-        VkDevice m_device;
+        std::shared_ptr<Base> m_base;
 
     private:
         VkSurfaceFormatKHR GetSuitableSurfaceFormat() {
             std::vector<VkSurfaceFormatKHR> surfaceFormats;
             {
                 unsigned int surfaceFormatsCount = 0;
-                vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &surfaceFormatsCount, nullptr);
+                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base->GetPhysicalDevice(), m_surface, &surfaceFormatsCount, nullptr);
                 surfaceFormats = std::vector<VkSurfaceFormatKHR>(surfaceFormatsCount);
-                vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &surfaceFormatsCount, surfaceFormats.data());
+                vkGetPhysicalDeviceSurfaceFormatsKHR(m_base->GetPhysicalDevice(), m_surface, &surfaceFormatsCount, surfaceFormats.data());
             }
 
             for(auto i = 0; i < surfaceFormats.size(); ++i) {
@@ -65,9 +60,9 @@ namespace uvke {
             std::vector<VkPresentModeKHR> presentModes;
             {
                 unsigned int presentModesCount = 0;
-                vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModesCount, nullptr);
+                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base->GetPhysicalDevice(), m_surface, &presentModesCount, nullptr);
                 presentModes = std::vector<VkPresentModeKHR>(presentModesCount);
-                vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModesCount, presentModes.data());
+                vkGetPhysicalDeviceSurfacePresentModesKHR(m_base->GetPhysicalDevice(), m_surface, &presentModesCount, presentModes.data());
             }
 
             for(auto i = 0; i < presentModes.size(); ++i) {

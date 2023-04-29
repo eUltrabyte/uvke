@@ -68,14 +68,14 @@ namespace uvke {
         m_renderPass = renderPass;
     }
     
-    void Framebuffer::SetSwapchain(std::shared_ptr<Swapchain> swapchain) {
-        m_swapchain = swapchain;
-    }
-    
     void Framebuffer::SetSurface(std::shared_ptr<Surface> surface) {
         m_surface = surface;
     }
 
+    void Framebuffer::SetSwapchain(std::shared_ptr<Swapchain> swapchain) {
+        m_swapchain = swapchain;
+    }
+    
     VkDevice& Framebuffer::GetDevice() {
         return m_device;
     }

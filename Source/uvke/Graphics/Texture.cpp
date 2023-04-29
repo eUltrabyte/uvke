@@ -4,8 +4,8 @@
 #include <stb/stb_image.h>
 
 namespace uvke {
-    Texture::Texture(VkPhysicalDevice physicalDevice, VkDevice device, std::string_view filename)
-        : m_physicalDevice(physicalDevice), m_device(device) {
+    Texture::Texture(std::shared_ptr<Base> base, std::string_view filename)
+        : m_base(base) {
         vec2i size = { 0, 0 };
         m_pixels = stbi_load(filename.data(), &size.x, &size.y, &m_channel, STBI_rgb_alpha);
 
@@ -26,15 +26,15 @@ namespace uvke {
         imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 
-        UVKE_ASSERT(vkCreateImage(m_device, &imageCreateInfo, nullptr, &m_image));
+        UVKE_ASSERT(vkCreateImage(m_base->GetDevice(), &imageCreateInfo, nullptr, &m_image));
 
         UVKE_LOG("Texture Created");
     }
     
     Texture::~Texture() {
-        if(m_device != VK_NULL_HANDLE) {
-            vkFreeMemory(m_device, m_imageMemory, nullptr);
-            vkDestroyImage(m_device, m_image, nullptr);
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
+            vkFreeMemory(m_base->GetDevice(), m_imageMemory, nullptr);
+            vkDestroyImage(m_base->GetDevice(), m_image, nullptr);
         }
 
         UVKE_LOG("Texture Destroyed");
@@ -44,10 +44,10 @@ namespace uvke {
         stbi_image_free(m_pixels);
 
         VkMemoryRequirements memoryRequirements { };
-        vkGetImageMemoryRequirements(m_device, m_image, &memoryRequirements);
+        vkGetImageMemoryRequirements(m_base->GetDevice(), m_image, &memoryRequirements);
 
         VkPhysicalDeviceMemoryProperties memoryProperties { };
-        vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memoryProperties);
+        vkGetPhysicalDeviceMemoryProperties(m_base->GetPhysicalDevice(), &memoryProperties);
 
         unsigned int filter = memoryRequirements.memoryTypeBits;
         VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -65,9 +65,9 @@ namespace uvke {
         memoryAllocateInfo.allocationSize = memoryRequirements.size;
         memoryAllocateInfo.memoryTypeIndex = index;
 
-        UVKE_ASSERT(vkAllocateMemory(m_device, &memoryAllocateInfo, nullptr, &m_imageMemory));
+        UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_imageMemory));
 
-        vkBindImageMemory(m_device, m_image, m_imageMemory, 0);
+        vkBindImageMemory(m_base->GetDevice(), m_image, m_imageMemory, 0);
 
         UVKE_LOG("Texture Allocated");
     }
@@ -151,8 +151,8 @@ namespace uvke {
         commandBuffer->End(buffer, queue);
     }
     
-    void Texture::SetDevice(VkDevice device) {
-        m_device = device;
+    void Texture::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
     }
     
     void Texture::SetSize(vec2u size) {
@@ -175,8 +175,8 @@ namespace uvke {
         m_imageMemory = imageMemory;
     }
     
-    VkDevice& Texture::GetDevice() {
-        return m_device;
+    std::shared_ptr<Base> Texture::GetBase() {
+        return m_base;
     }
     
     vec2u& Texture::GetSize() {

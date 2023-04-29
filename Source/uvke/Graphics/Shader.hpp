@@ -3,21 +3,25 @@
 #define UVKE_SHADER_HEADER
 
 #include "../uvke.hpp"
+#include "../Core/Base.hpp"
 
 namespace uvke {
     class UVKE_API Shader {
     public:
-        Shader(VkDevice device = nullptr, std::vector<char> vertexCode = std::vector<char>(0), std::vector<char> fragmentCode = std::vector<char>(0));
-        Shader(VkDevice device = nullptr, File vertexFile = File(0), File fragmentFile = File(0));
+        Shader(std::shared_ptr<Base> base = nullptr, std::vector<char> vertexCode = std::vector<char>(0), std::vector<char> fragmentCode = std::vector<char>(0));
+        Shader(std::shared_ptr<Base> base = nullptr, File vertexFile = File(0), File fragmentFile = File(0));
         virtual ~Shader();
 
+        virtual void SetBase(std::shared_ptr<Base> base);
+
+        virtual std::shared_ptr<Base> GetBase();
         virtual VkShaderModule GetVertexShader();
         virtual VkShaderModule GetFragmentShader();
         virtual VkPipelineShaderStageCreateInfo* GetVertexShaderStageCreateInfo();
         virtual VkPipelineShaderStageCreateInfo* GetFragmentShaderStageCreateInfo();
 
     protected:
-        VkDevice m_device;
+        std::shared_ptr<Base> m_base;
 
     private:
         VkShaderModule CreateShaderModule(std::vector<char> code) {
@@ -31,7 +35,7 @@ namespace uvke {
                 shaderModuleCreateInfo.codeSize = code.size();
                 shaderModuleCreateInfo.pCode = reinterpret_cast<const unsigned int*>(code.data());
 
-                UVKE_ASSERT(vkCreateShaderModule(m_device, &shaderModuleCreateInfo, nullptr, &shaderModule));
+                UVKE_ASSERT(vkCreateShaderModule(m_base->GetDevice(), &shaderModuleCreateInfo, nullptr, &shaderModule));
             }
             
             return shaderModule;

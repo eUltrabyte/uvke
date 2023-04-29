@@ -1,8 +1,8 @@
 #include "VertexBuffer.hpp"
 
 namespace uvke {
-    VertexBuffer::VertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, std::vector<Vertex> vertices)
-        : m_physicalDevice(physicalDevice), m_device(device), m_vertices(vertices) {
+    VertexBuffer::VertexBuffer(std::shared_ptr<Base> base, std::vector<Vertex> vertices)
+        : m_base(base), m_vertices(vertices) {
         {
             m_vertexInputBindingDescription = { };
             m_vertexInputBindingDescription.binding = 0;
@@ -35,13 +35,13 @@ namespace uvke {
             bufferCreateInfo.queueFamilyIndexCount = 0;
             bufferCreateInfo.pQueueFamilyIndices = nullptr;
 
-            UVKE_ASSERT(vkCreateBuffer(m_device, &bufferCreateInfo, nullptr, &m_buffer));
+            UVKE_ASSERT(vkCreateBuffer(m_base->GetDevice(), &bufferCreateInfo, nullptr, &m_buffer));
 
             VkMemoryRequirements memoryRequirements { };
-            vkGetBufferMemoryRequirements(m_device, m_buffer, &memoryRequirements);
+            vkGetBufferMemoryRequirements(m_base->GetDevice(), m_buffer, &memoryRequirements);
 
             VkPhysicalDeviceMemoryProperties memoryProperties { };
-            vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memoryProperties);
+            vkGetPhysicalDeviceMemoryProperties(m_base->GetPhysicalDevice(), &memoryProperties);
 
             unsigned int filter = memoryRequirements.memoryTypeBits;
             VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -59,22 +59,22 @@ namespace uvke {
             memoryAllocateInfo.allocationSize = memoryRequirements.size;
             memoryAllocateInfo.memoryTypeIndex = index;
 
-            UVKE_ASSERT(vkAllocateMemory(m_device, &memoryAllocateInfo, nullptr, &m_bufferMemory));
+            UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_bufferMemory));
         }
 
-        vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
+        vkBindBufferMemory(m_base->GetDevice(), m_buffer, m_bufferMemory, 0);
 
         UVKE_LOG("Vertex Buffer Created");
     }
 
     VertexBuffer::~VertexBuffer() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_buffer != VK_NULL_HANDLE) {
-                vkDestroyBuffer(m_device, m_buffer, nullptr);
+                vkDestroyBuffer(m_base->GetDevice(), m_buffer, nullptr);
             }
 
             if(m_bufferMemory != VK_NULL_HANDLE) {
-                vkFreeMemory(m_device, m_bufferMemory, nullptr);
+                vkFreeMemory(m_base->GetDevice(), m_bufferMemory, nullptr);
             }
         }
 
@@ -84,6 +84,14 @@ namespace uvke {
     void VertexBuffer::Bind(VkCommandBuffer commandBuffer) {
         VkDeviceSize offsets[] = { 0 };
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, &m_buffer, offsets);
+    }
+
+    void VertexBuffer::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
+    }
+
+    std::shared_ptr<Base> VertexBuffer::GetBase() {
+        return m_base;
     }
 
     std::vector<Vertex>& VertexBuffer::GetVertices() {
@@ -104,5 +112,9 @@ namespace uvke {
 
     VkBuffer& VertexBuffer::GetBuffer() {
         return m_buffer;
+    }
+
+    VkDeviceMemory& VertexBuffer::GetBufferMemory() {
+        return m_bufferMemory;
     }
 };

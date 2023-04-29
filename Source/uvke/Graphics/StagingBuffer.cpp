@@ -1,8 +1,8 @@
 #include "StagingBuffer.hpp"
 
 namespace uvke {
-    StagingBuffer::StagingBuffer(VkPhysicalDevice physicalDevice, VkDevice device, unsigned int size)
-        : m_physicalDevice(physicalDevice), m_device(device), m_size(size) {
+    StagingBuffer::StagingBuffer(std::shared_ptr<Base> base, unsigned int size)
+        : m_base(base), m_size(size) {
         {
             VkBufferCreateInfo bufferCreateInfo = { };
             bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -14,13 +14,13 @@ namespace uvke {
             bufferCreateInfo.queueFamilyIndexCount = 0;
             bufferCreateInfo.pQueueFamilyIndices = nullptr;
 
-            UVKE_ASSERT(vkCreateBuffer(m_device, &bufferCreateInfo, nullptr, &m_buffer));
+            UVKE_ASSERT(vkCreateBuffer(m_base->GetDevice(), &bufferCreateInfo, nullptr, &m_buffer));
 
             VkMemoryRequirements memoryRequirements { };
-            vkGetBufferMemoryRequirements(m_device, m_buffer, &memoryRequirements);
+            vkGetBufferMemoryRequirements(m_base->GetDevice(), m_buffer, &memoryRequirements);
 
             VkPhysicalDeviceMemoryProperties memoryProperties { };
-            vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memoryProperties);
+            vkGetPhysicalDeviceMemoryProperties(m_base->GetPhysicalDevice(), &memoryProperties);
 
             unsigned int filter = memoryRequirements.memoryTypeBits;
             VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -38,22 +38,22 @@ namespace uvke {
             memoryAllocateInfo.allocationSize = memoryRequirements.size;
             memoryAllocateInfo.memoryTypeIndex = index;
 
-            UVKE_ASSERT(vkAllocateMemory(m_device, &memoryAllocateInfo, nullptr, &m_bufferMemory));
+            UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_bufferMemory));
         }
 
-        vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
+        vkBindBufferMemory(m_base->GetDevice(), m_buffer, m_bufferMemory, 0);
 
         UVKE_LOG("Staging Buffer Created");
     }
 
     StagingBuffer::~StagingBuffer() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_buffer != VK_NULL_HANDLE) {
-                vkDestroyBuffer(m_device, m_buffer, nullptr);
+                vkDestroyBuffer(m_base->GetDevice(), m_buffer, nullptr);
             }
 
             if(m_bufferMemory != VK_NULL_HANDLE) {
-                vkFreeMemory(m_device, m_bufferMemory, nullptr);
+                vkFreeMemory(m_base->GetDevice(), m_bufferMemory, nullptr);
             }
         }
 
@@ -62,9 +62,9 @@ namespace uvke {
 
     void StagingBuffer::Map(void* data) {
         void* rawData;
-        vkMapMemory(m_device, m_bufferMemory, 0, m_size, 0, &rawData);
+        vkMapMemory(m_base->GetDevice(), m_bufferMemory, 0, m_size, 0, &rawData);
         std::memcpy(rawData, data, m_size);
-        vkUnmapMemory(m_device, m_bufferMemory);
+        vkUnmapMemory(m_base->GetDevice(), m_bufferMemory);
     }
 
     void StagingBuffer::Copy(VkCommandPool commandPool, VkQueue queue, VkBuffer destination, VkDeviceSize size) {
@@ -76,7 +76,7 @@ namespace uvke {
         commandBufferAllocateInfo.commandBufferCount = 1;
 
         VkCommandBuffer commandBuffer;
-        UVKE_ASSERT(vkAllocateCommandBuffers(m_device, &commandBufferAllocateInfo, &commandBuffer));
+        UVKE_ASSERT(vkAllocateCommandBuffers(m_base->GetDevice(), &commandBufferAllocateInfo, &commandBuffer));
 
         VkCommandBufferBeginInfo commandBufferBeginInfo { };
         commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -104,10 +104,22 @@ namespace uvke {
         vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
         vkQueueWaitIdle(queue);
 
-        vkFreeCommandBuffers(m_device, commandPool, 1, &commandBuffer);
+        vkFreeCommandBuffers(m_base->GetDevice(), commandPool, 1, &commandBuffer);
     }
 
+    void StagingBuffer::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
+    }
+
+    std::shared_ptr<Base> StagingBuffer::GetBase() {
+        return m_base;
+    }
+    
     VkBuffer& StagingBuffer::GetBuffer() {
         return m_buffer;
+    }
+    
+    VkDeviceMemory& StagingBuffer::GetBufferMemory() {
+        return m_bufferMemory;
     }
 };

@@ -3,27 +3,28 @@
 #define UVKE_COMMAND_BUFFER_HEADER
 
 #include "../uvke.hpp"
+#include "../Core/Base.hpp"
 
 namespace uvke {
     class UVKE_API CommandBuffer {
     public:
-        CommandBuffer(VkDevice device, unsigned int queueFamilyIndex);
+        CommandBuffer(std::shared_ptr<Base> base = nullptr);
         virtual ~CommandBuffer();
 
         virtual VkCommandBuffer Begin();
         virtual void End(VkCommandBuffer commandBuffer, VkQueue queue);
 
-        virtual void SetDevice(VkDevice device);
+        virtual void SetBase(std::shared_ptr<Base> base);
         virtual void SetCommandPool(VkCommandPool commandPool);
         virtual void SetCommandBuffers(std::vector<VkCommandBuffer> commandBuffers);
 
-        virtual VkDevice& GetDevice();
+        virtual std::shared_ptr<Base>& GetBase();
         virtual VkCommandPool& GetCommandPool();
         virtual std::vector<VkCommandBuffer>& GetCommandBuffers();
         virtual VkCommandBuffer& GetCommandBuffer(unsigned int index);
 
     protected:
-        VkDevice m_device;
+        std::shared_ptr<Base> m_base;
 
     private:
         VkCommandPool m_commandPool;

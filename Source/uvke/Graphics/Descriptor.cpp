@@ -29,6 +29,8 @@ namespace uvke {
 
             UVKE_ASSERT(vkCreateDescriptorSetLayout(m_device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout));
         }
+
+        UVKE_LOG("Descriptor Created");
     }
     
     Descriptor::~Descriptor() {
@@ -37,6 +39,8 @@ namespace uvke {
                 vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, nullptr);
             }
         }
+
+        UVKE_LOG("Descriptor Destroyed");
     }
 
     std::array<VkDescriptorSetLayoutBinding, 2>& Descriptor::GetDescriptorSetLayoutBindings() {

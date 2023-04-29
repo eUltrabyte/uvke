@@ -13,28 +13,34 @@ namespace uvke {
         m_indices = std::vector<unsigned int> {
             0, 1, 2, 2, 3, 0
         };
+
+        UVKE_LOG("Sprite Setup");
     }
 
     Sprite::~Sprite() {
         m_uniformBuffer.reset();
         m_indexBuffer.reset();
         m_vertexBuffer.reset();
+
+        UVKE_LOG("Sprite Destroyed");
     }
 
     void Sprite::Create(std::shared_ptr<Renderer> renderer) {
-        m_vertexBuffer = std::make_shared<VertexBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_vertices);
-        m_indexBuffer = std::make_shared<IndexBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_indices);
+        m_vertexBuffer = std::make_shared<VertexBuffer>(renderer->GetBase(), m_vertices);
+        m_indexBuffer = std::make_shared<IndexBuffer>(renderer->GetBase(), m_indices);
         m_uniformBuffer = std::make_shared<UniformBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), renderer->GetSampler()->GetImageView(), renderer->GetSampler()->GetSampler(), renderer->GetDescriptor()->GetDescriptorSetLayout());
 
-        std::shared_ptr<StagingBuffer> m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_vertexBuffer->GetSize());
+        std::shared_ptr<StagingBuffer> m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase(), m_vertexBuffer->GetSize());
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
         m_stagingBuffer.reset();
 
-        m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_indexBuffer->GetSize());
+        m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase(), m_indexBuffer->GetSize());
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
         m_stagingBuffer.reset();
+
+        UVKE_LOG("Sprite Created");
     }
 
     void Sprite::Update(std::shared_ptr<Window> window) {

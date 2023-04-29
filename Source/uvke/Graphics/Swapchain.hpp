@@ -4,23 +4,24 @@
 
 #include "../uvke.hpp"
 #include "../Core/Window.hpp"
+#include "../Core/Base.hpp"
 #include "Surface.hpp"
 
 namespace uvke {
     class UVKE_API Swapchain {
     public:
-        Swapchain(VkDevice device = nullptr, std::shared_ptr<Surface> surface = nullptr);
+        Swapchain(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Surface> surface = nullptr);
         virtual ~Swapchain();
 
-        virtual void Recreate(std::shared_ptr<Window> window, std::vector<VkFramebuffer>& framebuffers, VkRenderPass renderPass);
+        virtual void Recreate(std::shared_ptr<Window> window, VkRenderPass renderPass, std::vector<VkFramebuffer> framebuffers);
 
-        virtual void SetDevice(VkDevice device);
+        virtual void SetBase(std::shared_ptr<Base> base);
         virtual void SetSurface(std::shared_ptr<Surface> surface);
         virtual void SetImageCount(unsigned int count);
         virtual void SetImages(const std::vector<VkImage>& images);
         virtual void SetImageViews(const std::vector<VkImageView>& imageViews);
 
-        virtual VkDevice& GetDevice();
+        virtual std::shared_ptr<Base> GetBase();
         virtual std::shared_ptr<Surface> GetSurface();
         virtual unsigned int& GetImageCount();
         virtual VkSwapchainKHR& GetSwapchain();
@@ -31,7 +32,7 @@ namespace uvke {
         virtual bool& IsRecreated();
 
     protected:
-        VkDevice m_device;
+        std::shared_ptr<Base> m_base;
         std::shared_ptr<Surface> m_surface;
 
     private:
