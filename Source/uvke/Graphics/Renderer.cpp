@@ -36,15 +36,15 @@ namespace uvke {
         
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base, std::vector<unsigned int> { 0 } );
 
-        m_descriptor = std::make_shared<Descriptor>(m_base->GetDevice());
+        m_descriptor = std::make_shared<Descriptor>(m_base);
 
-        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base->GetPhysicalDevice(), m_base->GetDevice(), m_sampler->GetImageView(), m_sampler->GetSampler(), m_descriptor->GetDescriptorSetLayout());
+        m_uniformBuffer = std::make_shared<UniformBuffer>(m_base, m_sampler, m_descriptor);
 
-        m_pipeline = std::make_shared<Pipeline>(m_base->GetDevice(), m_surface, m_shader, m_vertexBuffer, m_descriptor);
+        m_pipeline = std::make_shared<Pipeline>(m_base, m_surface, m_shader, m_vertexBuffer, m_descriptor);
 
-        m_framebuffer = std::make_shared<Framebuffer>(m_base->GetDevice(), m_pipeline->GetRenderPass(), m_swapchain, m_surface);
+        m_framebuffer = std::make_shared<Framebuffer>(m_base, m_pipeline->GetRenderPass(), m_swapchain, m_surface);
 
-        m_syncManager = std::make_shared<SyncManager>(m_base->GetDevice());
+        m_syncManager = std::make_shared<SyncManager>(m_base);
 
         m_interface = std::make_shared<Interface>(m_base, m_window, m_surface, m_commandBuffer, m_pipeline->GetRenderPass());
         m_interface->SetFPS(0);
@@ -93,7 +93,8 @@ namespace uvke {
         unsigned int index = 0;
         VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
         if(result == VK_ERROR_OUT_OF_DATE_KHR) {
-            m_swapchain->Recreate(m_window, m_pipeline->GetRenderPass(), m_framebuffer->GetFramebuffers());
+            m_swapchain->Recreate(m_window, m_pipeline->GetRenderPass());
+            m_framebuffer->Recreate();
         } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             UVKE_FATAL("Swapchain Acquire Image Error");
         }
@@ -134,7 +135,8 @@ namespace uvke {
 
         result = vkQueuePresentKHR(m_surface->GetQueue(1), &presentInfo);
         if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_swapchain->IsRecreated()) {
-            m_swapchain->Recreate(m_window, m_pipeline->GetRenderPass(), m_framebuffer->GetFramebuffers());
+            m_swapchain->Recreate(m_window, m_pipeline->GetRenderPass());
+            m_framebuffer->Recreate();
         } else if(result != VK_SUCCESS) {
             UVKE_FATAL("Framebuffer Recreation Error");
         }

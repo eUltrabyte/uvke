@@ -1,8 +1,8 @@
 #include "SyncManager.hpp"
 
 namespace uvke {
-    SyncManager::SyncManager(VkDevice device)
-        : m_device(device) {
+    SyncManager::SyncManager(std::shared_ptr<Base> base)
+        : m_base(base){
         m_frame = 0;
         m_size = 2;
         m_availableSemaphores.resize(m_size);
@@ -20,9 +20,9 @@ namespace uvke {
         fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
         for(auto i = 0; i < m_size; ++i) {
-            UVKE_ASSERT(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_availableSemaphores[i]));
-            UVKE_ASSERT(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_finishedSemaphores[i]));
-            UVKE_ASSERT(vkCreateFence(m_device, &fenceCreateInfo, nullptr, &m_fences[i]));
+            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_availableSemaphores[i]));
+            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_finishedSemaphores[i]));
+            UVKE_ASSERT(vkCreateFence(m_base->GetDevice(), &fenceCreateInfo, nullptr, &m_fences[i]));
         }
 
         UVKE_LOG("Sync Manager Created");
@@ -30,9 +30,9 @@ namespace uvke {
 
     SyncManager::~SyncManager() {
         for(auto i = 0; i < m_size; ++i) {
-            vkDestroyFence(m_device, m_fences[i], nullptr);
-            vkDestroySemaphore(m_device, m_finishedSemaphores[i], nullptr);
-            vkDestroySemaphore(m_device, m_availableSemaphores[i], nullptr);
+            vkDestroyFence(m_base->GetDevice(), m_fences[i], nullptr);
+            vkDestroySemaphore(m_base->GetDevice(), m_finishedSemaphores[i], nullptr);
+            vkDestroySemaphore(m_base->GetDevice(), m_availableSemaphores[i], nullptr);
         }
 
         m_fences.clear();
@@ -48,9 +48,9 @@ namespace uvke {
 
     void SyncManager::Recreate() {
         for(auto i = 0; i < m_size; ++i) {
-            vkDestroyFence(m_device, m_fences[i], nullptr);
-            vkDestroySemaphore(m_device, m_finishedSemaphores[i], nullptr);
-            vkDestroySemaphore(m_device, m_availableSemaphores[i], nullptr);
+            vkDestroyFence(m_base->GetDevice(), m_fences[i], nullptr);
+            vkDestroySemaphore(m_base->GetDevice(), m_finishedSemaphores[i], nullptr);
+            vkDestroySemaphore(m_base->GetDevice(), m_availableSemaphores[i], nullptr);
         }
 
         m_fences.clear();
@@ -72,16 +72,16 @@ namespace uvke {
         fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
         for(auto i = 0; i < m_size; ++i) {
-            UVKE_ASSERT(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_availableSemaphores[i]));
-            UVKE_ASSERT(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_finishedSemaphores[i]));
-            UVKE_ASSERT(vkCreateFence(m_device, &fenceCreateInfo, nullptr, &m_fences[i]));
+            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_availableSemaphores[i]));
+            UVKE_ASSERT(vkCreateSemaphore(m_base->GetDevice(), &semaphoreCreateInfo, nullptr, &m_finishedSemaphores[i]));
+            UVKE_ASSERT(vkCreateFence(m_base->GetDevice(), &fenceCreateInfo, nullptr, &m_fences[i]));
         }
 
         UVKE_LOG("Sync Manager Recreated");
     }
 
     void SyncManager::WaitForDevice() {
-        vkDeviceWaitIdle(m_device);
+        vkDeviceWaitIdle(m_base->GetDevice());
     }
 
     void SyncManager::WaitForQueue(VkQueue queue) {
@@ -90,22 +90,22 @@ namespace uvke {
     
     void SyncManager::WaitForFence(unsigned int index) {
         if(index < 0 || index >= m_fences.size()) {
-            vkWaitForFences(m_device, 1, &m_fences[0], VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
+            vkWaitForFences(m_base->GetDevice(), 1, &m_fences[0], VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
         } else {
-            vkWaitForFences(m_device, 1, &m_fences[index], VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
+            vkWaitForFences(m_base->GetDevice(), 1, &m_fences[index], VK_TRUE, std::numeric_limits<unsigned long long>::infinity());
         }
     }
 
     void SyncManager::ResetFence(unsigned int index) {
         if(index < 0 || index >= m_fences.size()) {
-            vkResetFences(m_device, 1, &m_fences[0]);
+            vkResetFences(m_base->GetDevice(), 1, &m_fences[0]);
         } else {
-            vkResetFences(m_device, 1, &m_fences[index]);
+            vkResetFences(m_base->GetDevice(), 1, &m_fences[index]);
         }
     }
 
-    void SyncManager::SetDevice(VkDevice device) {
-        m_device = device;
+    void SyncManager::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
     }
 
     void SyncManager::SetFrame(unsigned int frame) {
@@ -128,8 +128,8 @@ namespace uvke {
         m_fences = fences;
     }
 
-    VkDevice& SyncManager::GetDevice() {
-        return m_device;
+    std::shared_ptr<Base> SyncManager::GetBase() {
+        return m_base;
     }
 
     unsigned int& SyncManager::GetFrame() {

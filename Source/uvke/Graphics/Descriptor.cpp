@@ -1,8 +1,8 @@
 #include "Descriptor.hpp"
 
 namespace uvke {
-    Descriptor::Descriptor(VkDevice device)
-        : m_device(device) {
+    Descriptor::Descriptor(std::shared_ptr<Base> base)
+        : m_base(base) {
         {
             VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = { };
             descriptorSetLayoutBinding.binding = 0;
@@ -27,20 +27,28 @@ namespace uvke {
             descriptorSetLayoutCreateInfo.bindingCount = m_descriptorSetLayoutBindings.size();
             descriptorSetLayoutCreateInfo.pBindings = m_descriptorSetLayoutBindings.data();
 
-            UVKE_ASSERT(vkCreateDescriptorSetLayout(m_device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout));
+            UVKE_ASSERT(vkCreateDescriptorSetLayout(m_base->GetDevice(), &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout));
         }
 
         UVKE_LOG("Descriptor Created");
     }
     
     Descriptor::~Descriptor() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_descriptorSetLayout != VK_NULL_HANDLE) {
-                vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, nullptr);
+                vkDestroyDescriptorSetLayout(m_base->GetDevice(), m_descriptorSetLayout, nullptr);
             }
         }
 
         UVKE_LOG("Descriptor Destroyed");
+    }
+
+    void Descriptor::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
+    }
+
+    std::shared_ptr<Base> Descriptor::GetBase() {
+        return m_base;
     }
 
     std::array<VkDescriptorSetLayoutBinding, 2>& Descriptor::GetDescriptorSetLayoutBindings() {

@@ -1,5 +1,3 @@
-- repair classes ( change all vulkan types ( VkDevice etc ) to classes having them ( Base etc ))
-- fix framebuffer parameter in renderpassbegininfo
 - add camera class
 - add support other primitive types
 - add presentation class

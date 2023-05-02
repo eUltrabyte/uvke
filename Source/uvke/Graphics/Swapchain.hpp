@@ -13,7 +13,7 @@ namespace uvke {
         Swapchain(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Surface> surface = nullptr);
         virtual ~Swapchain();
 
-        virtual void Recreate(std::shared_ptr<Window> window, VkRenderPass renderPass, std::vector<VkFramebuffer> framebuffers);
+        virtual void Recreate(std::shared_ptr<Window> window, VkRenderPass renderPass);
 
         virtual void SetBase(std::shared_ptr<Base> base);
         virtual void SetSurface(std::shared_ptr<Surface> surface);

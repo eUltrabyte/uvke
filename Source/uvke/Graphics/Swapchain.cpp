@@ -92,7 +92,7 @@ namespace uvke {
         UVKE_LOG("Swapchain Destroyed");
     }
 
-    void Swapchain::Recreate(std::shared_ptr<Window> window, VkRenderPass renderPass, std::vector<VkFramebuffer> framebuffers) {
+    void Swapchain::Recreate(std::shared_ptr<Window> window, VkRenderPass renderPass) {
         m_isRecreated = false;
         window->Update();
 
@@ -109,10 +109,6 @@ namespace uvke {
         }
 
         vkDeviceWaitIdle(m_base->GetDevice());
-
-        for(auto i = 0; i < framebuffers.size(); ++i) {
-            vkDestroyFramebuffer(m_base->GetDevice(), framebuffers[i], nullptr);
-        }
 
         for(auto i = 0; i < m_imageViews.size(); ++i) {
             vkDestroyImageView(m_base->GetDevice(), m_imageViews[i], nullptr);
@@ -185,26 +181,7 @@ namespace uvke {
             }
         }
 
-        {
-            framebuffers = std::vector<VkFramebuffer>(m_imageViews.size());
-
-            for(auto i = 0; i < framebuffers.size(); ++i) {
-                VkFramebufferCreateInfo framebufferCreateInfo { };
-                framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-                framebufferCreateInfo.pNext = nullptr;
-                framebufferCreateInfo.flags = 0;
-                framebufferCreateInfo.renderPass = renderPass;
-                framebufferCreateInfo.attachmentCount = 1;
-                framebufferCreateInfo.pAttachments = &m_imageViews[i];
-                framebufferCreateInfo.width = m_surface->GetExtent().width;
-                framebufferCreateInfo.height = m_surface->GetExtent().height;
-                framebufferCreateInfo.layers = 1;
-
-                UVKE_ASSERT(vkCreateFramebuffer(m_base->GetDevice(), &framebufferCreateInfo, nullptr, &framebuffers[i]));
-            }
-        }
-
-        UVKE_LOG("Swapchain Recreated Successfully");
+        UVKE_LOG("Swapchain Recreated");
     }
 
     void Swapchain::SetBase(std::shared_ptr<Base> base) {
