@@ -1,8 +1,8 @@
 #include "Shader.hpp"
 
 namespace uvke {
-    Shader::Shader(VkDevice device, std::vector<char> vertexCode, std::vector<char> fragmentCode)
-        : m_device(device) {
+    Shader::Shader(std::shared_ptr<Base> base, std::vector<char> vertexCode, std::vector<char> fragmentCode)
+        : m_base(base) {
         m_vertexShader = CreateShaderModule(vertexCode);
         m_fragmentShader = CreateShaderModule(fragmentCode);
 
@@ -25,8 +25,8 @@ namespace uvke {
         m_fragmentShaderStageCreateInfo.pSpecializationInfo = nullptr;
     }
 
-    Shader::Shader(VkDevice device, File vertexFile, File fragmentFile)
-        : m_device(device) {
+    Shader::Shader(std::shared_ptr<Base> base, File vertexFile, File fragmentFile)
+        : m_base(base) {
         m_vertexShader = CreateShaderModule(vertexFile.GetData());
         m_fragmentShader = CreateShaderModule(fragmentFile.GetData());
 
@@ -52,17 +52,25 @@ namespace uvke {
     }
 
     Shader::~Shader() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_fragmentShader != VK_NULL_HANDLE) {
-                vkDestroyShaderModule(m_device, m_fragmentShader, nullptr);
+                vkDestroyShaderModule(m_base->GetDevice(), m_fragmentShader, nullptr);
             }
 
             if(m_vertexShader != VK_NULL_HANDLE) {
-                vkDestroyShaderModule(m_device, m_vertexShader, nullptr);
+                vkDestroyShaderModule(m_base->GetDevice(), m_vertexShader, nullptr);
             }
         }
 
         UVKE_LOG("Shaders Destroyed");
+    }
+
+    void Shader::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
+    }
+
+    std::shared_ptr<Base> Shader::GetBase() {
+        return m_base;
     }
 
     VkShaderModule Shader::GetVertexShader() {

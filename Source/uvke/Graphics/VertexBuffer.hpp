@@ -3,6 +3,7 @@
 #define UVKE_VERTEX_BUFFER_HEADER
 
 #include "../uvke.hpp"
+#include "../Core/Base.hpp"
 
 namespace uvke {
     struct Vertex {
@@ -13,20 +14,23 @@ namespace uvke {
 
     class UVKE_API VertexBuffer {
     public:
-        VertexBuffer(VkPhysicalDevice physicalDevice = nullptr, VkDevice device = nullptr, std::vector<Vertex> vertices = std::vector<Vertex>(0));
+        VertexBuffer(std::shared_ptr<Base> base = nullptr, std::vector<Vertex> vertices = std::vector<Vertex>(0));
         virtual ~VertexBuffer();
 
         virtual void Bind(VkCommandBuffer commandBuffer);
 
+        virtual void SetBase(std::shared_ptr<Base> base);
+
+        virtual std::shared_ptr<Base> GetBase();
         virtual std::vector<Vertex>& GetVertices();
         virtual VkVertexInputBindingDescription& GetVertexInputBindingDescription();
         virtual std::array<VkVertexInputAttributeDescription, 3>& GetVertexInputAttributeDescription();
         virtual unsigned int GetSize();
         virtual VkBuffer& GetBuffer();
+        virtual VkDeviceMemory& GetBufferMemory();
 
     protected:
-        VkPhysicalDevice m_physicalDevice;
-        VkDevice m_device;
+        std::shared_ptr<Base> m_base;
 
     private:
         std::vector<Vertex> m_vertices;

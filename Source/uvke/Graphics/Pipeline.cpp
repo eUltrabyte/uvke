@@ -1,8 +1,8 @@
 #include "Pipeline.hpp"
 
 namespace uvke {
-    Pipeline::Pipeline(VkDevice device, std::shared_ptr<Surface> surface, std::shared_ptr<Shader> shader, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<UniformBuffer> uniformBuffer)
-        : m_device(device), m_surface(surface), m_shader(shader), m_vertexBuffer(vertexBuffer), m_uniformBuffer(uniformBuffer) {
+    Pipeline::Pipeline(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface, std::shared_ptr<Shader> shader, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<Descriptor> descriptor)
+        : m_base(base), m_surface(surface), m_shader(shader), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
         {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *m_shader->GetVertexShaderStageCreateInfo(), *m_shader->GetFragmentShaderStageCreateInfo() };
 
@@ -133,18 +133,18 @@ namespace uvke {
             renderPassCreateInfo.subpassCount = 1;
             renderPassCreateInfo.pSubpasses = &subpassDescription;
 
-            UVKE_ASSERT(vkCreateRenderPass(m_device, &renderPassCreateInfo, nullptr, &m_renderPass));
+            UVKE_ASSERT(vkCreateRenderPass(m_base->GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
             pipelineLayoutCreateInfo.pNext = nullptr;
             pipelineLayoutCreateInfo.flags = 0;
             pipelineLayoutCreateInfo.setLayoutCount = 1;
-            pipelineLayoutCreateInfo.pSetLayouts = &m_uniformBuffer->GetDescriptorSetLayout();
+            pipelineLayoutCreateInfo.pSetLayouts = &descriptor->GetDescriptorSetLayout();
             pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
             pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 
-            UVKE_ASSERT(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
+            UVKE_ASSERT(vkCreatePipelineLayout(m_base->GetDevice(), &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
             
             VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo { };
             graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -166,24 +166,24 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
         }
         
         UVKE_LOG("Graphics Pipeline Created");
     }
     
     Pipeline::~Pipeline() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_pipeline != VK_NULL_HANDLE) {
-                vkDestroyPipeline(m_device, m_pipeline, nullptr);
+                vkDestroyPipeline(m_base->GetDevice(), m_pipeline, nullptr);
             }
 
             if(m_pipelineLayout != VK_NULL_HANDLE) {
-                vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
+                vkDestroyPipelineLayout(m_base->GetDevice(), m_pipelineLayout, nullptr);
             }
 
             if(m_renderPass != VK_NULL_HANDLE) {
-                vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+                vkDestroyRenderPass(m_base->GetDevice(), m_renderPass, nullptr);
             }
         }
 
@@ -192,9 +192,9 @@ namespace uvke {
 
     void Pipeline::Recreate() {
         {
-            vkDestroyPipeline(m_device, m_pipeline, nullptr);
-            vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
-            vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+            vkDestroyPipeline(m_base->GetDevice(), m_pipeline, nullptr);
+            vkDestroyPipelineLayout(m_base->GetDevice(), m_pipelineLayout, nullptr);
+            vkDestroyRenderPass(m_base->GetDevice(), m_renderPass, nullptr);
 
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *m_shader->GetVertexShaderStageCreateInfo(), *m_shader->GetFragmentShaderStageCreateInfo() };
 
@@ -325,18 +325,18 @@ namespace uvke {
             renderPassCreateInfo.subpassCount = 1;
             renderPassCreateInfo.pSubpasses = &subpassDescription;
 
-            UVKE_ASSERT(vkCreateRenderPass(m_device, &renderPassCreateInfo, nullptr, &m_renderPass));
+            UVKE_ASSERT(vkCreateRenderPass(m_base->GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
             pipelineLayoutCreateInfo.pNext = nullptr;
             pipelineLayoutCreateInfo.flags = 0;
             pipelineLayoutCreateInfo.setLayoutCount = 1;
-            pipelineLayoutCreateInfo.pSetLayouts = &m_uniformBuffer->GetDescriptorSetLayout();
+            pipelineLayoutCreateInfo.pSetLayouts = &m_descriptor->GetDescriptorSetLayout();
             pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
             pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 
-            UVKE_ASSERT(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
+            UVKE_ASSERT(vkCreatePipelineLayout(m_base->GetDevice(), &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
             
             VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo { };
             graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -358,7 +358,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
         }
         
         UVKE_LOG("Graphics Pipeline Recreated");
@@ -427,8 +427,8 @@ namespace uvke {
         UVKE_ASSERT(vkEndCommandBuffer(commandBuffer->GetCommandBuffer(frame)));
     }
 
-    void Pipeline::SetDevice(VkDevice device) {
-        m_device = device;
+    void Pipeline::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
     }
     
     void Pipeline::SetRenderPass(VkRenderPass renderPass) {
@@ -443,8 +443,8 @@ namespace uvke {
         m_pipeline = pipeline;
     }
     
-    VkDevice& Pipeline::GetDevice() {
-        return m_device;
+    std::shared_ptr<Base> Pipeline::GetBase() {
+        return m_base;
     }
     
     std::shared_ptr<Surface> Pipeline::GetSurface() {
@@ -459,8 +459,8 @@ namespace uvke {
         return m_vertexBuffer;
     }
     
-    std::shared_ptr<UniformBuffer> Pipeline::GetUniformBuffer() {
-        return m_uniformBuffer;
+    std::shared_ptr<Descriptor> Pipeline::GetDescriptor() {
+        return m_descriptor;
     }
     
     VkRenderPass& Pipeline::GetRenderPass() {

@@ -1,16 +1,19 @@
 #include "Surface.hpp"
 
 namespace uvke {
-    Surface::Surface(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device, std::shared_ptr<Window> window)
-        : m_instance(instance), m_physicalDevice(physicalDevice), m_device(device), m_extent({ 0, 0 }) {
-        window->CreatePlatformSurface(m_instance, &m_surface);
+    Surface::Surface(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
+        : m_base(base), m_extent({ 0, 0 }) {
+        window->CreatePlatformSurface(m_base->GetInstance(), &m_surface);
+
+        m_queueFamilyIndex = m_base->GetQueueFamily();
+        m_multiQueue = m_base->IsMultiQueueSupported();
 
         UVKE_LOG("Surface Created");
     }
 
     Surface::~Surface() {
-        if(m_instance != VK_NULL_HANDLE && m_surface != VK_NULL_HANDLE) {
-            vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+        if(m_base->GetInstance() != VK_NULL_HANDLE && m_surface != VK_NULL_HANDLE) {
+            vkDestroySurfaceKHR(m_base->GetInstance(), m_surface, nullptr);
         }
 
         m_queues.clear();
@@ -22,12 +25,12 @@ namespace uvke {
         if(m_multiQueue) {
             m_queues.clear();
             m_queues.resize(2);
-            vkGetDeviceQueue(m_device, m_queueFamilyIndex, 0, &m_queues[0]);
-            vkGetDeviceQueue(m_device, m_queueFamilyIndex, 0, &m_queues[1]);
+            vkGetDeviceQueue(m_base->GetDevice(), m_queueFamilyIndex, 0, &m_queues[0]);
+            vkGetDeviceQueue(m_base->GetDevice(), m_queueFamilyIndex, 0, &m_queues[1]);
         } else {
             m_queues.clear();
             m_queues.resize(1);
-            vkGetDeviceQueue(m_device, m_queueFamilyIndex, 0, &m_queues[0]);
+            vkGetDeviceQueue(m_base->GetDevice(), m_queueFamilyIndex, 0, &m_queues[0]);
         }
 
         m_surfaceFormat = GetSuitableSurfaceFormat();
@@ -36,20 +39,12 @@ namespace uvke {
         UVKE_LOG("Queue Family Index - " + std::to_string(m_queueFamilyIndex));
 
         VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, m_queueFamilyIndex, m_surface, &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(m_base->GetPhysicalDevice(), m_queueFamilyIndex, m_surface, &presentSupport);
         UVKE_LOG("Queue Present Support - " + std::string(presentSupport ? "True" : "False"));
     }
 
-    void Surface::SetInstance(VkInstance instance) {
-        m_instance = instance;
-    }
-
-    void Surface::SetPhysicalDevice(VkPhysicalDevice physicalDevice) {
-        m_physicalDevice = physicalDevice;
-    }
-
-    void Surface::SetDevice(VkDevice device) {
-        m_device = device;
+    void Surface::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
     }
 
     void Surface::SetQueueFamily(unsigned int queueFamilyIndex) {
@@ -77,7 +72,7 @@ namespace uvke {
     }
 
     void Surface::SetSwapExtent(std::shared_ptr<Window> window) {
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &m_surfaceCapabilities);
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_base->GetPhysicalDevice(), m_surface, &m_surfaceCapabilities);
 
         if(m_surfaceCapabilities.currentExtent.width != std::numeric_limits<unsigned int>::infinity() || m_surfaceCapabilities.currentExtent.height != std::numeric_limits<unsigned int>::infinity()) {
             m_extent = m_surfaceCapabilities.currentExtent;
@@ -88,16 +83,8 @@ namespace uvke {
         }
     }
 
-    VkInstance& Surface::GetInstance() {
-        return m_instance;
-    }
-
-    VkPhysicalDevice& Surface::GetPhysicalDevice() {
-        return m_physicalDevice;
-    }
-
-    VkDevice& Surface::GetDevice() {
-        return m_device;
+    std::shared_ptr<Base> Surface::GetBase() {
+        return m_base;
     }
 
     unsigned int Surface::GetQueueFamily() {

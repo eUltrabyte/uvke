@@ -7,6 +7,7 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
+#include "Camera.hpp"
 #include "Renderable.hpp"
 #include "Renderer.hpp"
 
@@ -17,7 +18,7 @@ namespace uvke {
         virtual ~Sprite();
 
         virtual void Create(std::shared_ptr<Renderer> renderer) override;
-        virtual void Update(std::shared_ptr<Window> window) override;
+        virtual void Update(std::shared_ptr<Camera> camera) override;
         virtual void Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) override;
 
         virtual void SetPosition(const vec2f& position);

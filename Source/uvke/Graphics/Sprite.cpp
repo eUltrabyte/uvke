@@ -13,46 +13,43 @@ namespace uvke {
         m_indices = std::vector<unsigned int> {
             0, 1, 2, 2, 3, 0
         };
+
+        UVKE_LOG("Sprite Setup");
     }
 
     Sprite::~Sprite() {
         m_uniformBuffer.reset();
         m_indexBuffer.reset();
         m_vertexBuffer.reset();
+
+        UVKE_LOG("Sprite Destroyed");
     }
 
     void Sprite::Create(std::shared_ptr<Renderer> renderer) {
-        m_vertexBuffer = std::make_shared<VertexBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_vertices);
-        m_indexBuffer = std::make_shared<IndexBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_indices);
-        m_uniformBuffer = std::make_shared<UniformBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), renderer->GetSampler()->GetImageView(), renderer->GetSampler()->GetSampler());
+        m_vertexBuffer = std::make_shared<VertexBuffer>(renderer->GetBase(), m_vertices);
+        m_indexBuffer = std::make_shared<IndexBuffer>(renderer->GetBase(), m_indices);
+        m_uniformBuffer = std::make_shared<UniformBuffer>(renderer->GetBase(), renderer->GetSampler(), renderer->GetDescriptor());
 
-        std::shared_ptr<StagingBuffer> m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_vertexBuffer->GetSize());
+        std::shared_ptr<StagingBuffer> m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase(), m_vertexBuffer->GetSize());
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
         m_stagingBuffer.reset();
 
-        m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase()->GetPhysicalDevice(), renderer->GetBase()->GetDevice(), m_indexBuffer->GetSize());
+        m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase(), m_indexBuffer->GetSize());
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
         m_stagingBuffer.reset();
+
+        UVKE_LOG("Sprite Created");
     }
 
-    void Sprite::Update(std::shared_ptr<Window> window) {
-        UniformBufferObject ubo { };
-        ubo.model = Identity<float>();
-        ubo.model = Scale<float>(ubo.model, vec3f(m_scale.x, m_scale.y, 1.0f));
-        ubo.model = Translate<float>(ubo.model, vec3f(m_position.x, m_position.y, 0.0f));
-
-        ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
-
-        if(window->GetKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo.projection = Perspective<float>(Radians(45.0f), (window->GetWindowProps()->size.x / window->GetWindowProps()->size.y), 0.1f, 1000.0f);
-            ubo.projection.data[1][1] *= -1;
-        } else {
-            ubo.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
-        }
-
-        m_uniformBuffer->Update(ubo);
+    void Sprite::Update(std::shared_ptr<Camera> camera) {
+        mat4x4f model = Identity<float>();
+        model = Scale<float>(camera->GetModel(), vec3f(m_scale.x, m_scale.y, 1.0f));
+        model = Translate<float>(camera->GetModel(), vec3f(m_position.x, m_position.y, 0.0f));
+        
+        camera->SetModel(model);
+        camera->Update(m_uniformBuffer);
     }
 
     void Sprite::Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) {

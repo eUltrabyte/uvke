@@ -60,6 +60,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/VertexBuffer.cpp
     Source/uvke/Graphics/IndexBuffer.hpp
     Source/uvke/Graphics/IndexBuffer.cpp
+    Source/uvke/Graphics/Descriptor.hpp
+    Source/uvke/Graphics/Descriptor.cpp
     Source/uvke/Graphics/UniformBuffer.hpp
     Source/uvke/Graphics/UniformBuffer.cpp
     Source/uvke/Graphics/Pipeline.hpp
@@ -76,6 +78,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/SyncManager.cpp
     Source/uvke/Graphics/Interface.hpp
     Source/uvke/Graphics/Interface.cpp
+    Source/uvke/Graphics/Camera.hpp
+    Source/uvke/Graphics/Camera.cpp
     Source/uvke/Graphics/Renderable.hpp
     Source/uvke/Graphics/Sprite.hpp
     Source/uvke/Graphics/Sprite.cpp

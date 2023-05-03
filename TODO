@@ -1,5 +1,3 @@
-- move descriptor set and descriptor set layout to class
-- add camera class
 - add support other primitive types
 - add presentation class
 - add scene class

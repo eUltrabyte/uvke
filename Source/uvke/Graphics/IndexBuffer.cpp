@@ -1,8 +1,8 @@
 #include "IndexBuffer.hpp"
 
 namespace uvke {
-    IndexBuffer::IndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, std::vector<unsigned int> indices)
-        : m_physicalDevice(physicalDevice), m_device(device), m_indices(indices) {
+    IndexBuffer::IndexBuffer(std::shared_ptr<Base> base, std::vector<unsigned int> indices)
+        : m_base(base), m_indices(indices) {
         VkBufferCreateInfo bufferCreateInfo = { };
         bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         bufferCreateInfo.pNext = nullptr;
@@ -13,13 +13,13 @@ namespace uvke {
         bufferCreateInfo.queueFamilyIndexCount = 0;
         bufferCreateInfo.pQueueFamilyIndices = nullptr;
 
-        UVKE_ASSERT(vkCreateBuffer(m_device, &bufferCreateInfo, nullptr, &m_buffer));
+        UVKE_ASSERT(vkCreateBuffer(m_base->GetDevice(), &bufferCreateInfo, nullptr, &m_buffer));
 
         VkMemoryRequirements memoryRequirements { };
-        vkGetBufferMemoryRequirements(m_device, m_buffer, &memoryRequirements);
+        vkGetBufferMemoryRequirements(m_base->GetDevice(), m_buffer, &memoryRequirements);
 
         VkPhysicalDeviceMemoryProperties memoryProperties { };
-        vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memoryProperties);
+        vkGetPhysicalDeviceMemoryProperties(m_base->GetPhysicalDevice(), &memoryProperties);
 
         unsigned int filter = memoryRequirements.memoryTypeBits;
         VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -37,21 +37,21 @@ namespace uvke {
         memoryAllocateInfo.allocationSize = memoryRequirements.size;
         memoryAllocateInfo.memoryTypeIndex = index;
 
-        UVKE_ASSERT(vkAllocateMemory(m_device, &memoryAllocateInfo, nullptr, &m_bufferMemory));
+        UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_bufferMemory));
 
-        vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
+        vkBindBufferMemory(m_base->GetDevice(), m_buffer, m_bufferMemory, 0);
 
         UVKE_LOG("Index Buffer Created");
     }
 
     IndexBuffer::~IndexBuffer() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_buffer != VK_NULL_HANDLE) {
-                vkDestroyBuffer(m_device, m_buffer, nullptr);
+                vkDestroyBuffer(m_base->GetDevice(), m_buffer, nullptr);
             }
 
             if(m_bufferMemory != VK_NULL_HANDLE) {
-                vkFreeMemory(m_device, m_bufferMemory, nullptr);
+                vkFreeMemory(m_base->GetDevice(), m_bufferMemory, nullptr);
             }
         }
 
@@ -60,6 +60,14 @@ namespace uvke {
 
     void IndexBuffer::Bind(VkCommandBuffer commandBuffer) {
         vkCmdBindIndexBuffer(commandBuffer, m_buffer, 0, VK_INDEX_TYPE_UINT32);
+    }
+
+    void IndexBuffer::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
+    }
+
+    std::shared_ptr<Base> IndexBuffer::GetBase() {
+        return m_base;
     }
 
     std::vector<unsigned int>& IndexBuffer::GetIndices() {
@@ -72,5 +80,9 @@ namespace uvke {
 
     VkBuffer& IndexBuffer::GetBuffer() {
         return m_buffer;
+    }
+
+    VkDeviceMemory& IndexBuffer::GetBufferMemory() {
+        return m_bufferMemory;
     }
 };

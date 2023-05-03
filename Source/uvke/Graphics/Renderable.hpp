@@ -4,6 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Window.hpp"
+#include "Camera.hpp"
 
 namespace uvke {
     class UVKE_API Renderer;
@@ -14,7 +15,7 @@ namespace uvke {
         virtual ~Renderable() = default;
 
         virtual void Create(std::shared_ptr<Renderer> renderer) = 0;
-        virtual void Update(std::shared_ptr<Window> window) = 0;
+        virtual void Update(std::shared_ptr<Camera> camera) = 0;
         virtual void Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) = 0;
 
     };

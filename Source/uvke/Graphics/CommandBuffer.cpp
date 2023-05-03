@@ -1,8 +1,8 @@
 #include "CommandBuffer.hpp"
 
 namespace uvke {
-    CommandBuffer::CommandBuffer(VkDevice device, unsigned int queueFamilyIndex)
-        : m_device(device) {
+    CommandBuffer::CommandBuffer(std::shared_ptr<Base> base)
+        : m_base(base) {
         {
             m_commandBuffers.resize(2);
 
@@ -10,9 +10,9 @@ namespace uvke {
             commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
             commandPoolCreateInfo.pNext = nullptr;
             commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            commandPoolCreateInfo.queueFamilyIndex = queueFamilyIndex;
+            commandPoolCreateInfo.queueFamilyIndex = m_base->GetQueueFamily();
 
-            UVKE_ASSERT(vkCreateCommandPool(m_device, &commandPoolCreateInfo, nullptr, &m_commandPool));
+            UVKE_ASSERT(vkCreateCommandPool(m_base->GetDevice(), &commandPoolCreateInfo, nullptr, &m_commandPool));
 
             VkCommandBufferAllocateInfo commandBufferAllocateInfo { };
             commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -21,20 +21,20 @@ namespace uvke {
             commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
             commandBufferAllocateInfo.commandBufferCount = m_commandBuffers.size();
 
-            UVKE_ASSERT(vkAllocateCommandBuffers(m_device, &commandBufferAllocateInfo, m_commandBuffers.data()));
+            UVKE_ASSERT(vkAllocateCommandBuffers(m_base->GetDevice(), &commandBufferAllocateInfo, m_commandBuffers.data()));
         }
 
         UVKE_LOG("Command Buffer Created");
     }
     
     CommandBuffer::~CommandBuffer() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_commandPool != VK_NULL_HANDLE) {
                 if(m_commandBuffers.data() != nullptr) {
-                    vkFreeCommandBuffers(m_device, m_commandPool, m_commandBuffers.size(), m_commandBuffers.data());
+                    vkFreeCommandBuffers(m_base->GetDevice(), m_commandPool, m_commandBuffers.size(), m_commandBuffers.data());
                 }
 
-                vkDestroyCommandPool(m_device, m_commandPool, nullptr);
+                vkDestroyCommandPool(m_base->GetDevice(), m_commandPool, nullptr);
             }
         }
 
@@ -49,7 +49,7 @@ namespace uvke {
         commandBufferAllocateInfo.commandBufferCount = 1;
 
         VkCommandBuffer commandBuffer;
-        UVKE_ASSERT(vkAllocateCommandBuffers(m_device, &commandBufferAllocateInfo, &commandBuffer));
+        UVKE_ASSERT(vkAllocateCommandBuffers(m_base->GetDevice(), &commandBufferAllocateInfo, &commandBuffer));
 
         VkCommandBufferBeginInfo commandBufferBeginInfo { };
         commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -73,11 +73,11 @@ namespace uvke {
         UVKE_ASSERT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
         vkQueueWaitIdle(queue);
 
-        vkFreeCommandBuffers(m_device, m_commandPool, 1, &commandBuffer);
+        vkFreeCommandBuffers(m_base->GetDevice(), m_commandPool, 1, &commandBuffer);
     }
-    
-    void CommandBuffer::SetDevice(VkDevice device) {
-        m_device = device;
+
+    void CommandBuffer::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
     }
     
     void CommandBuffer::SetCommandPool(VkCommandPool commandPool) {
@@ -87,9 +87,9 @@ namespace uvke {
     void CommandBuffer::SetCommandBuffers(std::vector<VkCommandBuffer> commandBuffers) {
         m_commandBuffers = commandBuffers;
     }
-    
-    VkDevice& CommandBuffer::GetDevice() {
-        return m_device;
+
+    std::shared_ptr<Base>& CommandBuffer::GetBase() {
+        return m_base;
     }
     
     VkCommandPool& CommandBuffer::GetCommandPool() {

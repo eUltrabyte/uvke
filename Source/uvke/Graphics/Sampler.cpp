@@ -1,8 +1,8 @@
 #include "Sampler.hpp"
 
 namespace uvke {
-    Sampler::Sampler(VkPhysicalDevice physicalDevice, VkDevice device, std::shared_ptr<Texture> texture)
-        : m_physicalDevice(physicalDevice), m_device(device) {
+    Sampler::Sampler(std::shared_ptr<Base> base, std::shared_ptr<Texture> texture)
+        : m_base(base) {
         {
             VkImageViewCreateInfo imageViewCreateInfo { };
             imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -17,15 +17,15 @@ namespace uvke {
             imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
             imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-            UVKE_ASSERT(vkCreateImageView(m_device, &imageViewCreateInfo, nullptr, &m_imageView));
+            UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageView));
         }
 
         {
             VkPhysicalDeviceFeatures physicalDeviceFeatures { };
-            vkGetPhysicalDeviceFeatures(m_physicalDevice, &physicalDeviceFeatures);
+            vkGetPhysicalDeviceFeatures(m_base->GetPhysicalDevice(), &physicalDeviceFeatures);
 
             VkPhysicalDeviceProperties physicalDeviceProperties { };
-            vkGetPhysicalDeviceProperties(m_physicalDevice, &physicalDeviceProperties);
+            vkGetPhysicalDeviceProperties(m_base->GetPhysicalDevice(), &physicalDeviceProperties);
 
             VkSamplerCreateInfo samplerCreateInfo { };
             samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -51,32 +51,32 @@ namespace uvke {
             samplerCreateInfo.compareOp = VK_COMPARE_OP_ALWAYS;
             samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-            UVKE_ASSERT(vkCreateSampler(m_device, &samplerCreateInfo, nullptr, &m_sampler));
+            UVKE_ASSERT(vkCreateSampler(m_base->GetDevice(), &samplerCreateInfo, nullptr, &m_sampler));
         }
 
         UVKE_LOG("Sampler Created");
     }
 
     Sampler::~Sampler() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_sampler != VK_NULL_HANDLE) {
-                vkDestroySampler(m_device, m_sampler, nullptr);
+                vkDestroySampler(m_base->GetDevice(), m_sampler, nullptr);
             }
 
             if(m_imageView != VK_NULL_HANDLE) {
-                vkDestroyImageView(m_device, m_imageView, nullptr);
+                vkDestroyImageView(m_base->GetDevice(), m_imageView, nullptr);
             }
         }
 
         UVKE_LOG("Sampler Destroyed");
     }
 
-    VkPhysicalDevice& Sampler::GetPhysicalDevice() {
-        return m_physicalDevice;
+    void Sampler::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
     }
 
-    VkDevice& Sampler::GetDevice() {
-        return m_device;
+    std::shared_ptr<Base> Sampler::GetBase() {
+        return m_base;
     }
 
     VkImageView& Sampler::GetImageView() {

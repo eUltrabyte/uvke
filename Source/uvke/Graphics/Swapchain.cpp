@@ -1,8 +1,8 @@
 #include "Swapchain.hpp"
 
 namespace uvke {
-    Swapchain::Swapchain(VkDevice device, std::shared_ptr<Surface> surface)
-        : m_device(device), m_surface(surface), m_isRecreated(false) {
+    Swapchain::Swapchain(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface)
+        : m_base(base), m_surface(surface), m_isRecreated(false) {
         m_imageCount = m_surface->GetCapabilities().minImageCount + 1;
         if(m_surface->GetCapabilities().maxImageCount > 0 && m_imageCount > m_surface->GetCapabilities().maxImageCount) {
             m_imageCount = m_surface->GetCapabilities().maxImageCount;
@@ -38,14 +38,14 @@ namespace uvke {
             swapchainCreateInfo.clipped = VK_TRUE;
             swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-            UVKE_ASSERT(vkCreateSwapchainKHR(m_device, &swapchainCreateInfo, nullptr, &m_swapchain));
+            UVKE_ASSERT(vkCreateSwapchainKHR(m_base->GetDevice(), &swapchainCreateInfo, nullptr, &m_swapchain));
         }
 
         {
             unsigned int swapchainImageCount = 0;
-            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, nullptr);
+            vkGetSwapchainImagesKHR(m_base->GetDevice(), m_swapchain, &swapchainImageCount, nullptr);
             m_images = std::vector<VkImage>(swapchainImageCount);
-            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, m_images.data());
+            vkGetSwapchainImagesKHR(m_base->GetDevice(), m_swapchain, &swapchainImageCount, m_images.data());
         }
 
         {
@@ -66,7 +66,7 @@ namespace uvke {
                 imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
                 imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-                UVKE_ASSERT(vkCreateImageView(m_device, &imageViewCreateInfo, nullptr, &m_imageViews[i]));
+                UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageViews[i]));
             }
         }
 
@@ -74,10 +74,10 @@ namespace uvke {
     }
     
     Swapchain::~Swapchain() {
-        if(m_device != VK_NULL_HANDLE) {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
             if(m_imageViews.data() != nullptr) {
                 for(auto i = 0; i < m_imageViews.size(); ++i) {
-                    vkDestroyImageView(m_device, m_imageViews[i], nullptr);
+                    vkDestroyImageView(m_base->GetDevice(), m_imageViews[i], nullptr);
                 }
             }
 
@@ -85,14 +85,14 @@ namespace uvke {
             m_images.clear();
 
             if(m_swapchain != VK_NULL_HANDLE) {
-                vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+                vkDestroySwapchainKHR(m_base->GetDevice(), m_swapchain, nullptr);
             }
         }
 
         UVKE_LOG("Swapchain Destroyed");
     }
 
-    void Swapchain::Recreate(std::shared_ptr<Window> window, std::vector<VkFramebuffer>& framebuffers, VkRenderPass renderPass) {
+    void Swapchain::Recreate(std::shared_ptr<Window> window, VkRenderPass renderPass) {
         m_isRecreated = false;
         window->Update();
 
@@ -108,14 +108,10 @@ namespace uvke {
             m_surface->SetSwapExtent(window);
         }
 
-        vkDeviceWaitIdle(m_device);
-
-        for(auto i = 0; i < framebuffers.size(); ++i) {
-            vkDestroyFramebuffer(m_device, framebuffers[i], nullptr);
-        }
+        vkDeviceWaitIdle(m_base->GetDevice());
 
         for(auto i = 0; i < m_imageViews.size(); ++i) {
-            vkDestroyImageView(m_device, m_imageViews[i], nullptr);
+            vkDestroyImageView(m_base->GetDevice(), m_imageViews[i], nullptr);
         }
 
         m_imageCount = m_surface->GetCapabilities().minImageCount + 1;
@@ -153,14 +149,14 @@ namespace uvke {
             swapchainCreateInfo.clipped = VK_TRUE;
             swapchainCreateInfo.oldSwapchain = m_swapchain;
 
-            UVKE_ASSERT(vkCreateSwapchainKHR(m_device, &swapchainCreateInfo, nullptr, &m_swapchain));
+            UVKE_ASSERT(vkCreateSwapchainKHR(m_base->GetDevice(), &swapchainCreateInfo, nullptr, &m_swapchain));
         }
 
         {
             unsigned int swapchainImageCount = 0;
-            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, nullptr);
+            vkGetSwapchainImagesKHR(m_base->GetDevice(), m_swapchain, &swapchainImageCount, nullptr);
             m_images = std::vector<VkImage>(swapchainImageCount);
-            vkGetSwapchainImagesKHR(m_device, m_swapchain, &swapchainImageCount, m_images.data());
+            vkGetSwapchainImagesKHR(m_base->GetDevice(), m_swapchain, &swapchainImageCount, m_images.data());
         }
 
         {
@@ -181,34 +177,15 @@ namespace uvke {
                 imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
                 imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-                UVKE_ASSERT(vkCreateImageView(m_device, &imageViewCreateInfo, nullptr, &m_imageViews[i]));
+                UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageViews[i]));
             }
         }
 
-        {
-            framebuffers = std::vector<VkFramebuffer>(m_imageViews.size());
-
-            for(auto i = 0; i < framebuffers.size(); ++i) {
-                VkFramebufferCreateInfo framebufferCreateInfo { };
-                framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-                framebufferCreateInfo.pNext = nullptr;
-                framebufferCreateInfo.flags = 0;
-                framebufferCreateInfo.renderPass = renderPass;
-                framebufferCreateInfo.attachmentCount = 1;
-                framebufferCreateInfo.pAttachments = &m_imageViews[i];
-                framebufferCreateInfo.width = m_surface->GetExtent().width;
-                framebufferCreateInfo.height = m_surface->GetExtent().height;
-                framebufferCreateInfo.layers = 1;
-
-                UVKE_ASSERT(vkCreateFramebuffer(m_device, &framebufferCreateInfo, nullptr, &framebuffers[i]));
-            }
-        }
-
-        UVKE_LOG("Swapchain Recreated Successfully");
+        UVKE_LOG("Swapchain Recreated");
     }
 
-    void Swapchain::SetDevice(VkDevice device) {
-        m_device = device;
+    void Swapchain::SetBase(std::shared_ptr<Base> base) {
+        m_base = base;
     }
     
     void Swapchain::SetSurface(std::shared_ptr<Surface> surface) {
@@ -227,8 +204,8 @@ namespace uvke {
         m_imageViews = imageViews;
     }
     
-    VkDevice& Swapchain::GetDevice() {
-        return m_device;
+    std::shared_ptr<Base> Swapchain::GetBase() {
+        return m_base;
     }
 
     std::shared_ptr<Surface> Swapchain::GetSurface() {
