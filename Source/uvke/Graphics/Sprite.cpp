@@ -43,22 +43,13 @@ namespace uvke {
         UVKE_LOG("Sprite Created");
     }
 
-    void Sprite::Update(std::shared_ptr<Window> window) {
-        UniformBufferObject ubo { };
-        ubo.model = Identity<float>();
-        ubo.model = Scale<float>(ubo.model, vec3f(m_scale.x, m_scale.y, 1.0f));
-        ubo.model = Translate<float>(ubo.model, vec3f(m_position.x, m_position.y, 0.0f));
-
-        ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
-
-        if(window->GetKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
-            ubo.projection = Perspective<float>(Radians(45.0f), (window->GetWindowProps()->size.x / window->GetWindowProps()->size.y), 0.1f, 1000.0f);
-            ubo.projection.data[1][1] *= -1;
-        } else {
-            ubo.projection = Ortho<float>(-1.0f, 1.0f, 1.0f, -1.0f, -150.0f, 100.0f);
-        }
-
-        m_uniformBuffer->Update(ubo);
+    void Sprite::Update(std::shared_ptr<Camera> camera) {
+        mat4x4f model = Identity<float>();
+        model = Scale<float>(camera->GetModel(), vec3f(m_scale.x, m_scale.y, 1.0f));
+        model = Translate<float>(camera->GetModel(), vec3f(m_position.x, m_position.y, 0.0f));
+        
+        camera->SetModel(model);
+        camera->Update(m_uniformBuffer);
     }
 
     void Sprite::Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) {

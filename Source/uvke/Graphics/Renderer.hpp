@@ -19,6 +19,7 @@
 #include "Sampler.hpp"
 #include "SyncManager.hpp"
 #include "Interface.hpp"
+#include "Camera.hpp"
 #include "Renderable.hpp"
 
 namespace uvke {
@@ -81,6 +82,7 @@ namespace uvke {
         std::shared_ptr<Sampler> m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
         std::shared_ptr<Interface> m_interface;
+        std::shared_ptr<Camera> m_camera;
         Clock m_clock;
         Clock m_frameClock;
         int m_fps;

@@ -49,6 +49,8 @@ namespace uvke {
         m_interface = std::make_shared<Interface>(m_base, m_window, m_surface, m_commandBuffer, m_pipeline->GetRenderPass());
         m_interface->SetFPS(0);
 
+        m_camera = std::make_shared<Camera>();
+
         UVKE_LOG("Renderer Created");
     }
 
@@ -100,7 +102,7 @@ namespace uvke {
         }
 
         for(auto i = 0; i < m_renderables.size(); ++i) {
-            m_renderables[i]->Update(m_window);
+            m_renderables[i]->Update(m_camera);
         }
 
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
