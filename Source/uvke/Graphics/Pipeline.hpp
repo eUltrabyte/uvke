@@ -24,6 +24,7 @@ namespace uvke {
 
         virtual void SetBase(std::shared_ptr<Base> base);
         virtual void SetRenderPass(VkRenderPass renderPass);
+        virtual void SetPipelineCache(VkPipelineCache pipelineCache);
         virtual void SetPipelineLayout(VkPipelineLayout pipelineLayout);
         virtual void SetPipeline(VkPipeline pipeline);
 
@@ -33,6 +34,7 @@ namespace uvke {
         virtual std::shared_ptr<VertexBuffer> GetVertexBuffer();
         virtual std::shared_ptr<Descriptor> GetDescriptor();
         virtual VkRenderPass& GetRenderPass();
+        virtual VkPipelineCache& GetPipelineCache();
         virtual VkPipelineLayout& GetPipelineLayout();
         virtual VkPipeline& GetPipeline();
 
@@ -45,6 +47,7 @@ namespace uvke {
 
     private:
         VkRenderPass m_renderPass;
+        VkPipelineCache m_pipelineCache;
         VkPipelineLayout m_pipelineLayout;
         VkPipeline m_pipeline;
 

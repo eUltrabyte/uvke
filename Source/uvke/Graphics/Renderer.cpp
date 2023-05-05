@@ -31,13 +31,10 @@ namespace uvke {
         m_stagingBuffer.reset();
 
         m_sampler = std::make_shared<Sampler>(m_base, m_texture);
-
-        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base, std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
-        
-        m_indexBuffer = std::make_shared<IndexBuffer>(m_base, std::vector<unsigned int> { 0 } );
-
         m_descriptor = std::make_shared<Descriptor>(m_base);
 
+        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base, std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
+        m_indexBuffer = std::make_shared<IndexBuffer>(m_base, std::vector<unsigned int> { 0 } );
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base, m_sampler, m_descriptor);
 
         m_pipeline = std::make_shared<Pipeline>(m_base, m_surface, m_shader, m_vertexBuffer, m_descriptor);
@@ -74,13 +71,10 @@ namespace uvke {
         m_renderables.clear();
 
         m_uniformBuffer.reset();
-        
-        m_descriptor.reset();
-
         m_indexBuffer.reset();
-
         m_vertexBuffer.reset();
 
+        m_descriptor.reset();
         m_shader.reset();
 
         m_swapchain.reset();

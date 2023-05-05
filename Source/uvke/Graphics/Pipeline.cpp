@@ -4,6 +4,17 @@ namespace uvke {
     Pipeline::Pipeline(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface, std::shared_ptr<Shader> shader, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<Descriptor> descriptor)
         : m_base(base), m_surface(surface), m_shader(shader), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
         {
+            VkPipelineCacheCreateInfo pipelineCacheCreateInfo { };
+            pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+            pipelineCacheCreateInfo.pNext = nullptr;
+            pipelineCacheCreateInfo.flags = 0;
+            pipelineCacheCreateInfo.initialDataSize = 0;
+            pipelineCacheCreateInfo.pInitialData = nullptr;
+
+            UVKE_ASSERT(vkCreatePipelineCache(m_base->GetDevice(), &pipelineCacheCreateInfo, nullptr, &m_pipelineCache));
+        }
+        
+        {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *m_shader->GetVertexShaderStageCreateInfo(), *m_shader->GetFragmentShaderStageCreateInfo() };
 
             std::vector<VkDynamicState> dynamicStates = {
@@ -166,7 +177,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
         }
         
         UVKE_LOG("Graphics Pipeline Created");
@@ -358,7 +369,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
         }
         
         UVKE_LOG("Graphics Pipeline Recreated");
@@ -410,16 +421,6 @@ namespace uvke {
             renderables[i]->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
         }
 
-        /* ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::ShowDemoWindow();
-
-        ImGui::Render();
-
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer->GetCommandBuffer(frame)); */
-
         interfaces->Render(commandBuffer, frame);
 
         vkCmdEndRenderPass(commandBuffer->GetCommandBuffer(frame));
@@ -435,6 +436,10 @@ namespace uvke {
         m_renderPass = renderPass;
     }
     
+    void Pipeline::SetPipelineCache(VkPipelineCache pipelineCache) {
+        m_pipelineCache = pipelineCache;
+    }
+    
     void Pipeline::SetPipelineLayout(VkPipelineLayout pipelineLayout) {
         m_pipelineLayout = pipelineLayout;
     }
@@ -442,7 +447,7 @@ namespace uvke {
     void Pipeline::SetPipeline(VkPipeline pipeline) {
         m_pipeline = pipeline;
     }
-    
+
     std::shared_ptr<Base> Pipeline::GetBase() {
         return m_base;
     }
@@ -465,6 +470,10 @@ namespace uvke {
     
     VkRenderPass& Pipeline::GetRenderPass() {
         return m_renderPass;
+    }
+    
+    VkPipelineCache& Pipeline::GetPipelineCache() {
+        return m_pipelineCache;
     }
     
     VkPipelineLayout& Pipeline::GetPipelineLayout() {
