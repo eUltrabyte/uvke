@@ -1,8 +1,10 @@
 #include "Pipeline.hpp"
 
 namespace uvke {
-    Pipeline::Pipeline(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface, std::shared_ptr<Shader> shader, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<Descriptor> descriptor)
-        : m_base(base), m_surface(surface), m_shader(shader), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
+    Pipeline::Pipeline(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<Descriptor> descriptor)
+        : m_base(base), m_surface(surface), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
+        m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Default.vert.spv"), File::Load("Resource/Default.frag.spv"));
+
         {
             VkPipelineCacheCreateInfo pipelineCacheCreateInfo { };
             pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
@@ -74,7 +76,7 @@ namespace uvke {
             pipelineRasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
             pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
             pipelineRasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE;
+            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
             pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
@@ -193,10 +195,16 @@ namespace uvke {
                 vkDestroyPipelineLayout(m_base->GetDevice(), m_pipelineLayout, nullptr);
             }
 
+            if(m_pipelineCache != VK_NULL_HANDLE) {
+                vkDestroyPipelineCache(m_base->GetDevice(), m_pipelineCache, nullptr);
+            }
+
             if(m_renderPass != VK_NULL_HANDLE) {
                 vkDestroyRenderPass(m_base->GetDevice(), m_renderPass, nullptr);
             }
         }
+
+        m_shader.reset();
 
         UVKE_LOG("Graphics Pipeline Destroyed");
     }
@@ -266,7 +274,7 @@ namespace uvke {
             pipelineRasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
             pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
             pipelineRasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE;
+            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
             pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
@@ -393,7 +401,7 @@ namespace uvke {
         renderPassBeginInfo.framebuffer = framebuffer->GetFramebuffer(index);
         renderPassBeginInfo.renderArea.offset = { 0, 0 };
         renderPassBeginInfo.renderArea.extent = m_surface->GetExtent();
-        VkClearValue clearValue = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+        VkClearValue clearValue = { { { 0.2f, 0.3f, 0.5f, 1.0f } } };
         renderPassBeginInfo.clearValueCount = 1;
         renderPassBeginInfo.pClearValues = &clearValue;
 

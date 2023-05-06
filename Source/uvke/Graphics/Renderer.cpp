@@ -14,8 +14,6 @@ namespace uvke {
 
         m_swapchain = std::make_shared<Swapchain>(m_base, m_surface);
 
-        m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
-
         m_commandBuffer = std::make_shared<CommandBuffer>(m_base);
 
         m_texture = std::make_shared<Texture>(m_base, "Resource/uvke.png");
@@ -37,7 +35,7 @@ namespace uvke {
         m_indexBuffer = std::make_shared<IndexBuffer>(m_base, std::vector<unsigned int> { 0 } );
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base, m_sampler, m_descriptor);
 
-        m_pipeline = std::make_shared<Pipeline>(m_base, m_surface, m_shader, m_vertexBuffer, m_descriptor);
+        m_pipeline = std::make_shared<Pipeline>(m_base, m_surface, m_vertexBuffer, m_descriptor);
 
         m_framebuffer = std::make_shared<Framebuffer>(m_base, m_pipeline->GetRenderPass(), m_swapchain, m_surface);
 
@@ -47,6 +45,7 @@ namespace uvke {
         m_interface->SetFPS(0);
 
         m_camera = std::make_shared<Camera>();
+        // m_camera = std::make_shared<Camera>(Projection::Perspectivic, vec2f(m_window->GetWindowProps()->size.x, m_window->GetWindowProps()->size.y));
 
         UVKE_LOG("Renderer Created");
     }
@@ -75,7 +74,6 @@ namespace uvke {
         m_vertexBuffer.reset();
 
         m_descriptor.reset();
-        m_shader.reset();
 
         m_swapchain.reset();
         m_surface.reset();

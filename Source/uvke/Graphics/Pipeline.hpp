@@ -16,7 +16,7 @@
 namespace uvke {
     class UVKE_API Pipeline {
     public:
-        Pipeline(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Surface> surface = nullptr, std::shared_ptr<Shader> shader = nullptr, std::shared_ptr<VertexBuffer> vertexBuffer = nullptr, std::shared_ptr<Descriptor> descriptor = nullptr);
+        Pipeline(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Surface> surface = nullptr, std::shared_ptr<VertexBuffer> vertexBuffer = nullptr, std::shared_ptr<Descriptor> descriptor = nullptr);
         virtual ~Pipeline();
 
         virtual void Recreate();
@@ -41,11 +41,11 @@ namespace uvke {
     protected:
         std::shared_ptr<Base> m_base;
         std::shared_ptr<Surface> m_surface;
-        std::shared_ptr<Shader> m_shader;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
         std::shared_ptr<Descriptor> m_descriptor;
 
     private:
+        std::shared_ptr<Shader> m_shader;
         VkRenderPass m_renderPass;
         VkPipelineCache m_pipelineCache;
         VkPipelineLayout m_pipelineLayout;

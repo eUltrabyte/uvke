@@ -23,6 +23,7 @@ namespace uvke {
 
         virtual void SetPosition(const vec2f& position);
         virtual void SetScale(const vec2f& scale);
+        virtual void SetRotation(float angle);
         virtual void SetVertices(const std::vector<Vertex>& vertices);
         virtual void SetIndices(const std::vector<unsigned int>& indices);
 
@@ -37,6 +38,7 @@ namespace uvke {
     private:
         vec2f m_position;
         vec2f m_scale;
+        float m_angle;
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;

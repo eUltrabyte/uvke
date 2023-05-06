@@ -68,7 +68,6 @@ namespace uvke {
         std::shared_ptr<Window> m_window;
         std::shared_ptr<Surface> m_surface;
         std::shared_ptr<Swapchain> m_swapchain;
-        std::shared_ptr<Shader> m_shader;
         std::shared_ptr<StagingBuffer> m_stagingBuffer;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
         std::shared_ptr<IndexBuffer> m_indexBuffer;

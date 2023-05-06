@@ -9,6 +9,7 @@ uvke::App* Create(int argc, char** argv) {
 
     uvke::Sprite sprite({ 0.2f, 0.15f });
     sprite.SetPosition({ 0.0f, 0.0f });
+    // sprite.SetRotation(90.0f);
     sprite.Create(std::make_shared<uvke::Renderer>(renderer));
     renderer.Push(std::make_shared<uvke::Sprite>(sprite));
 
