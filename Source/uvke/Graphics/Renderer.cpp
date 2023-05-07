@@ -44,6 +44,8 @@ namespace uvke {
         m_interface = std::make_shared<Interface>(m_base, m_window, m_surface, m_commandBuffer, m_pipeline->GetRenderPass());
         m_interface->SetFPS(0);
 
+        m_presentation = std::make_shared<Presentation>(m_base, m_swapchain, m_syncManager);
+
         m_camera = std::make_shared<Camera>();
         // m_camera = std::make_shared<Camera>(Projection::Perspectivic, vec2f(m_window->GetWindowProps()->size.x, m_window->GetWindowProps()->size.y));
 
@@ -54,6 +56,8 @@ namespace uvke {
         m_syncManager->WaitForDevice();
 
         m_interface.reset();
+
+        m_presentation.reset();
 
         m_syncManager.reset();
 
@@ -82,58 +86,23 @@ namespace uvke {
     }
 
     void Renderer::Render() {
-        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
-
-        unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
-        if(result == VK_ERROR_OUT_OF_DATE_KHR) {
-            m_swapchain->Recreate(m_window, m_pipeline->GetRenderPass());
-            m_framebuffer->Recreate();
-        } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            UVKE_FATAL("Swapchain Acquire Image Error");
-        }
-
         for(auto i = 0; i < m_renderables.size(); ++i) {
+            m_camera->Move(m_window, vec2f(0.01f, 0.01f));
             m_renderables[i]->Update(m_camera);
         }
+
+        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
+
+        m_presentation->AcquireNextImage(m_window, m_pipeline, m_framebuffer);
 
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
         m_interface->SetRenderTime(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count());
-        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, m_renderables, m_interface);
+        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), m_presentation->GetIndex(), m_renderables, m_interface);
 
-        VkSubmitInfo submitInfo { };
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.pNext = nullptr;
-        VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = &m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame());
-        submitInfo.pWaitDstStageMask = waitStages;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &m_commandBuffer->GetCommandBuffer(m_syncManager->GetFrame());
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
-
-        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueue(0), 1, &submitInfo, m_syncManager->GetFence(m_syncManager->GetFrame())));
-
-        VkPresentInfoKHR presentInfo { };
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        presentInfo.pNext = nullptr;
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = &m_swapchain->GetSwapchain();
-        presentInfo.pImageIndices = &index;
-        presentInfo.pResults = nullptr;
-
-        result = vkQueuePresentKHR(m_surface->GetQueue(1), &presentInfo);
-        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_swapchain->IsRecreated()) {
-            m_swapchain->Recreate(m_window, m_pipeline->GetRenderPass());
-            m_framebuffer->Recreate();
-        } else if(result != VK_SUCCESS) {
-            UVKE_FATAL("Framebuffer Recreation Error");
-        }
+        m_presentation->Submit(m_commandBuffer, m_surface);
+        m_presentation->Present(m_window, m_surface, m_pipeline, m_framebuffer);
 
         if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
             m_clock.Restart();

@@ -1,6 +1,4 @@
 - add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
-- add control over camera
-- add presentation class
 - add scene class
 - fix mat4x4 rotate ( and other mathematic functions to just work )
 - job manager class ( job queue and job priorities )
