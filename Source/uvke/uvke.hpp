@@ -4,7 +4,7 @@
 
 #include "uvkepch.hpp"
 
-#include "Core/Platform.hpp"
+#include "Core/Core.hpp"
 #include "Core/Logger.hpp"
 
 #ifdef UVKE_DEBUG

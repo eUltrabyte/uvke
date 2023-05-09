@@ -33,8 +33,6 @@ namespace uvke {
         virtual void Push(std::shared_ptr<Renderable> renderable);
         virtual void Erase();
 
-        virtual void SetBase(std::shared_ptr<Base> base);
-        virtual void SetWindow(std::shared_ptr<Window> window);
         virtual void SetSurface(std::shared_ptr<Surface> surface);
         virtual void SetSwapchain(std::shared_ptr<Swapchain> swapchain);
         virtual void SetStagingBuffer(std::shared_ptr<StagingBuffer> stagingBuffer);

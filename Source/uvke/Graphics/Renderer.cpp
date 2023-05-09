@@ -122,14 +122,6 @@ namespace uvke {
     void Renderer::Erase() {
         m_renderables.erase(m_renderables.begin());
     }
-
-    void Renderer::SetBase(std::shared_ptr<Base> base) {
-        m_base = base;
-    }
-    
-    void Renderer::SetWindow(std::shared_ptr<Window> window) {
-        m_window = window;
-    }
     
     void Renderer::SetSurface(std::shared_ptr<Surface> surface) {
         m_surface = surface;
@@ -178,7 +170,7 @@ namespace uvke {
     void Renderer::SetSyncManager(std::shared_ptr<SyncManager> syncManager) {
         m_syncManager = syncManager;
     }
-    
+
     std::shared_ptr<Base> Renderer::GetBase() {
         return m_base;
     }

@@ -3,6 +3,7 @@
 #define UVKE_ENTRY_HEADER
 
 #include "../uvke.hpp"
+#include "WindowManager.hpp"
 
 namespace uvke {
     using App = char;
@@ -15,14 +16,15 @@ namespace uvke {
         bool IsRunning = true;
 
         auto Main(int argc, char** argv) -> int {
-            uvke::priv::Init();
+            uvke::Core core;
+            uvke::WindowManager windowManager;
 
             for(; IsRunning ;) {
                 App* app = Create(argc, argv);
                 delete app;
             }
-            
-            return uvke::priv::Deinit();;
+
+            return 0;
         }
     };
 };
