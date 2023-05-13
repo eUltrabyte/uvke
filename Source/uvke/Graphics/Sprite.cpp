@@ -1,8 +1,7 @@
 #include "Sprite.hpp"
 
 namespace uvke {
-    Sprite::Sprite(const vec2f& size)
-        : m_position({ 0.0f, 0.0f }), m_scale({ 1.0f, 1.0f }), m_debug(false) {
+    Sprite::Sprite(const vec2f& size) {
         m_vertices = std::vector<Vertex> {
             { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
             { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
@@ -13,6 +12,8 @@ namespace uvke {
         m_indices = std::vector<unsigned int> {
             0, 1, 2, 2, 3, 0
         };
+
+        m_model = Identity<float>();
 
         UVKE_LOG("Sprite Setup");
     }
@@ -44,16 +45,7 @@ namespace uvke {
     }
 
     void Sprite::Update(std::shared_ptr<Camera> camera) {
-        mat4x4f model = camera->GetModel();
-        model = Scale<float>(model, vec3f(m_scale.x, m_scale.y, 1.0f));
-        model = Translate<float>(model, vec3f(m_position.x, m_position.y, 0.0f));
-        
-        if(!m_debug) {
-            model = Rotate<float>(model, vec3f(1.0f, 0.0f, 0.0f), Radians<float>(m_angle));
-            m_debug = true;
-        }
-
-        camera->SetModel(model);
+        camera->SetModel(m_model);
         camera->Update(m_uniformBuffer);
     }
 
@@ -66,15 +58,15 @@ namespace uvke {
     }
 
     void Sprite::SetPosition(const vec2f& position) {
-        m_position = position;
+        m_model = Translate<float>(m_model, vec3f(position.x, position.y, 0.0f));
     }
 
     void Sprite::SetScale(const vec2f& scale) {
-        m_scale = scale;
+        m_model = Scale<float>(m_model, vec3f(scale.x, scale.y, 1.0f));
     }
 
     void Sprite::SetRotation(float angle) {
-        m_angle = angle;
+        m_model = Rotate<float>(m_model, vec3f(0.0f, 1.0f, 0.0f), Radians<float>(angle));
     }
 
     void Sprite::SetVertices(const std::vector<Vertex>& vertices) {
@@ -83,14 +75,6 @@ namespace uvke {
     
     void Sprite::SetIndices(const std::vector<unsigned int>& indices) {
         m_indices = indices;
-    }
-
-    vec2f& Sprite::GetPosition() {
-        return m_position;
-    }
-
-    vec2f& Sprite::GetScale() {
-        return m_scale;
     }
 
     std::vector<Vertex>& Sprite::GetVertices() {

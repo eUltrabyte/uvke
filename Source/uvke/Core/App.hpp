@@ -18,6 +18,7 @@ namespace uvke {
 
     protected:
         bool m_isRunning;
+        std::unique_ptr<Clock> m_clock;
         std::unique_ptr<Core> m_core;
         std::unique_ptr<WindowManager> m_windowManager;
 

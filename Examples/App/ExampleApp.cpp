@@ -31,6 +31,8 @@ public:
     }
 
     virtual void Update() override {
+        // UVKE_LOG("App Timer - " + std::to_string(m_clock->GetElapsedTime().count()) + "ms");
+
         m_window->PollEvents(m_event);
         m_window->Update();
 

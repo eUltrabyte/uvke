@@ -456,28 +456,28 @@ namespace uvke {
         T cosinus = Cos<T>(angle);
         T sinus = Sin<T>(angle);
         vec3<T> axis = Normalize<T>(direction);
-        vec3<T> calculation = vec3<T>(1.0f - cosinus * direction.x, 1.0f - cosinus * direction.y, 1.0f - cosinus * direction.z);
+        vec3<T> calculation = vec3<T>(1 - cosinus * direction.x, 1 - cosinus * direction.y, 1 - cosinus * direction.z);
 
         mat4x4<T> result;
         result.data[0][0] = cosinus + calculation.x * axis.x;
         result.data[0][1] = calculation.x * axis.y + sinus * axis.z;
         result.data[0][2] = calculation.x * axis.z - sinus * axis.y;
-        result.data[0][3] = 1.0f;
+        result.data[0][3] = 1;
 
         result.data[1][0] = calculation.y * axis.x - sinus * axis.z;
         result.data[1][1] = cosinus + calculation.y * axis.y;
         result.data[1][2] = calculation.y * axis.z + sinus * axis.x;
-        result.data[1][3] = 1.0f;
+        result.data[1][3] = 1;
 
         result.data[2][0] = calculation.z * axis.x + sinus * axis.y;
         result.data[2][1] = calculation.z * axis.y - sinus * axis.x;
         result.data[2][2] = cosinus + calculation.z * axis.z;
-        result.data[2][3] = 1.0f;
+        result.data[2][3] = 1;
 
-        result.data[3][0] = 1.0f;
-        result.data[3][1] = 1.0f;
-        result.data[3][2] = 1.0f;
-        result.data[3][3] = 1.0f;
+        result.data[3][0] = 1;
+        result.data[3][1] = 1;
+        result.data[3][2] = 1;
+        result.data[3][3] = 1;
 
         result *= matrix;
         return result;
