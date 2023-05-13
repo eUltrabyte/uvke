@@ -3,6 +3,7 @@
 #define UVKE_VEC3_HEADER
 
 #include "../uvkepch.hpp"
+#include "../Core/Core.hpp"
 
 namespace uvke {
     template<typename T>

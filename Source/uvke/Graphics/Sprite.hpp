@@ -39,6 +39,7 @@ namespace uvke {
         vec2f m_position;
         vec2f m_scale;
         float m_angle;
+        bool m_debug;
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;

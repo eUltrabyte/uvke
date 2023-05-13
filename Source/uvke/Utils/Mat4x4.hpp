@@ -3,6 +3,8 @@
 #define UVKE_MAT4X4_HEADER
 
 #include "../uvkepch.hpp"
+#include "../Core/Core.hpp"
+#include "Vec3.hpp"
 
 namespace uvke {
     template<typename T>
@@ -402,6 +404,20 @@ namespace uvke {
     }
 
     template<typename T>
+    inline constexpr mat4x4<T> Frustum(const T& left, const T& right, const T& bottom, const T& top, const T& zNear, const T& zFar) {
+        mat4x4<T> result;
+        result.data[0][0] = (2 * zNear) / (right - left);
+        result.data[1][1] = (2 * zNear) / (bottom - top);
+        result.data[2][0] = -(right + left) / (right - left);
+        result.data[2][0] = -(bottom + top) / (bottom - top);
+        result.data[2][2] = zNear / (zNear - zFar);
+        result.data[2][3] = 1;
+        result.data[3][2] = zNear * zFar / (zNear - zFar);
+
+        return result;
+    }
+
+    template<typename T>
     inline constexpr mat4x4<T> LookAt(const vec3<T>& eye, const vec3<T>& center, const vec3<T>& up) {
         vec3<T> normalized = Normalize<T>(vec3<T>(center.x - eye.x, center.y - eye.y, center.z - eye.z));
         vec3<T> normalizedCrossProduct = Normalize<T>(CrossProduct<T, T>(normalized, up));
@@ -440,27 +456,27 @@ namespace uvke {
         T cosinus = Cos<T>(angle);
         T sinus = Sin<T>(angle);
         vec3<T> axis = Normalize<T>(direction);
-        float calculation = 1.0f - cosinus;
+        vec3<T> calculation = vec3<T>(1.0f - cosinus * direction.x, 1.0f - cosinus * direction.y, 1.0f - cosinus * direction.z);
 
         mat4x4<T> result;
-        result.data[0][0] = cosinus + calculation * axis.x * axis.x;
-        result.data[0][1] = calculation * axis.x * axis.y + sinus * axis.z;
-        result.data[0][2] = calculation * axis.x * axis.z - sinus * axis.y;
-        result.data[0][3] = 0.0f;
+        result.data[0][0] = cosinus + calculation.x * axis.x;
+        result.data[0][1] = calculation.x * axis.y + sinus * axis.z;
+        result.data[0][2] = calculation.x * axis.z - sinus * axis.y;
+        result.data[0][3] = 1.0f;
 
-        result.data[1][0] = calculation * axis.y * axis.x - sinus * axis.z;
-        result.data[1][1] = cosinus + calculation * axis.y * axis.y;
-        result.data[1][2] = calculation * axis.y * axis.z + sinus * axis.x;
-        result.data[1][3] = 0.0f;
+        result.data[1][0] = calculation.y * axis.x - sinus * axis.z;
+        result.data[1][1] = cosinus + calculation.y * axis.y;
+        result.data[1][2] = calculation.y * axis.z + sinus * axis.x;
+        result.data[1][3] = 1.0f;
 
-        result.data[2][0] = calculation * axis.z * axis.x + sinus * axis.y;
-        result.data[2][1] = calculation * axis.z * axis.y - sinus * axis.x;
-        result.data[2][2] = cosinus + calculation * axis.z * axis.z;
-        result.data[2][3] = 0.0f;
+        result.data[2][0] = calculation.z * axis.x + sinus * axis.y;
+        result.data[2][1] = calculation.z * axis.y - sinus * axis.x;
+        result.data[2][2] = cosinus + calculation.z * axis.z;
+        result.data[2][3] = 1.0f;
 
-        result.data[3][0] = 0.0f;
-        result.data[3][1] = 0.0f;
-        result.data[3][2] = 0.0f;
+        result.data[3][0] = 1.0f;
+        result.data[3][1] = 1.0f;
+        result.data[3][2] = 1.0f;
         result.data[3][3] = 1.0f;
 
         result *= matrix;

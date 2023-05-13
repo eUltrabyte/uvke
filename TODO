@@ -6,6 +6,7 @@
 - add multi threading support
 - add audio support
 - asset manager class
+- add smid and avx support in math lib
 - own file format for textures, audio, etc
 - reimplement stb_image with own library
 - reimplement audio with own library

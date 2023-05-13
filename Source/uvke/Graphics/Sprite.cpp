@@ -2,7 +2,7 @@
 
 namespace uvke {
     Sprite::Sprite(const vec2f& size)
-        : m_position({ 0.0f, 0.0f }), m_scale({ 1.0f, 1.0f }) {
+        : m_position({ 0.0f, 0.0f }), m_scale({ 1.0f, 1.0f }), m_debug(false) {
         m_vertices = std::vector<Vertex> {
             { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
             { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
@@ -47,7 +47,11 @@ namespace uvke {
         mat4x4f model = camera->GetModel();
         model = Scale<float>(model, vec3f(m_scale.x, m_scale.y, 1.0f));
         model = Translate<float>(model, vec3f(m_position.x, m_position.y, 0.0f));
-        // model = Rotate<float>(model, vec3f(0.0f, 0.0f, 1.0f), Radians<float>(m_angle));
+        
+        if(!m_debug) {
+            model = Rotate<float>(model, vec3f(1.0f, 0.0f, 0.0f), Radians<float>(m_angle));
+            m_debug = true;
+        }
 
         camera->SetModel(model);
         camera->Update(m_uniformBuffer);
