@@ -14,8 +14,6 @@ namespace uvke {
 
         m_swapchain = std::make_shared<Swapchain>(m_base, m_surface);
 
-        m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Shader.vert.spv"), File::Load("Resource/Shader.frag.spv"));
-
         m_commandBuffer = std::make_shared<CommandBuffer>(m_base);
 
         m_texture = std::make_shared<Texture>(m_base, "Resource/uvke.png");
@@ -31,16 +29,13 @@ namespace uvke {
         m_stagingBuffer.reset();
 
         m_sampler = std::make_shared<Sampler>(m_base, m_texture);
-
-        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base, std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
-        
-        m_indexBuffer = std::make_shared<IndexBuffer>(m_base, std::vector<unsigned int> { 0 } );
-
         m_descriptor = std::make_shared<Descriptor>(m_base);
 
+        m_vertexBuffer = std::make_shared<VertexBuffer>(m_base, std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
+        m_indexBuffer = std::make_shared<IndexBuffer>(m_base, std::vector<unsigned int> { 0 } );
         m_uniformBuffer = std::make_shared<UniformBuffer>(m_base, m_sampler, m_descriptor);
 
-        m_pipeline = std::make_shared<Pipeline>(m_base, m_surface, m_shader, m_vertexBuffer, m_descriptor);
+        m_pipeline = std::make_shared<Pipeline>(m_base, m_surface, m_vertexBuffer, m_descriptor);
 
         m_framebuffer = std::make_shared<Framebuffer>(m_base, m_pipeline->GetRenderPass(), m_swapchain, m_surface);
 
@@ -49,7 +44,10 @@ namespace uvke {
         m_interface = std::make_shared<Interface>(m_base, m_window, m_surface, m_commandBuffer, m_pipeline->GetRenderPass());
         m_interface->SetFPS(0);
 
+        m_presentation = std::make_shared<Presentation>(m_base, m_swapchain, m_syncManager);
+
         m_camera = std::make_shared<Camera>();
+        // m_camera = std::make_shared<Camera>(Projection::Perspectivic, vec2f(m_window->GetWindowProps()->size.x, m_window->GetWindowProps()->size.y));
 
         UVKE_LOG("Renderer Created");
     }
@@ -58,6 +56,8 @@ namespace uvke {
         m_syncManager->WaitForDevice();
 
         m_interface.reset();
+
+        m_presentation.reset();
 
         m_syncManager.reset();
 
@@ -74,14 +74,10 @@ namespace uvke {
         m_renderables.clear();
 
         m_uniformBuffer.reset();
-        
-        m_descriptor.reset();
-
         m_indexBuffer.reset();
-
         m_vertexBuffer.reset();
 
-        m_shader.reset();
+        m_descriptor.reset();
 
         m_swapchain.reset();
         m_surface.reset();
@@ -90,58 +86,23 @@ namespace uvke {
     }
 
     void Renderer::Render() {
-        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
-
-        unsigned int index = 0;
-        VkResult result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &index);
-        if(result == VK_ERROR_OUT_OF_DATE_KHR) {
-            m_swapchain->Recreate(m_window, m_pipeline->GetRenderPass());
-            m_framebuffer->Recreate();
-        } else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            UVKE_FATAL("Swapchain Acquire Image Error");
-        }
-
         for(auto i = 0; i < m_renderables.size(); ++i) {
+            m_camera->Move(m_window, vec2f(0.01f, 0.01f));
             m_renderables[i]->Update(m_camera);
         }
+
+        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
+
+        m_presentation->AcquireNextImage(m_window, m_pipeline, m_framebuffer);
 
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
         m_interface->SetRenderTime(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count());
-        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), index, m_renderables, m_interface);
+        m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), m_presentation->GetIndex(), m_renderables, m_interface);
 
-        VkSubmitInfo submitInfo { };
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.pNext = nullptr;
-        VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = &m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame());
-        submitInfo.pWaitDstStageMask = waitStages;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &m_commandBuffer->GetCommandBuffer(m_syncManager->GetFrame());
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
-
-        UVKE_ASSERT(vkQueueSubmit(m_surface->GetQueue(0), 1, &submitInfo, m_syncManager->GetFence(m_syncManager->GetFrame())));
-
-        VkPresentInfoKHR presentInfo { };
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        presentInfo.pNext = nullptr;
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = &m_swapchain->GetSwapchain();
-        presentInfo.pImageIndices = &index;
-        presentInfo.pResults = nullptr;
-
-        result = vkQueuePresentKHR(m_surface->GetQueue(1), &presentInfo);
-        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_swapchain->IsRecreated()) {
-            m_swapchain->Recreate(m_window, m_pipeline->GetRenderPass());
-            m_framebuffer->Recreate();
-        } else if(result != VK_SUCCESS) {
-            UVKE_FATAL("Framebuffer Recreation Error");
-        }
+        m_presentation->Submit(m_commandBuffer, m_surface);
+        m_presentation->Present(m_window, m_surface, m_pipeline, m_framebuffer);
 
         if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
             m_clock.Restart();
@@ -160,14 +121,6 @@ namespace uvke {
 
     void Renderer::Erase() {
         m_renderables.erase(m_renderables.begin());
-    }
-
-    void Renderer::SetBase(std::shared_ptr<Base> base) {
-        m_base = base;
-    }
-    
-    void Renderer::SetWindow(std::shared_ptr<Window> window) {
-        m_window = window;
     }
     
     void Renderer::SetSurface(std::shared_ptr<Surface> surface) {
@@ -217,7 +170,7 @@ namespace uvke {
     void Renderer::SetSyncManager(std::shared_ptr<SyncManager> syncManager) {
         m_syncManager = syncManager;
     }
-    
+
     std::shared_ptr<Base> Renderer::GetBase() {
         return m_base;
     }

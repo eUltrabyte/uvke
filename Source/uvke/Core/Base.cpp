@@ -10,7 +10,7 @@ namespace uvke {
             appInfo.pApplicationName = name.data();
             appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
             appInfo.pEngineName = "uvke";
-            appInfo.apiVersion = uvke::GetSupportedVulkan();
+            appInfo.apiVersion = uvke::Core::GetSupportedVulkan();
 
             std::vector<const char*> layers = {
                 #ifdef UVKE_DEBUG

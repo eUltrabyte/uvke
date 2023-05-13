@@ -32,17 +32,20 @@ else()
 endif()
 
 set(UVKE_CORE_SOURCE
-    Source/uvke/Core/Platform.hpp
-    Source/uvke/Core/Platform.cpp
+    Source/uvke/Core/Core.hpp
+    Source/uvke/Core/Core.cpp
     Source/uvke/Core/Logger.hpp
     Source/uvke/Core/Logger.cpp
     Source/uvke/Core/Event.hpp
     Source/uvke/Core/Event.cpp
     Source/uvke/Core/Window.hpp
     Source/uvke/Core/Window.cpp
+    Source/uvke/Core/WindowManager.hpp
+    Source/uvke/Core/WindowManager.cpp
     Source/uvke/Core/Base.hpp
     Source/uvke/Core/Base.cpp
-    Source/uvke/Core/Entry.hpp
+    Source/uvke/Core/App.hpp
+    Source/uvke/Core/App.cpp
 )
 
 set(UVKE_GRAPHICS_SOURCE
@@ -78,6 +81,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/SyncManager.cpp
     Source/uvke/Graphics/Interface.hpp
     Source/uvke/Graphics/Interface.cpp
+    Source/uvke/Graphics/Presentation.hpp
+    Source/uvke/Graphics/Presentation.cpp
     Source/uvke/Graphics/Camera.hpp
     Source/uvke/Graphics/Camera.cpp
     Source/uvke/Graphics/Renderable.hpp

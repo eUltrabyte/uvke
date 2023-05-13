@@ -1,8 +1,21 @@
 #include "Pipeline.hpp"
 
 namespace uvke {
-    Pipeline::Pipeline(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface, std::shared_ptr<Shader> shader, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<Descriptor> descriptor)
-        : m_base(base), m_surface(surface), m_shader(shader), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
+    Pipeline::Pipeline(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<Descriptor> descriptor)
+        : m_base(base), m_surface(surface), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
+        m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Default.vert.spv"), File::Load("Resource/Default.frag.spv"));
+
+        {
+            VkPipelineCacheCreateInfo pipelineCacheCreateInfo { };
+            pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+            pipelineCacheCreateInfo.pNext = nullptr;
+            pipelineCacheCreateInfo.flags = 0;
+            pipelineCacheCreateInfo.initialDataSize = 0;
+            pipelineCacheCreateInfo.pInitialData = nullptr;
+
+            UVKE_ASSERT(vkCreatePipelineCache(m_base->GetDevice(), &pipelineCacheCreateInfo, nullptr, &m_pipelineCache));
+        }
+        
         {
             VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfos[] = { *m_shader->GetVertexShaderStageCreateInfo(), *m_shader->GetFragmentShaderStageCreateInfo() };
 
@@ -63,7 +76,7 @@ namespace uvke {
             pipelineRasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
             pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
             pipelineRasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE;
+            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
             pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
@@ -166,7 +179,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
         }
         
         UVKE_LOG("Graphics Pipeline Created");
@@ -182,10 +195,16 @@ namespace uvke {
                 vkDestroyPipelineLayout(m_base->GetDevice(), m_pipelineLayout, nullptr);
             }
 
+            if(m_pipelineCache != VK_NULL_HANDLE) {
+                vkDestroyPipelineCache(m_base->GetDevice(), m_pipelineCache, nullptr);
+            }
+
             if(m_renderPass != VK_NULL_HANDLE) {
                 vkDestroyRenderPass(m_base->GetDevice(), m_renderPass, nullptr);
             }
         }
+
+        m_shader.reset();
 
         UVKE_LOG("Graphics Pipeline Destroyed");
     }
@@ -255,7 +274,7 @@ namespace uvke {
             pipelineRasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
             pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
             pipelineRasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE;
+            pipelineRasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
             pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
             pipelineRasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
@@ -358,7 +377,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
         }
         
         UVKE_LOG("Graphics Pipeline Recreated");
@@ -382,7 +401,7 @@ namespace uvke {
         renderPassBeginInfo.framebuffer = framebuffer->GetFramebuffer(index);
         renderPassBeginInfo.renderArea.offset = { 0, 0 };
         renderPassBeginInfo.renderArea.extent = m_surface->GetExtent();
-        VkClearValue clearValue = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+        VkClearValue clearValue = { { { 0.2f, 0.3f, 0.5f, 1.0f } } };
         renderPassBeginInfo.clearValueCount = 1;
         renderPassBeginInfo.pClearValues = &clearValue;
 
@@ -410,16 +429,6 @@ namespace uvke {
             renderables[i]->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
         }
 
-        /* ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::ShowDemoWindow();
-
-        ImGui::Render();
-
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer->GetCommandBuffer(frame)); */
-
         interfaces->Render(commandBuffer, frame);
 
         vkCmdEndRenderPass(commandBuffer->GetCommandBuffer(frame));
@@ -435,6 +444,10 @@ namespace uvke {
         m_renderPass = renderPass;
     }
     
+    void Pipeline::SetPipelineCache(VkPipelineCache pipelineCache) {
+        m_pipelineCache = pipelineCache;
+    }
+    
     void Pipeline::SetPipelineLayout(VkPipelineLayout pipelineLayout) {
         m_pipelineLayout = pipelineLayout;
     }
@@ -442,7 +455,7 @@ namespace uvke {
     void Pipeline::SetPipeline(VkPipeline pipeline) {
         m_pipeline = pipeline;
     }
-    
+
     std::shared_ptr<Base> Pipeline::GetBase() {
         return m_base;
     }
@@ -465,6 +478,10 @@ namespace uvke {
     
     VkRenderPass& Pipeline::GetRenderPass() {
         return m_renderPass;
+    }
+    
+    VkPipelineCache& Pipeline::GetPipelineCache() {
+        return m_pipelineCache;
     }
     
     VkPipelineLayout& Pipeline::GetPipelineLayout() {

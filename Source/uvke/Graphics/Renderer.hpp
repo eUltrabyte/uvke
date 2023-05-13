@@ -19,6 +19,7 @@
 #include "Sampler.hpp"
 #include "SyncManager.hpp"
 #include "Interface.hpp"
+#include "Presentation.hpp"
 #include "Camera.hpp"
 #include "Renderable.hpp"
 
@@ -32,8 +33,6 @@ namespace uvke {
         virtual void Push(std::shared_ptr<Renderable> renderable);
         virtual void Erase();
 
-        virtual void SetBase(std::shared_ptr<Base> base);
-        virtual void SetWindow(std::shared_ptr<Window> window);
         virtual void SetSurface(std::shared_ptr<Surface> surface);
         virtual void SetSwapchain(std::shared_ptr<Swapchain> swapchain);
         virtual void SetStagingBuffer(std::shared_ptr<StagingBuffer> stagingBuffer);
@@ -68,7 +67,6 @@ namespace uvke {
         std::shared_ptr<Window> m_window;
         std::shared_ptr<Surface> m_surface;
         std::shared_ptr<Swapchain> m_swapchain;
-        std::shared_ptr<Shader> m_shader;
         std::shared_ptr<StagingBuffer> m_stagingBuffer;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;
         std::shared_ptr<IndexBuffer> m_indexBuffer;
@@ -82,6 +80,7 @@ namespace uvke {
         std::shared_ptr<Sampler> m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
         std::shared_ptr<Interface> m_interface;
+        std::shared_ptr<Presentation> m_presentation;
         std::shared_ptr<Camera> m_camera;
         Clock m_clock;
         Clock m_frameClock;

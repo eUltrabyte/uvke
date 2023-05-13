@@ -44,10 +44,11 @@ namespace uvke {
     }
 
     void Sprite::Update(std::shared_ptr<Camera> camera) {
-        mat4x4f model = Identity<float>();
-        model = Scale<float>(camera->GetModel(), vec3f(m_scale.x, m_scale.y, 1.0f));
-        model = Translate<float>(camera->GetModel(), vec3f(m_position.x, m_position.y, 0.0f));
-        
+        mat4x4f model = camera->GetModel();
+        model = Scale<float>(model, vec3f(m_scale.x, m_scale.y, 1.0f));
+        model = Translate<float>(model, vec3f(m_position.x, m_position.y, 0.0f));
+        // model = Rotate<float>(model, vec3f(0.0f, 0.0f, 1.0f), Radians<float>(m_angle));
+
         camera->SetModel(model);
         camera->Update(m_uniformBuffer);
     }
@@ -66,6 +67,10 @@ namespace uvke {
 
     void Sprite::SetScale(const vec2f& scale) {
         m_scale = scale;
+    }
+
+    void Sprite::SetRotation(float angle) {
+        m_angle = angle;
     }
 
     void Sprite::SetVertices(const std::vector<Vertex>& vertices) {

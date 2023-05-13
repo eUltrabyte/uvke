@@ -1,13 +1,14 @@
-- add support other primitive types
-- add presentation class
+- shared ptr to unique ptr
+- add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
 - add scene class
-- fix mat4x4 rotate ( and other functions to just work )
-- job manager ( job queue and job priorities )
+- fix mat4x4 rotate ( and other mathematic functions to just work )
+- job manager class ( job queue and job priorities )
 - add multi threading support
 - add audio support
 - asset manager class
 - own file format for textures, audio, etc
 - reimplement stb_image with own library
+- reimplement audio with own library
 - reimplement imgui with own library
 - reimplement windows with own library
 - add something like vulkan wrapper as alternative for vulkansdk ( with win32, x11, xcb, wayland and android support )

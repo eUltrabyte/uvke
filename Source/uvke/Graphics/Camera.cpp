@@ -21,6 +21,20 @@ namespace uvke {
         uniformBuffer->Update(m_ubo);
     }
 
+    void Camera::Move(std::shared_ptr<Window> window, const vec2f& speed) {
+        if(window->GetKey(GLFW_KEY_UP) == GLFW_PRESS) {
+            m_ubo.view = Translate<float>(m_ubo.view, vec3f(0.0f, speed.y, 0.0f));
+        } else if(window->GetKey(GLFW_KEY_DOWN) == GLFW_PRESS) {
+            m_ubo.view = Translate<float>(m_ubo.view, vec3f(0.0f, -speed.y, 0.0f));
+        }
+
+        if(window->GetKey(GLFW_KEY_LEFT) == GLFW_PRESS) {
+            m_ubo.view = Translate<float>(m_ubo.view, vec3f(-speed.x, 0.0f, 0.0f));
+        } else if(window->GetKey(GLFW_KEY_RIGHT) == GLFW_PRESS) {
+            m_ubo.view = Translate<float>(m_ubo.view, vec3f(speed.x, 0.0f, 0.0f));
+        }
+    }
+
     void Camera::SetModel(const mat4x4f& model) {
         m_ubo.model = model;
     }

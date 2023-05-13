@@ -1,6 +1,6 @@
 #pragma once
-#ifndef UVKE_PLATFORM_HEADER
-#define UVKE_PLATFORM_HEADER
+#ifndef UVKE_PLATFORM_CORE_HEADER
+#define UVKE_PLATFORM_CORE_HEADER
 
 #include "../uvkepch.hpp"
 
@@ -26,7 +26,20 @@
 #endif
 
 #ifdef _WIN32
-    #include <Windows.h>
+    #ifdef _WIN64
+        #define UVKE_PLATFORM_WINDOWS
+        #include <Windows.h>
+    #else
+        #error "uvke Doesn't Support 32-bit Platform"
+    #endif
+#elif __linux__
+    #define UVKE_PLATFORM_LINUX
+    // todo
+#elif __ANDROID__
+    #define UVKE_PLATFORM_ANDROID
+    // todo
+#else
+    #error "uvke Doesn't Support This Platform"
 #endif
 
 #include <imgui.h>
@@ -34,12 +47,14 @@
 #include <imgui_impl_vulkan.h>
 
 namespace uvke {
-    namespace priv {
-        extern int UVKE_API Init();
-        extern int UVKE_API Deinit();
+    class UVKE_API Core {
+    public:
+        Core();
+        virtual ~Core() = default;
+
+        static unsigned int GetSupportedVulkan();
+
     };
-    
-    extern unsigned int UVKE_API GetSupportedVulkan();
 };
 
 #endif

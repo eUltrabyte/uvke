@@ -4,6 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
+#include "../Core/Window.hpp"
 #include "UniformBuffer.hpp"
 
 namespace uvke {
@@ -18,6 +19,7 @@ namespace uvke {
         virtual ~Camera() = default;
 
         virtual void Update(std::shared_ptr<UniformBuffer> uniformBuffer);
+        virtual void Move(std::shared_ptr<Window> window, const vec2f& speed);
 
         virtual void SetModel(const mat4x4f& model);
         virtual void SetView(const mat4x4f& view);

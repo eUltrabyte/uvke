@@ -3,7 +3,8 @@
 namespace uvke {
     Window::Window(const WindowProps& windowProps) {
         glfwSetErrorCallback([](int error, const char* description) {
-            UVKE_LOG("GLFW Error - " + std::to_string(error) + " - " + description);
+            UVKE_LOG("GLFW Error - " + std::string(description));
+            std::exit(error);
         });
 
         SetWindowProps(windowProps);
