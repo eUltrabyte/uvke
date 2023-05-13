@@ -1,8 +1,6 @@
 #include "WindowManager.hpp"
 
 namespace uvke {
-    WindowManager* WindowManager::m_instance = nullptr;
-    
     WindowManager::WindowManager() {
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);

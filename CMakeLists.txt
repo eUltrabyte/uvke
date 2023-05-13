@@ -44,7 +44,8 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/WindowManager.cpp
     Source/uvke/Core/Base.hpp
     Source/uvke/Core/Base.cpp
-    Source/uvke/Core/Entry.hpp
+    Source/uvke/Core/App.hpp
+    Source/uvke/Core/App.cpp
 )
 
 set(UVKE_GRAPHICS_SOURCE
