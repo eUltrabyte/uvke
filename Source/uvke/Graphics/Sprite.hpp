@@ -27,8 +27,6 @@ namespace uvke {
         virtual void SetVertices(const std::vector<Vertex>& vertices);
         virtual void SetIndices(const std::vector<unsigned int>& indices);
 
-        virtual vec2f& GetPosition();
-        virtual vec2f& GetScale();
         virtual std::vector<Vertex>& GetVertices();
         virtual std::vector<unsigned int>& GetIndices();
         virtual std::shared_ptr<VertexBuffer> GetVertexBuffer();
@@ -36,9 +34,7 @@ namespace uvke {
         virtual std::shared_ptr<UniformBuffer> GetUniformBuffer();
 
     private:
-        vec2f m_position;
-        vec2f m_scale;
-        float m_angle;
+        mat4x4f m_model;
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;
         std::shared_ptr<VertexBuffer> m_vertexBuffer;

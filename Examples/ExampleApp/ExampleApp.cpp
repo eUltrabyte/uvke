@@ -20,7 +20,7 @@ public:
 
         uvke::Sprite sprite({ 0.2f, 0.15f });
         sprite.SetPosition({ 0.0f, 0.0f });
-        // sprite.SetRotation(90.0f);
+        sprite.SetRotation(45.0f);
         sprite.Create(m_renderer);
         m_renderer->Push(std::make_shared<uvke::Sprite>(sprite));
 
@@ -31,6 +31,8 @@ public:
     }
 
     virtual void Update() override {
+        // UVKE_LOG("App Timer - " + std::to_string(m_clock->GetElapsedTime().count()) + "ms");
+
         m_window->PollEvents(m_event);
         m_window->Update();
 

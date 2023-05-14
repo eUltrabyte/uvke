@@ -14,6 +14,7 @@ namespace uvke {
         virtual void Sleep(unsigned int time);
 
         virtual std::chrono::time_point<std::chrono::steady_clock> GetStart();
+        virtual std::chrono::milliseconds GetElapsedTime();
         virtual std::time_t GetTime();
 
     private:

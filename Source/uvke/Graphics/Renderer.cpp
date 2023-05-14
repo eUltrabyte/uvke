@@ -2,7 +2,7 @@
 
 namespace uvke {
     Renderer::Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
-        : m_base(base), m_window(window), m_fps(0) {
+        : m_base(base), m_window(window), m_deltaTime(0.0f), m_fps(0) {
         m_surface = std::make_shared<Surface>(m_base, m_window);
         
         m_surface->CheckQueues();
@@ -98,7 +98,7 @@ namespace uvke {
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_interface->SetRenderTime(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count());
+        m_interface->SetRenderTime(m_deltaTime);
         m_pipeline->Render(m_framebuffer, m_commandBuffer, m_syncManager->GetFrame(), m_presentation->GetIndex(), m_renderables, m_interface);
 
         m_presentation->Submit(m_commandBuffer, m_surface);
@@ -111,6 +111,7 @@ namespace uvke {
         }
 
         m_syncManager->Update();
+        m_deltaTime = std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count();
         m_frameClock.Restart();
         ++m_fps;
     }

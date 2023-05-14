@@ -2,6 +2,8 @@
 #ifndef UVKE_UTILS_HEADER
 #define UVKE_UTILS_HEADER
 
+#include "../uvkepch.hpp"
+
 namespace uvke {
     namespace priv {
         inline static const float PI = 3.141592653f;

@@ -1,11 +1,13 @@
 - shared ptr to unique ptr
+- fix issue with closing window
 - add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
 - add scene class
-- fix mat4x4 rotate ( and other mathematic functions to just work )
+- add 3d support because why not
 - job manager class ( job queue and job priorities )
 - add multi threading support
 - add audio support
 - asset manager class
+- add smid and avx support in math lib
 - own file format for textures, audio, etc
 - reimplement stb_image with own library
 - reimplement audio with own library

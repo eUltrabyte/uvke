@@ -84,7 +84,8 @@ namespace uvke {
         std::shared_ptr<Camera> m_camera;
         Clock m_clock;
         Clock m_frameClock;
-        int m_fps;
+        float m_deltaTime;
+        unsigned int m_fps;
 
     };
 };

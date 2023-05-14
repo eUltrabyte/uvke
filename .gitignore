@@ -16,4 +16,5 @@ output/
 cmake-build-debug/
 cmake-build-release/
 
-compile_commands.json
+.clangd
+justfile

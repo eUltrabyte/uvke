@@ -11,6 +11,7 @@ namespace uvke {
     enum UVKE_API Projection {
         Orthographic = 0,
         Perspectivic = 1,
+        Frustumic = 2,
     };
 
     class UVKE_API Camera {

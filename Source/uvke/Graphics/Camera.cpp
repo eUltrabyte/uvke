@@ -14,6 +14,10 @@ namespace uvke {
                 m_ubo.projection = Perspective<float>(Radians(45.0f), size.x / size.y, 0.1f, 1000.0f);
                 m_ubo.projection.data[1][1] *= -1;
             } break;
+
+            case Projection::Frustumic: {
+                m_ubo.projection = Frustum<float>(-size.x, size.x, size.y, -size.y, -150.0f, 100.0f);
+            } break;
         }
     }
 

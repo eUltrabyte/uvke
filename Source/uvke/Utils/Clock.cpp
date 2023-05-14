@@ -15,6 +15,10 @@ namespace uvke {
     std::chrono::time_point<std::chrono::steady_clock> Clock::GetStart() {
         return m_start;
     }
+
+    std::chrono::milliseconds Clock::GetElapsedTime() {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_start);
+    }
     
     std::time_t Clock::GetTime() {
         return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
