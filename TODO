@@ -1,4 +1,5 @@
 - shared ptr to unique ptr
+- fix issue with closing window
 - add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
 - add scene class
 - add 3d support because why not

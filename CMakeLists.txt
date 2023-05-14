@@ -167,6 +167,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME
 file(COPY Resource/ DESTINATION Resource/)
 
 if(UVKE_EXAMPLES)
-    add_subdirectory(Examples/App)
-    file(COPY Resource/ DESTINATION Examples/App/Resource/)
+    add_subdirectory(Examples/ExampleApp)
+    file(COPY Resource/ DESTINATION Examples/ExampleApp/Resource/)
 endif()
