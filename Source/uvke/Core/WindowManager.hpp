@@ -11,12 +11,6 @@ namespace uvke {
         WindowManager();
         virtual ~WindowManager();
 
-        virtual void Push(std::shared_ptr<Window> window);
-        virtual void Erase();
-
-    private:
-        std::vector<std::shared_ptr<Window>> m_windows;
-
     };
 };
 
