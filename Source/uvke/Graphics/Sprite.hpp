@@ -21,8 +21,8 @@ namespace uvke {
         virtual void Update(std::shared_ptr<Camera> camera) override;
         virtual void Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) override;
 
-        virtual void SetPosition(const vec2f& position);
-        virtual void SetScale(const vec2f& scale);
+        virtual void SetPosition(const vec3f& position);
+        virtual void SetScale(const vec3f& scale);
         virtual void SetRotation(float angle);
         virtual void SetVertices(const std::vector<Vertex>& vertices);
         virtual void SetIndices(const std::vector<unsigned int>& indices);

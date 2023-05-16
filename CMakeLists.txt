@@ -67,6 +67,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Descriptor.cpp
     Source/uvke/Graphics/UniformBuffer.hpp
     Source/uvke/Graphics/UniformBuffer.cpp
+    Source/uvke/Graphics/DepthBuffer.hpp
+    Source/uvke/Graphics/DepthBuffer.cpp
     Source/uvke/Graphics/Pipeline.hpp
     Source/uvke/Graphics/Pipeline.cpp
     Source/uvke/Graphics/Framebuffer.hpp

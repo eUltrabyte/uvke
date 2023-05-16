@@ -57,12 +57,12 @@ namespace uvke {
         vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
     }
 
-    void Sprite::SetPosition(const vec2f& position) {
-        m_model = Translate<float>(m_model, vec3f(position.x, position.y, 0.0f));
+    void Sprite::SetPosition(const vec3f& position) {
+        m_model = Translate<float>(m_model, vec3f(position.x, position.y, position.z));
     }
 
-    void Sprite::SetScale(const vec2f& scale) {
-        m_model = Scale<float>(m_model, vec3f(scale.x, scale.y, 1.0f));
+    void Sprite::SetScale(const vec3f& scale) {
+        m_model = Scale<float>(m_model, vec3f(scale.x, scale.y, scale.z));
     }
 
     void Sprite::SetRotation(float angle) {

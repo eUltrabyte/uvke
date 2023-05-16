@@ -1,4 +1,5 @@
 #pragma once
+#include <vulkan/vulkan_core.h>
 #ifndef UVKE_BASE_HEADER
 #define UVKE_BASE_HEADER
 
@@ -17,9 +18,12 @@ namespace uvke {
         virtual VkInstance& GetInstance();
         virtual VkPhysicalDevice& GetPhysicalDevice();
         virtual VkDevice& GetDevice();
+        virtual VkFormat GetDepthFormat();
+        virtual VkSampleCountFlagBits GetMaxSampleCount();
         virtual unsigned int GetQueueFamily();
         virtual unsigned int GetQueueCount();
         virtual bool IsMultiQueueSupported();
+        virtual bool HasStencilComponent();
 
     private:
         VkPhysicalDevice GetSuitablePhysicalDevice() {
@@ -38,12 +42,48 @@ namespace uvke {
                 vkGetPhysicalDeviceProperties(physicalDevices[i], &physicalDevicesProperties[i]);
                 vkGetPhysicalDeviceFeatures(physicalDevices[i], &physicalDevicesFeatures[i]);
 
-                if(physicalDevicesProperties.at(i).deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && physicalDevicesFeatures.at(i).geometryShader == VK_TRUE) {
-                    UVKE_LOG("GPU - " + std::string(physicalDevicesProperties.at(i).deviceName));
+                if(physicalDevicesProperties[i].deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && physicalDevicesFeatures[i].geometryShader == VK_TRUE) {
+                    std::vector<VkFormat> depthFormats = {
+                        VK_FORMAT_D32_SFLOAT,
+                        VK_FORMAT_D32_SFLOAT_S8_UINT,
+                        VK_FORMAT_D24_UNORM_S8_UINT
+                    };
+
+                    for(auto j = 0; j < depthFormats.size(); ++j) {
+                        VkFormatProperties formatProperties;
+                        vkGetPhysicalDeviceFormatProperties(physicalDevices[i], depthFormats[j], &formatProperties);
+
+                        if(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+                            m_depthFormat = depthFormats[j];
+                            break;
+                        }
+
+                        UVKE_FATAL("Supported Format Not Found!");
+                    }
+                    
+                    VkSampleCountFlags sampleCount = physicalDevicesProperties[i].limits.framebufferColorSampleCounts & physicalDevicesProperties[i].limits.framebufferDepthSampleCounts;
+                    if(sampleCount & VK_SAMPLE_COUNT_64_BIT) {
+                        m_sampleCount = VK_SAMPLE_COUNT_64_BIT;
+                    } else if(sampleCount & VK_SAMPLE_COUNT_32_BIT) {
+                        m_sampleCount = VK_SAMPLE_COUNT_32_BIT;
+                    } else if(sampleCount & VK_SAMPLE_COUNT_16_BIT) {
+                        m_sampleCount = VK_SAMPLE_COUNT_16_BIT;
+                    } else if(sampleCount & VK_SAMPLE_COUNT_8_BIT) {
+                        m_sampleCount = VK_SAMPLE_COUNT_8_BIT;
+                    } else if(sampleCount & VK_SAMPLE_COUNT_4_BIT) {
+                        m_sampleCount = VK_SAMPLE_COUNT_4_BIT;
+                    } else if(sampleCount & VK_SAMPLE_COUNT_2_BIT) {
+                        m_sampleCount = VK_SAMPLE_COUNT_2_BIT;
+                    } else {
+                        m_sampleCount = VK_SAMPLE_COUNT_1_BIT;
+                    }
+                    
+                    UVKE_LOG("GPU - " + std::string(physicalDevicesProperties[i].deviceName));
                     return physicalDevices[i];
                 }
             }
 
+            m_sampleCount = VK_SAMPLE_COUNT_1_BIT;
             return physicalDevices[0];
         }
 
@@ -57,8 +97,8 @@ namespace uvke {
             }
 
             for(auto i = 0; i < queueFamilyProperties.size(); ++i) {
-                if(queueFamilyProperties.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-                    m_queueCount = queueFamilyProperties.at(i).queueCount;
+                if(queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                    m_queueCount = queueFamilyProperties[i].queueCount;
                     if(m_queueCount > 1) {
                         m_multiQueue = true;
                     } else {
@@ -75,6 +115,8 @@ namespace uvke {
         VkInstance m_instance;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
+        VkFormat m_depthFormat;
+        VkSampleCountFlagBits m_sampleCount;
         unsigned int m_queueFamilyIndex;
         unsigned int m_queueCount;
         bool m_multiQueue;

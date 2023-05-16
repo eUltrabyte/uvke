@@ -1,4 +1,5 @@
 #include "Base.hpp"
+#include <vulkan/vulkan_core.h>
 
 namespace uvke {
     Base::Base(std::string_view name) {
@@ -124,6 +125,14 @@ namespace uvke {
         return m_device;
     }
 
+    VkFormat Base::GetDepthFormat() {
+        return m_depthFormat;
+    }
+
+    VkSampleCountFlagBits Base::GetMaxSampleCount() {
+        return m_sampleCount;
+    }
+
     unsigned int Base::GetQueueFamily() {
         return m_queueFamilyIndex;
     }
@@ -134,5 +143,9 @@ namespace uvke {
     
     bool Base::IsMultiQueueSupported() {
         return m_multiQueue;
+    }
+
+    bool Base::HasStencilComponent() {
+        return m_depthFormat == VK_FORMAT_D32_SFLOAT || m_depthFormat == VK_FORMAT_D24_UNORM_S8_UINT;
     }
 };

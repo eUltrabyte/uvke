@@ -1,8 +1,7 @@
 - shared ptr to unique ptr
-- fix alpha channel
-- fix issue with closing window
 - add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
-- antialiasing support
+- add antialiasing support
+- add depth buffer
 - add scene class
 - add 3d support because why not
 - job manager class ( job queue and job priorities )
