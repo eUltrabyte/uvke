@@ -1,4 +1,5 @@
 #include "Renderer.hpp"
+#include <memory>
 
 namespace uvke {
     Renderer::Renderer(std::shared_ptr<Base> base, std::shared_ptr<Window> window)
@@ -28,6 +29,10 @@ namespace uvke {
 
         m_stagingBuffer.reset();
 
+        m_depthBuffer = std::make_shared<DepthBuffer>(m_base, m_surface);
+        
+        m_depthBuffer->LayoutTransition(m_commandBuffer, m_surface->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+
         m_sampler = std::make_shared<Sampler>(m_base, m_texture);
         m_descriptor = std::make_shared<Descriptor>(m_base);
 
@@ -37,7 +42,7 @@ namespace uvke {
 
         m_pipeline = std::make_shared<Pipeline>(m_base, m_surface, m_vertexBuffer, m_descriptor);
 
-        m_framebuffer = std::make_shared<Framebuffer>(m_base, m_pipeline->GetRenderPass(), m_swapchain, m_surface);
+        m_framebuffer = std::make_shared<Framebuffer>(m_base, m_pipeline->GetRenderPass(), m_swapchain, m_surface, m_depthBuffer);
 
         m_syncManager = std::make_shared<SyncManager>(m_base);
 

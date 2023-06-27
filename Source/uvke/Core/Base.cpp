@@ -86,6 +86,8 @@ namespace uvke {
             UVKE_ASSERT(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device));
         }
 
+        FindDepthFormat(VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+
         UVKE_LOG("Base Created");
     }
 
@@ -99,6 +101,28 @@ namespace uvke {
         }
 
         UVKE_LOG("Base Destroyed");
+    }
+
+    void Base::FindDepthFormat(VkImageTiling tiling, VkFormatFeatureFlags features) {
+        std::vector<VkFormat> depthFormats = {
+            VK_FORMAT_D32_SFLOAT_S8_UINT,
+            VK_FORMAT_D24_UNORM_S8_UINT
+        };
+
+        for(auto i = 0; i < depthFormats.size(); ++i) {
+            VkFormatProperties formatProperties;
+            vkGetPhysicalDeviceFormatProperties(m_physicalDevice, depthFormats[i], &formatProperties);
+
+            if(tiling == VK_IMAGE_TILING_LINEAR && (formatProperties.linearTilingFeatures & features) == features) {
+                m_depthFormat = depthFormats[i];
+                break;
+            } else if(tiling == VK_IMAGE_TILING_OPTIMAL && (formatProperties.optimalTilingFeatures & features) == features) {
+                m_depthFormat = depthFormats[i];
+                break;
+            }
+
+            UVKE_FATAL("Supported Format Not Found!");
+        }
     }
     
     void Base::SetInstance(VkInstance instance) {
@@ -127,10 +151,6 @@ namespace uvke {
 
     VkFormat Base::GetDepthFormat() {
         return m_depthFormat;
-    }
-
-    VkSampleCountFlagBits Base::GetMaxSampleCount() {
-        return m_sampleCount;
     }
 
     unsigned int Base::GetQueueFamily() {

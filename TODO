@@ -2,6 +2,7 @@
 - add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
 - add antialiasing support
 - add depth buffer
+- add image class ( for imageviews and images )
 - add scene class
 - add 3d support because why not
 - job manager class ( job queue and job priorities )

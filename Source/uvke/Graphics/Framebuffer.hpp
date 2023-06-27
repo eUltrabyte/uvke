@@ -6,11 +6,12 @@
 #include "../Core/Base.hpp"
 #include "Surface.hpp"
 #include "Swapchain.hpp"
+#include "DepthBuffer.hpp"
 
 namespace uvke {
     class UVKE_API Framebuffer {
     public:
-        Framebuffer(std::shared_ptr<Base> base = nullptr, VkRenderPass renderPass = nullptr, std::shared_ptr<Swapchain> swapchain = nullptr, std::shared_ptr<Surface> surface = nullptr);
+        Framebuffer(std::shared_ptr<Base> base = nullptr, VkRenderPass renderPass = nullptr, std::shared_ptr<Swapchain> swapchain = nullptr, std::shared_ptr<Surface> surface = nullptr, std::shared_ptr<DepthBuffer> depthBuffer = nullptr);
         virtual ~Framebuffer();
 
         virtual void Recreate();
@@ -31,6 +32,7 @@ namespace uvke {
         std::shared_ptr<Base> m_base;
         std::shared_ptr<Surface> m_surface;
         std::shared_ptr<Swapchain> m_swapchain;
+        std::shared_ptr<DepthBuffer> m_depthBuffer;
         VkRenderPass m_renderPass;
 
     private:

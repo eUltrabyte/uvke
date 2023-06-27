@@ -24,7 +24,7 @@ public:
         m_renderer->Push(std::make_shared<uvke::Sprite>(sprite));
 
         uvke::Sprite sprite1({ 0.2f, 0.15f });
-        sprite1.SetPosition({ 0.0f, 0.0f, 0.0f });
+        sprite1.SetPosition({ 0.0f, 0.0f, -1.0f });
         sprite1.SetRotation(0.0f);
         sprite1.Create(m_renderer);
         m_renderer->Push(std::make_shared<uvke::Sprite>(sprite1));

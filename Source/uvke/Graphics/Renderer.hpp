@@ -16,6 +16,7 @@
 #include "Framebuffer.hpp"
 #include "CommandBuffer.hpp"
 #include "Texture.hpp"
+#include "DepthBuffer.hpp"
 #include "Sampler.hpp"
 #include "SyncManager.hpp"
 #include "Interface.hpp"
@@ -77,6 +78,7 @@ namespace uvke {
         std::shared_ptr<Framebuffer> m_framebuffer;
         std::shared_ptr<CommandBuffer> m_commandBuffer;
         std::shared_ptr<Texture> m_texture;
+        std::shared_ptr<DepthBuffer> m_depthBuffer;
         std::shared_ptr<Sampler> m_sampler;
         std::shared_ptr<SyncManager> m_syncManager;
         std::shared_ptr<Interface> m_interface;

@@ -1,18 +1,23 @@
 #include "Framebuffer.hpp"
 
 namespace uvke {
-    Framebuffer::Framebuffer(std::shared_ptr<Base> base, VkRenderPass renderPass, std::shared_ptr<Swapchain> swapchain, std::shared_ptr<Surface> surface)
-        : m_base(base), m_renderPass(renderPass), m_swapchain(swapchain), m_surface(surface) {
+    Framebuffer::Framebuffer(std::shared_ptr<Base> base, VkRenderPass renderPass, std::shared_ptr<Swapchain> swapchain, std::shared_ptr<Surface> surface, std::shared_ptr<DepthBuffer> depthBuffer)
+        : m_base(base), m_renderPass(renderPass), m_swapchain(swapchain), m_surface(surface), m_depthBuffer(depthBuffer) {
         m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
 
         for(auto i = 0; i < m_framebuffers.size(); ++i) {
+            std::array<VkImageView, 2> imageViews = {
+                m_swapchain->GetImageView(i),
+                m_depthBuffer->GetImageView()
+            };
+
             VkFramebufferCreateInfo framebufferCreateInfo { };
             framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferCreateInfo.pNext = nullptr;
             framebufferCreateInfo.flags = 0;
             framebufferCreateInfo.renderPass = m_renderPass;
-            framebufferCreateInfo.attachmentCount = 1;
-            framebufferCreateInfo.pAttachments = &m_swapchain->GetImageView(i);
+            framebufferCreateInfo.attachmentCount = imageViews.size();
+            framebufferCreateInfo.pAttachments = imageViews.data();
             framebufferCreateInfo.width = m_surface->GetExtent().width;
             framebufferCreateInfo.height = m_surface->GetExtent().height;
             framebufferCreateInfo.layers = 1;
@@ -43,13 +48,18 @@ namespace uvke {
         m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
 
         for(auto i = 0; i < m_framebuffers.size(); ++i) {
+            std::array<VkImageView, 2> imageViews = {
+                m_swapchain->GetImageView(i),
+                m_depthBuffer->GetImageView()
+            };
+
             VkFramebufferCreateInfo framebufferCreateInfo { };
             framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferCreateInfo.pNext = nullptr;
             framebufferCreateInfo.flags = 0;
             framebufferCreateInfo.renderPass = m_renderPass;
-            framebufferCreateInfo.attachmentCount = 1;
-            framebufferCreateInfo.pAttachments = &m_swapchain->GetImageView(i);
+            framebufferCreateInfo.attachmentCount = imageViews.size();
+            framebufferCreateInfo.pAttachments = imageViews.data();
             framebufferCreateInfo.width = m_surface->GetExtent().width;
             framebufferCreateInfo.height = m_surface->GetExtent().height;
             framebufferCreateInfo.layers = 1;
