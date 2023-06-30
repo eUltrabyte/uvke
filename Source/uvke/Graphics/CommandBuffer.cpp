@@ -1,7 +1,7 @@
 #include "CommandBuffer.hpp"
 
 namespace uvke {
-    CommandBuffer::CommandBuffer(std::shared_ptr<Base> base)
+    CommandBuffer::CommandBuffer(Base* base)
         : m_base(base) {
         {
             m_commandBuffers.resize(2);
@@ -76,7 +76,7 @@ namespace uvke {
         vkFreeCommandBuffers(m_base->GetDevice(), m_commandPool, 1, &commandBuffer);
     }
 
-    void CommandBuffer::SetBase(std::shared_ptr<Base> base) {
+    void CommandBuffer::SetBase(Base* base) {
         m_base = base;
     }
     
@@ -86,10 +86,6 @@ namespace uvke {
     
     void CommandBuffer::SetCommandBuffers(std::vector<VkCommandBuffer> commandBuffers) {
         m_commandBuffers = commandBuffers;
-    }
-
-    std::shared_ptr<Base>& CommandBuffer::GetBase() {
-        return m_base;
     }
     
     VkCommandPool& CommandBuffer::GetCommandPool() {

@@ -8,20 +8,19 @@
 namespace uvke {
     class UVKE_API Shader {
     public:
-        Shader(std::shared_ptr<Base> base = nullptr, std::vector<char> vertexCode = std::vector<char>(0), std::vector<char> fragmentCode = std::vector<char>(0));
-        Shader(std::shared_ptr<Base> base = nullptr, File vertexFile = File(0), File fragmentFile = File(0));
+        Shader(Base* base = nullptr, std::vector<char> vertexCode = std::vector<char>(0), std::vector<char> fragmentCode = std::vector<char>(0));
+        Shader(Base* base = nullptr, File vertexFile = File(0), File fragmentFile = File(0));
         virtual ~Shader();
 
-        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetBase(Base* base);
 
-        virtual std::shared_ptr<Base> GetBase();
         virtual VkShaderModule GetVertexShader();
         virtual VkShaderModule GetFragmentShader();
         virtual VkPipelineShaderStageCreateInfo* GetVertexShaderStageCreateInfo();
         virtual VkPipelineShaderStageCreateInfo* GetFragmentShaderStageCreateInfo();
 
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         VkShaderModule CreateShaderModule(std::vector<char> code) {

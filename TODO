@@ -1,4 +1,4 @@
-- shared ptr to unique ptr
+- fix some issues with descriptor pool
 - add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
 - add antialiasing support
 - add depth buffer

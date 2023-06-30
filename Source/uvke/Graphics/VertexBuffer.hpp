@@ -14,14 +14,13 @@ namespace uvke {
 
     class UVKE_API VertexBuffer {
     public:
-        VertexBuffer(std::shared_ptr<Base> base = nullptr, std::vector<Vertex> vertices = std::vector<Vertex>(0));
+        VertexBuffer(Base* base = nullptr, std::vector<Vertex> vertices = std::vector<Vertex>(0));
         virtual ~VertexBuffer();
 
         virtual void Bind(VkCommandBuffer commandBuffer);
 
-        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetBase(Base* base);
 
-        virtual std::shared_ptr<Base> GetBase();
         virtual std::vector<Vertex>& GetVertices();
         virtual VkVertexInputBindingDescription& GetVertexInputBindingDescription();
         virtual std::array<VkVertexInputAttributeDescription, 3>& GetVertexInputAttributeDescription();
@@ -30,7 +29,7 @@ namespace uvke {
         virtual VkDeviceMemory& GetBufferMemory();
 
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         std::vector<Vertex> m_vertices;

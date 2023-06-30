@@ -10,17 +10,17 @@
 namespace uvke {
     class UVKE_API DepthBuffer {
     public:
-        DepthBuffer(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Surface> surface = nullptr);
+        DepthBuffer(Base* base = nullptr, Surface* surface = nullptr);
         virtual ~DepthBuffer();
 
-        virtual void LayoutTransition(std::shared_ptr<CommandBuffer> commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout);
+        virtual void LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout);
 
         virtual VkImage& GetImage();
         virtual VkDeviceMemory& GetImageMemory();
         virtual VkImageView& GetImageView();
 
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         VkImage m_image;

@@ -17,22 +17,21 @@ namespace uvke {
 
     class UVKE_API UniformBuffer {
     public:
-        UniformBuffer(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Sampler> sampler = nullptr, std::shared_ptr<Descriptor> descriptor = nullptr);
+        UniformBuffer(Base* base = nullptr, Sampler* sampler = nullptr, Descriptor* descriptor = nullptr);
         virtual ~UniformBuffer();
 
         virtual void Update(const UniformBufferObject& ubo);
         virtual void Bind(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame);
 
-        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetBase(Base* base);
 
-        virtual std::shared_ptr<Base> GetBase();
         virtual VkDescriptorPool& GetDescriptorPool();
         virtual std::vector<VkDescriptorSet>& GetDescriptorSets();
         virtual unsigned int GetSize();
         virtual VkBuffer& GetBuffer();
 
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         VkDescriptorPool m_descriptorPool;

@@ -14,8 +14,8 @@ namespace uvke {
         Renderable() = default;
         virtual ~Renderable() = default;
 
-        virtual void Create(std::shared_ptr<Renderer> renderer) = 0;
-        virtual void Update(std::shared_ptr<Camera> camera) = 0;
+        virtual void Create(Renderer* renderer) = 0;
+        virtual void Update(Camera* camera) = 0;
         virtual void Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) = 0;
 
     };

@@ -19,8 +19,8 @@ namespace uvke {
         Camera(const Projection& projection = Projection::Orthographic, const vec2f& size = { 1.0f, 1.0f });
         virtual ~Camera() = default;
 
-        virtual void Update(std::shared_ptr<UniformBuffer> uniformBuffer);
-        virtual void Move(std::shared_ptr<Window> window, const vec2f& speed);
+        virtual void Update(UniformBuffer* uniformBuffer);
+        virtual void Move(Window* window, const vec2f& speed);
 
         virtual void SetModel(const mat4x4f& model);
         virtual void SetView(const mat4x4f& view);

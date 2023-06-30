@@ -8,7 +8,7 @@
 namespace uvke {
     class UVKE_API SyncManager {
     public:
-        SyncManager(std::shared_ptr<Base> base = nullptr);
+        SyncManager(Base* base = nullptr);
         virtual ~SyncManager();
 
         virtual void Update();
@@ -19,14 +19,13 @@ namespace uvke {
         virtual void WaitForFence(unsigned int index);
         virtual void ResetFence(unsigned int index);
 
-        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetBase(Base* base);
         virtual void SetFrame(unsigned int frame);
         virtual void SetSize(unsigned int size);
         virtual void SetAvailableSemaphores(std::vector<VkSemaphore> semaphores);
         virtual void SetFinishedSemaphores(std::vector<VkSemaphore> semaphores);
         virtual void SetFences(std::vector<VkFence> fences);
 
-        virtual std::shared_ptr<Base> GetBase();
         virtual unsigned int& GetFrame();
         virtual unsigned int& GetSize();
         virtual std::vector<VkSemaphore>& GetAvailableSemaphores();
@@ -37,7 +36,7 @@ namespace uvke {
         virtual VkFence& GetFence(unsigned int index);
 
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         unsigned int m_frame;

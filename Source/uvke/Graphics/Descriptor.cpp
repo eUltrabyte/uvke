@@ -1,7 +1,7 @@
 #include "Descriptor.hpp"
 
 namespace uvke {
-    Descriptor::Descriptor(std::shared_ptr<Base> base)
+    Descriptor::Descriptor(Base* base)
         : m_base(base) {
         {
             VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = { };
@@ -43,12 +43,8 @@ namespace uvke {
         UVKE_LOG("Descriptor Destroyed");
     }
 
-    void Descriptor::SetBase(std::shared_ptr<Base> base) {
+    void Descriptor::SetBase(Base* base) {
         m_base = base;
-    }
-
-    std::shared_ptr<Base> Descriptor::GetBase() {
-        return m_base;
     }
 
     std::array<VkDescriptorSetLayoutBinding, 2>& Descriptor::GetDescriptorSetLayoutBindings() {

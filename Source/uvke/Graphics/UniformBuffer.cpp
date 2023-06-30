@@ -1,7 +1,7 @@
 #include "UniformBuffer.hpp"
 
 namespace uvke {
-    UniformBuffer::UniformBuffer(std::shared_ptr<Base> base, std::shared_ptr<Sampler> sampler, std::shared_ptr<Descriptor> descriptor)
+    UniformBuffer::UniformBuffer(Base* base, Sampler* sampler, Descriptor* descriptor)
         : m_base(base) {
         {
             VkBufferCreateInfo bufferCreateInfo = { };
@@ -140,12 +140,8 @@ namespace uvke {
         vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &m_descriptorSets[frame], 0, nullptr);
     }
 
-    void UniformBuffer::SetBase(std::shared_ptr<Base> base) {
+    void UniformBuffer::SetBase(Base* base) {
         m_base = base;
-    }
-
-    std::shared_ptr<Base> UniformBuffer::GetBase() {
-        return m_base;
     }
 
     VkDescriptorPool& UniformBuffer::GetDescriptorPool() {

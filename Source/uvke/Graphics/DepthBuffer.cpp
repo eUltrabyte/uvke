@@ -1,7 +1,7 @@
 #include "DepthBuffer.hpp"
 
 namespace uvke {
-    DepthBuffer::DepthBuffer(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface)
+    DepthBuffer::DepthBuffer(Base* base, Surface* surface)
         : m_base(base) {
         VkImageCreateInfo imageCreateInfo { };
         imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -72,7 +72,7 @@ namespace uvke {
         }
     }
 
-    void DepthBuffer::LayoutTransition(std::shared_ptr<CommandBuffer> commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout) {
+    void DepthBuffer::LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout) {
         VkCommandBuffer buffer = commandBuffer->Begin();
 
         VkImageMemoryBarrier imageMemoryBarrier { };

@@ -10,19 +10,17 @@
 namespace uvke {
     class UVKE_API Swapchain {
     public:
-        Swapchain(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Surface> surface = nullptr);
+        Swapchain(Base* base = nullptr, Surface* surface = nullptr);
         virtual ~Swapchain();
 
-        virtual void Recreate(std::shared_ptr<Window> window, VkRenderPass renderPass);
+        virtual void Recreate(Window* window, VkRenderPass renderPass);
 
-        virtual void SetBase(std::shared_ptr<Base> base);
-        virtual void SetSurface(std::shared_ptr<Surface> surface);
+        virtual void SetBase(Base* base);
+        virtual void SetSurface(Surface* surface);
         virtual void SetImageCount(unsigned int count);
         virtual void SetImages(const std::vector<VkImage>& images);
         virtual void SetImageViews(const std::vector<VkImageView>& imageViews);
 
-        virtual std::shared_ptr<Base> GetBase();
-        virtual std::shared_ptr<Surface> GetSurface();
         virtual unsigned int& GetImageCount();
         virtual VkSwapchainKHR& GetSwapchain();
         virtual std::vector<VkImage>& GetImages();
@@ -32,8 +30,8 @@ namespace uvke {
         virtual bool& IsRecreated();
 
     protected:
-        std::shared_ptr<Base> m_base;
-        std::shared_ptr<Surface> m_surface;
+        Base* m_base;
+        Surface* m_surface;
 
     private:
         unsigned int m_imageCount;

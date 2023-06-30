@@ -1,7 +1,7 @@
 #include "StagingBuffer.hpp"
 
 namespace uvke {
-    StagingBuffer::StagingBuffer(std::shared_ptr<Base> base, unsigned int size)
+    StagingBuffer::StagingBuffer(Base* base, unsigned int size)
         : m_base(base), m_size(size) {
         {
             VkBufferCreateInfo bufferCreateInfo = { };
@@ -107,12 +107,8 @@ namespace uvke {
         vkFreeCommandBuffers(m_base->GetDevice(), commandPool, 1, &commandBuffer);
     }
 
-    void StagingBuffer::SetBase(std::shared_ptr<Base> base) {
+    void StagingBuffer::SetBase(Base* base) {
         m_base = base;
-    }
-
-    std::shared_ptr<Base> StagingBuffer::GetBase() {
-        return m_base;
     }
     
     VkBuffer& StagingBuffer::GetBuffer() {

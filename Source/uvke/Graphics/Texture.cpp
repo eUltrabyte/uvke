@@ -4,7 +4,7 @@
 #include <stb/stb_image.h>
 
 namespace uvke {
-    Texture::Texture(std::shared_ptr<Base> base, std::string_view filename)
+    Texture::Texture(Base* base, std::string_view filename)
         : m_base(base) {
         vec2i size = { 0, 0 };
         m_pixels = stbi_load(filename.data(), &size.x, &size.y, &m_channel, STBI_rgb_alpha);
@@ -72,7 +72,7 @@ namespace uvke {
         UVKE_LOG("Texture Allocated");
     }
 
-    void Texture::LayoutTransition(std::shared_ptr<CommandBuffer> commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout) {
+    void Texture::LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout) {
         VkCommandBuffer buffer = commandBuffer->Begin();
 
         VkImageMemoryBarrier imageMemoryBarrier { };
@@ -113,7 +113,7 @@ namespace uvke {
         commandBuffer->End(buffer, queue);
     }
 
-    void Texture::CopyFromBuffer(std::shared_ptr<CommandBuffer> commandBuffer, VkQueue queue, VkBuffer source) {
+    void Texture::CopyFromBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer source) {
         VkCommandBuffer buffer = commandBuffer->Begin();
 
         VkBufferImageCopy bufferImageCopy { };
@@ -132,7 +132,7 @@ namespace uvke {
         commandBuffer->End(buffer, queue);
     }
 
-    void Texture::CopyToBuffer(std::shared_ptr<CommandBuffer> commandBuffer, VkQueue queue, VkBuffer destination) {
+    void Texture::CopyToBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer destination) {
         VkCommandBuffer buffer = commandBuffer->Begin();
 
         VkBufferImageCopy bufferImageCopy { };
@@ -151,7 +151,7 @@ namespace uvke {
         commandBuffer->End(buffer, queue);
     }
     
-    void Texture::SetBase(std::shared_ptr<Base> base) {
+    void Texture::SetBase(Base* base) {
         m_base = base;
     }
     
@@ -173,10 +173,6 @@ namespace uvke {
     
     void Texture::SetImageMemory(VkDeviceMemory imageMemory) {
         m_imageMemory = imageMemory;
-    }
-    
-    std::shared_ptr<Base> Texture::GetBase() {
-        return m_base;
     }
     
     vec2u& Texture::GetSize() {

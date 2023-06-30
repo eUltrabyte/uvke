@@ -8,23 +8,22 @@
 namespace uvke {
     class UVKE_API CommandBuffer {
     public:
-        CommandBuffer(std::shared_ptr<Base> base = nullptr);
+        CommandBuffer(Base* base = nullptr);
         virtual ~CommandBuffer();
 
         virtual VkCommandBuffer Begin();
         virtual void End(VkCommandBuffer commandBuffer, VkQueue queue);
 
-        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetBase(Base* base);
         virtual void SetCommandPool(VkCommandPool commandPool);
         virtual void SetCommandBuffers(std::vector<VkCommandBuffer> commandBuffers);
 
-        virtual std::shared_ptr<Base>& GetBase();
         virtual VkCommandPool& GetCommandPool();
         virtual std::vector<VkCommandBuffer>& GetCommandBuffers();
         virtual VkCommandBuffer& GetCommandBuffer(unsigned int index);
 
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         VkCommandPool m_commandPool;

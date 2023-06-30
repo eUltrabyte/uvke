@@ -9,21 +9,20 @@
 namespace uvke {
     class UVKE_API Surface {
     public:
-        Surface(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Window> window = nullptr);
+        Surface(Base* base = nullptr, Window* window = nullptr);
         virtual ~Surface();
 
         virtual void CheckQueues();
 
-        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetBase(Base* base);
         virtual void SetQueueFamily(unsigned int queueFamilyIndex);
         virtual void SetMultiQueueMode(bool multiQueue);
         virtual void SetSurface(VkSurfaceKHR surface);
         virtual void SetSurfaceFormat(VkSurfaceFormatKHR surfaceFormat);
         virtual void SetPresentMode(VkPresentModeKHR presentMode);
         virtual void SetExtent(VkExtent2D extent);
-        virtual void SetSwapExtent(std::shared_ptr<Window> window);
+        virtual void SetSwapExtent(Window* window);
 
-        virtual std::shared_ptr<Base> GetBase();
         virtual unsigned int GetQueueFamily();
         virtual bool IsMultiQueueMode();
         virtual std::vector<VkQueue>& GetQueues();
@@ -35,7 +34,7 @@ namespace uvke {
         virtual VkSurfaceCapabilitiesKHR& GetCapabilities();
         
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         VkSurfaceFormatKHR GetSuitableSurfaceFormat() {

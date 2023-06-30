@@ -1,7 +1,7 @@
 #include "VertexBuffer.hpp"
 
 namespace uvke {
-    VertexBuffer::VertexBuffer(std::shared_ptr<Base> base, std::vector<Vertex> vertices)
+    VertexBuffer::VertexBuffer(Base* base, std::vector<Vertex> vertices)
         : m_base(base), m_vertices(vertices) {
         {
             m_vertexInputBindingDescription = { };
@@ -86,12 +86,8 @@ namespace uvke {
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, &m_buffer, offsets);
     }
 
-    void VertexBuffer::SetBase(std::shared_ptr<Base> base) {
+    void VertexBuffer::SetBase(Base* base) {
         m_base = base;
-    }
-
-    std::shared_ptr<Base> VertexBuffer::GetBase() {
-        return m_base;
     }
 
     std::vector<Vertex>& VertexBuffer::GetVertices() {

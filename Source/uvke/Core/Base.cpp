@@ -92,6 +92,8 @@ namespace uvke {
     }
 
     Base::~Base() {
+        vkDeviceWaitIdle(m_device);
+
         if(m_device != VK_NULL_HANDLE) {
             vkDestroyDevice(m_device, nullptr);
         }
@@ -105,6 +107,7 @@ namespace uvke {
 
     void Base::FindDepthFormat(VkImageTiling tiling, VkFormatFeatureFlags features) {
         std::vector<VkFormat> depthFormats = {
+            VK_FORMAT_D32_SFLOAT,
             VK_FORMAT_D32_SFLOAT_S8_UINT,
             VK_FORMAT_D24_UNORM_S8_UINT
         };
@@ -166,6 +169,6 @@ namespace uvke {
     }
 
     bool Base::HasStencilComponent() {
-        return m_depthFormat == VK_FORMAT_D32_SFLOAT || m_depthFormat == VK_FORMAT_D24_UNORM_S8_UINT;
+        return m_depthFormat == VK_FORMAT_D32_SFLOAT_S8_UINT || m_depthFormat == VK_FORMAT_D24_UNORM_S8_UINT;
     }
 };

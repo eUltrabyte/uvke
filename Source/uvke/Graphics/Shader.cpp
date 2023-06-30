@@ -1,7 +1,7 @@
 #include "Shader.hpp"
 
 namespace uvke {
-    Shader::Shader(std::shared_ptr<Base> base, std::vector<char> vertexCode, std::vector<char> fragmentCode)
+    Shader::Shader(Base* base, std::vector<char> vertexCode, std::vector<char> fragmentCode)
         : m_base(base) {
         m_vertexShader = CreateShaderModule(vertexCode);
         m_fragmentShader = CreateShaderModule(fragmentCode);
@@ -25,7 +25,7 @@ namespace uvke {
         m_fragmentShaderStageCreateInfo.pSpecializationInfo = nullptr;
     }
 
-    Shader::Shader(std::shared_ptr<Base> base, File vertexFile, File fragmentFile)
+    Shader::Shader(Base* base, File vertexFile, File fragmentFile)
         : m_base(base) {
         m_vertexShader = CreateShaderModule(vertexFile.GetData());
         m_fragmentShader = CreateShaderModule(fragmentFile.GetData());
@@ -65,12 +65,8 @@ namespace uvke {
         UVKE_LOG("Shaders Destroyed");
     }
 
-    void Shader::SetBase(std::shared_ptr<Base> base) {
+    void Shader::SetBase(Base* base) {
         m_base = base;
-    }
-
-    std::shared_ptr<Base> Shader::GetBase() {
-        return m_base;
     }
 
     VkShaderModule Shader::GetVertexShader() {

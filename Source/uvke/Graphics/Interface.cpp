@@ -1,8 +1,8 @@
 #include "Interface.hpp"
 
 namespace uvke {
-Interface::Interface(std::shared_ptr<Base> base, std::shared_ptr<Window> window, std::shared_ptr<Surface> surface, std::shared_ptr<CommandBuffer> commandBuffer, VkRenderPass renderPass)
-    : m_base(base), m_renderTime(0.0f) {
+    Interface::Interface(Base* base, Window* window, Surface* surface, CommandBuffer* commandBuffer, VkRenderPass renderPass)
+        : m_base(base), m_renderTime(0.0f), m_fps(0) {
         std::vector<VkDescriptorPoolSize> poolSizes = {
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
@@ -61,7 +61,7 @@ Interface::Interface(std::shared_ptr<Base> base, std::shared_ptr<Window> window,
         ImGui_ImplVulkan_Shutdown();
     }
 
-    void Interface::Render(std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame) {
+    void Interface::Render(CommandBuffer* commandBuffer, unsigned int frame) {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();

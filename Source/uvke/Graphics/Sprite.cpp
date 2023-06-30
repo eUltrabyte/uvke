@@ -26,17 +26,17 @@ namespace uvke {
         UVKE_LOG("Sprite Destroyed");
     }
 
-    void Sprite::Create(std::shared_ptr<Renderer> renderer) {
-        m_vertexBuffer = std::make_shared<VertexBuffer>(renderer->GetBase(), m_vertices);
-        m_indexBuffer = std::make_shared<IndexBuffer>(renderer->GetBase(), m_indices);
-        m_uniformBuffer = std::make_shared<UniformBuffer>(renderer->GetBase(), renderer->GetSampler(), renderer->GetDescriptor());
+    void Sprite::Create(Renderer* renderer) {
+        m_vertexBuffer = std::make_unique<VertexBuffer>(renderer->GetBase(), m_vertices);
+        m_indexBuffer = std::make_unique<IndexBuffer>(renderer->GetBase(), m_indices);
+        m_uniformBuffer = std::make_unique<UniformBuffer>(renderer->GetBase(), renderer->GetSampler(), renderer->GetDescriptor());
 
-        std::shared_ptr<StagingBuffer> m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase(), m_vertexBuffer->GetSize());
+        std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), m_vertexBuffer->GetSize());
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
         m_stagingBuffer.reset();
 
-        m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase(), m_indexBuffer->GetSize());
+        m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), m_indexBuffer->GetSize());
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
         m_stagingBuffer.reset();
@@ -44,9 +44,9 @@ namespace uvke {
         UVKE_LOG("Sprite Created");
     }
 
-    void Sprite::Update(std::shared_ptr<Camera> camera) {
+    void Sprite::Update(Camera* camera) {
         camera->SetModel(m_model);
-        camera->Update(m_uniformBuffer);
+        camera->Update(m_uniformBuffer.get());
     }
 
     void Sprite::Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) {
@@ -85,15 +85,15 @@ namespace uvke {
         return m_indices;
     }
 
-    std::shared_ptr<VertexBuffer> Sprite::GetVertexBuffer() {
-        return m_vertexBuffer;
+    VertexBuffer* Sprite::GetVertexBuffer() {
+        return m_vertexBuffer.get();
     }
     
-    std::shared_ptr<IndexBuffer> Sprite::GetIndexBuffer() {
-        return m_indexBuffer;
+    IndexBuffer* Sprite::GetIndexBuffer() {
+        return m_indexBuffer.get();
     }
     
-    std::shared_ptr<UniformBuffer> Sprite::GetUniformBuffer() {
-        return m_uniformBuffer;
+    UniformBuffer* Sprite::GetUniformBuffer() {
+        return m_uniformBuffer.get();
     }
 };

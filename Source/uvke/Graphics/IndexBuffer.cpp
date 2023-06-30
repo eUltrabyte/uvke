@@ -1,7 +1,7 @@
 #include "IndexBuffer.hpp"
 
 namespace uvke {
-    IndexBuffer::IndexBuffer(std::shared_ptr<Base> base, std::vector<unsigned int> indices)
+    IndexBuffer::IndexBuffer(Base* base, std::vector<unsigned int> indices)
         : m_base(base), m_indices(indices) {
         VkBufferCreateInfo bufferCreateInfo = { };
         bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -62,12 +62,8 @@ namespace uvke {
         vkCmdBindIndexBuffer(commandBuffer, m_buffer, 0, VK_INDEX_TYPE_UINT32);
     }
 
-    void IndexBuffer::SetBase(std::shared_ptr<Base> base) {
+    void IndexBuffer::SetBase(Base* base) {
         m_base = base;
-    }
-
-    std::shared_ptr<Base> IndexBuffer::GetBase() {
-        return m_base;
     }
 
     std::vector<unsigned int>& IndexBuffer::GetIndices() {

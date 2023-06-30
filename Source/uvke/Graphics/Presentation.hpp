@@ -15,12 +15,12 @@
 namespace uvke {
     class UVKE_API Presentation {
     public:
-        Presentation(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Swapchain> swapchain = nullptr, std::shared_ptr<SyncManager> syncManager = nullptr);
+        Presentation(Base* base = nullptr, Swapchain* swapchain = nullptr, SyncManager* syncManager = nullptr);
         virtual ~Presentation() = default;
 
-        virtual void AcquireNextImage(std::shared_ptr<Window> window, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer);
-        virtual void Submit(std::shared_ptr<CommandBuffer> commandBuffer, std::shared_ptr<Surface> surface);
-        virtual void Present(std::shared_ptr<Window> window, std::shared_ptr<Surface> surface, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer);
+        virtual void AcquireNextImage(Window* window, Pipeline* pipeline, Framebuffer* framebuffer);
+        virtual void Submit(CommandBuffer* commandBuffer, Surface* surface);
+        virtual void Present(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer);
 
         virtual unsigned int& GetIndex();
         virtual VkResult& GetResult();
@@ -28,9 +28,9 @@ namespace uvke {
         virtual VkPresentInfoKHR& GetPresentInfo();
 
     protected:
-        std::shared_ptr<Base> m_base;
-        std::shared_ptr<Swapchain> m_swapchain;
-        std::shared_ptr<SyncManager> m_syncManager;
+        Base* m_base;
+        Swapchain* m_swapchain;
+        SyncManager* m_syncManager;
 
     private:
         unsigned int m_index;

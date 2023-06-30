@@ -1,7 +1,7 @@
 #include "Pipeline.hpp"
 
 namespace uvke {
-    Pipeline::Pipeline(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<Descriptor> descriptor)
+    Pipeline::Pipeline(Base* base, Surface* surface, VertexBuffer* vertexBuffer, Descriptor* descriptor)
         : m_base(base), m_surface(surface), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
         m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Default.vert.spv"), File::Load("Resource/Default.frag.spv"));
 
@@ -481,7 +481,7 @@ namespace uvke {
         UVKE_LOG("Graphics Pipeline Recreated");
     }
 
-    void Pipeline::Render(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<CommandBuffer> commandBuffer, unsigned int frame, unsigned int index, std::vector<std::shared_ptr<Renderable>> renderables, std::shared_ptr<Interface> interfaces) {
+    void Pipeline::Render(Framebuffer* framebuffer, CommandBuffer* commandBuffer, unsigned int frame, unsigned int index, std::vector<Renderable*> renderables, Interface* interfaces) {
         vkResetCommandBuffer(commandBuffer->GetCommandBuffer(frame), 0);
 
         VkCommandBufferBeginInfo commandBufferBeginInfo { };
@@ -538,7 +538,7 @@ namespace uvke {
         UVKE_ASSERT(vkEndCommandBuffer(commandBuffer->GetCommandBuffer(frame)));
     }
 
-    void Pipeline::SetBase(std::shared_ptr<Base> base) {
+    void Pipeline::SetBase(Base* base) {
         m_base = base;
     }
     
@@ -558,24 +558,8 @@ namespace uvke {
         m_pipeline = pipeline;
     }
 
-    std::shared_ptr<Base> Pipeline::GetBase() {
-        return m_base;
-    }
-    
-    std::shared_ptr<Surface> Pipeline::GetSurface() {
-        return m_surface;
-    }
-    
     std::shared_ptr<Shader> Pipeline::GetShader() {
         return m_shader;
-    }
-    
-    std::shared_ptr<VertexBuffer> Pipeline::GetVertexBuffer() {
-        return m_vertexBuffer;
-    }
-    
-    std::shared_ptr<Descriptor> Pipeline::GetDescriptor() {
-        return m_descriptor;
     }
     
     VkRenderPass& Pipeline::GetRenderPass() {
