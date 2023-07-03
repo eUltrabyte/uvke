@@ -2,6 +2,8 @@
 
 namespace uvke {
     Sprite::Sprite(const vec2f& size) {
+        m_renderType = RenderType::Triangles;
+
         m_vertices = std::vector<Vertex> {
             { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
             { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },

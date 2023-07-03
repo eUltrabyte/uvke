@@ -113,6 +113,8 @@ namespace uvke {
 
     UniformBuffer::~UniformBuffer() {
         if(m_base->GetDevice() != VK_NULL_HANDLE) {
+            vkDeviceWaitIdle(m_base->GetDevice());
+
             if(m_descriptorPool != VK_NULL_HANDLE) {
                 vkDestroyDescriptorPool(m_base->GetDevice(), m_descriptorPool, nullptr);
             }

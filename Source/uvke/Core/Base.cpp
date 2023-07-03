@@ -92,9 +92,9 @@ namespace uvke {
     }
 
     Base::~Base() {
-        vkDeviceWaitIdle(m_device);
-
         if(m_device != VK_NULL_HANDLE) {
+            vkDeviceWaitIdle(m_device);
+
             vkDestroyDevice(m_device, nullptr);
         }
 

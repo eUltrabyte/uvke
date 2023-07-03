@@ -1,5 +1,6 @@
-- fix some issues with descriptor pool
-- add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
+- move texture to sprite class
+- fix issues with closing app
+- fix framebuffer resizing
 - add antialiasing support
 - add depth buffer
 - add image class ( for imageviews and images )
