@@ -1,4 +1,3 @@
-- fix framebuffer resizing
 - add antialiasing support
 - add image class ( for imageviews and images )
 - add scene class
