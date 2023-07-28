@@ -36,16 +36,19 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Core.cpp
     Source/uvke/Core/Logger.hpp
     Source/uvke/Core/Logger.cpp
-    Source/uvke/Core/Event.hpp
-    Source/uvke/Core/Event.cpp
-    Source/uvke/Core/Window.hpp
-    Source/uvke/Core/Window.cpp
-    Source/uvke/Core/WindowManager.hpp
-    Source/uvke/Core/WindowManager.cpp
     Source/uvke/Core/Base.hpp
     Source/uvke/Core/Base.cpp
     Source/uvke/Core/App.hpp
     Source/uvke/Core/App.cpp
+)
+
+set(UVKE_WINDOW_SOURCE
+    Source/uvke/Window/Event.hpp
+    Source/uvke/Window/Event.cpp
+    Source/uvke/Window/Window.hpp
+    Source/uvke/Window/Window.cpp
+    Source/uvke/Window/WindowManager.hpp
+    Source/uvke/Window/WindowManager.cpp
 )
 
 set(UVKE_GRAPHICS_SOURCE
@@ -67,6 +70,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Descriptor.cpp
     Source/uvke/Graphics/UniformBuffer.hpp
     Source/uvke/Graphics/UniformBuffer.cpp
+    Source/uvke/Graphics/DepthBuffer.hpp
+    Source/uvke/Graphics/DepthBuffer.cpp
     Source/uvke/Graphics/Pipeline.hpp
     Source/uvke/Graphics/Pipeline.cpp
     Source/uvke/Graphics/Framebuffer.hpp
@@ -139,12 +144,14 @@ if(UVKE_SHARED_LIBRARY)
     endif()
 
     add_library(${PROJECT_NAME}-Core SHARED ${UVKE_CORE_SOURCE})
+    add_library(${PROJECT_NAME}-Window SHARED ${UVKE_WINDOW_SOURCE})
     add_library(${PROJECT_NAME}-Utils SHARED ${UVKE_UTILS_SOURCE})
     add_library(${PROJECT_NAME}-Graphics SHARED ${UVKE_GRAPHICS_SOURCE})
 
     add_library(${PROJECT_NAME} SHARED ${UVKE_SOURCE})
 else()
     add_library(${PROJECT_NAME}-Core STATIC ${UVKE_CORE_SOURCE})
+    add_library(${PROJECT_NAME}-Window STATIC ${UVKE_WINDOW_SOURCE})
     add_library(${PROJECT_NAME}-Utils STATIC ${UVKE_UTILS_SOURCE})
     add_library(${PROJECT_NAME}-Graphics STATIC ${UVKE_GRAPHICS_SOURCE})
 
@@ -155,14 +162,16 @@ add_dependencies(uvke uvke-Shaders)
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC Source/uvke/uvkepch.hpp Source/uvke/uvkepch.cpp)
 target_compile_definitions(${PROJECT_NAME}-Core PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
+target_compile_definitions(${PROJECT_NAME}-Window PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME}-Utils PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME}-Graphics PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}-Core PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-Window PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}-Utils PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}-Graphics PUBLIC ${UVKE_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Window ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics)
 
 file(COPY Resource/ DESTINATION Resource/)
 

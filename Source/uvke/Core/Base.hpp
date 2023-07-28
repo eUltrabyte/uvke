@@ -1,4 +1,5 @@
 #pragma once
+#include <vulkan/vulkan_core.h>
 #ifndef UVKE_BASE_HEADER
 #define UVKE_BASE_HEADER
 
@@ -10,6 +11,8 @@ namespace uvke {
         Base(std::string_view name = "uvke Base");
         virtual ~Base();
 
+        virtual void FindDepthFormat(VkImageTiling tiling, VkFormatFeatureFlags features);
+
         virtual void SetInstance(VkInstance instance);
         virtual void SetPhysicalDevice(VkPhysicalDevice physicalDevice);
         virtual void SetDevice(VkDevice device);
@@ -17,9 +20,11 @@ namespace uvke {
         virtual VkInstance& GetInstance();
         virtual VkPhysicalDevice& GetPhysicalDevice();
         virtual VkDevice& GetDevice();
+        virtual VkFormat GetDepthFormat();
         virtual unsigned int GetQueueFamily();
         virtual unsigned int GetQueueCount();
         virtual bool IsMultiQueueSupported();
+        virtual bool HasStencilComponent();
 
     private:
         VkPhysicalDevice GetSuitablePhysicalDevice() {
@@ -38,8 +43,8 @@ namespace uvke {
                 vkGetPhysicalDeviceProperties(physicalDevices[i], &physicalDevicesProperties[i]);
                 vkGetPhysicalDeviceFeatures(physicalDevices[i], &physicalDevicesFeatures[i]);
 
-                if(physicalDevicesProperties.at(i).deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && physicalDevicesFeatures.at(i).geometryShader == VK_TRUE) {
-                    UVKE_LOG("GPU - " + std::string(physicalDevicesProperties.at(i).deviceName));
+                if(physicalDevicesProperties[i].deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && physicalDevicesFeatures[i].geometryShader == VK_TRUE) {
+                    UVKE_LOG("GPU - " + std::string(physicalDevicesProperties[i].deviceName));
                     return physicalDevices[i];
                 }
             }
@@ -57,8 +62,8 @@ namespace uvke {
             }
 
             for(auto i = 0; i < queueFamilyProperties.size(); ++i) {
-                if(queueFamilyProperties.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-                    m_queueCount = queueFamilyProperties.at(i).queueCount;
+                if(queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                    m_queueCount = queueFamilyProperties[i].queueCount;
                     if(m_queueCount > 1) {
                         m_multiQueue = true;
                     } else {
@@ -75,6 +80,7 @@ namespace uvke {
         VkInstance m_instance;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
+        VkFormat m_depthFormat;
         unsigned int m_queueFamilyIndex;
         unsigned int m_queueCount;
         bool m_multiQueue;

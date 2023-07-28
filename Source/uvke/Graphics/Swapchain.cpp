@@ -1,7 +1,7 @@
 #include "Swapchain.hpp"
 
 namespace uvke {
-    Swapchain::Swapchain(std::shared_ptr<Base> base, std::shared_ptr<Surface> surface)
+    Swapchain::Swapchain(Base* base, Surface* surface)
         : m_base(base), m_surface(surface), m_isRecreated(false) {
         m_imageCount = m_surface->GetCapabilities().minImageCount + 1;
         if(m_surface->GetCapabilities().maxImageCount > 0 && m_imageCount > m_surface->GetCapabilities().maxImageCount) {
@@ -92,7 +92,7 @@ namespace uvke {
         UVKE_LOG("Swapchain Destroyed");
     }
 
-    void Swapchain::Recreate(std::shared_ptr<Window> window, VkRenderPass renderPass) {
+    void Swapchain::Recreate(Window* window, VkRenderPass renderPass) {
         m_isRecreated = false;
         window->Update();
 
@@ -184,11 +184,11 @@ namespace uvke {
         UVKE_LOG("Swapchain Recreated");
     }
 
-    void Swapchain::SetBase(std::shared_ptr<Base> base) {
+    void Swapchain::SetBase(Base* base) {
         m_base = base;
     }
     
-    void Swapchain::SetSurface(std::shared_ptr<Surface> surface) {
+    void Swapchain::SetSurface(Surface* surface) {
         m_surface = surface;
     }
     
@@ -203,15 +203,7 @@ namespace uvke {
     void Swapchain::SetImageViews(const std::vector<VkImageView>& imageViews) {
         m_imageViews = imageViews;
     }
-    
-    std::shared_ptr<Base> Swapchain::GetBase() {
-        return m_base;
-    }
 
-    std::shared_ptr<Surface> Swapchain::GetSurface() {
-        return m_surface;
-    }
-    
     unsigned int& Swapchain::GetImageCount() {
         return m_imageCount;
     }

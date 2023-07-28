@@ -5,8 +5,7 @@
 class ExampleApp : public uvke::App {
 public:
     ExampleApp()
-        : m_window(std::make_shared<uvke::Window>(uvke::WindowProps("uvke Example App", { 1280, 720 }, uvke::Style::Default))), m_base(std::make_shared<uvke::Base>("uvke App")), m_renderer(std::make_shared<uvke::Renderer>(m_base, m_window)) {
-        m_windowManager->Push(m_window);
+        : m_window(std::make_unique<uvke::Window>(uvke::WindowProps("uvke Example App", { 1280, 720 }, uvke::Style::Default))), m_base(std::make_unique<uvke::Base>("uvke App")), m_renderer(std::make_unique<uvke::Renderer>(m_base.get(), m_window.get())) {
     }
 
     virtual ~ExampleApp() {
@@ -18,11 +17,17 @@ public:
     virtual void Run() override {
         m_isRunning = true;
 
-        uvke::Sprite sprite({ 0.2f, 0.15f });
-        sprite.SetPosition({ 0.0f, 0.0f });
-        sprite.SetRotation(45.0f);
-        sprite.Create(m_renderer);
-        m_renderer->Push(std::make_shared<uvke::Sprite>(sprite));
+        uvke::Sprite sprite({ 0.4f, 0.3f });
+        sprite.SetPosition({ 0.0f, 0.0f, 0.0f });
+        sprite.SetRotation(0.0f);
+        sprite.Create(m_renderer.get());
+        m_renderer->Push(&sprite);
+
+        /* uvke::Sprite sprite1({ 0.2f, 0.15f });
+        sprite1.SetPosition({ 0.0f, 0.0f, -1.0f });
+        sprite1.SetRotation(0.0f);
+        sprite1.Create(m_renderer.get());
+        m_renderer->Push(&sprite1); */
 
         while(m_isRunning) {
             Update();
@@ -32,9 +37,12 @@ public:
 
     virtual void Update() override {
         // UVKE_LOG("App Timer - " + std::to_string(m_clock->GetElapsedTime().count()) + "ms");
-
-        m_window->PollEvents(m_event);
         m_window->Update();
+
+        switch(m_event.GetType()) {
+            case uvke::EventType::Closed: { m_window->Close(); Shutdown(); } break;
+            default: break;
+        }
 
         /* switch(m_event.GetType()) {
             case uvke::EventType::Closed: { UVKE_LOG("Event - Closed"); } break;
@@ -48,7 +56,10 @@ public:
             case uvke::EventType::MouseMoved: { UVKE_LOG("Event - MouseMoved - " + std::to_string(m_event.GetPosition().x) + "/" + std::to_string(m_event.GetPosition().y)); } break;
             case uvke::EventType::ButtonPressed: { UVKE_LOG("Event - ButtonPressed - " + std::to_string(m_event.GetMouse().x) + "/" + std::to_string(m_event.GetMouse().y)); } break;
             case uvke::EventType::ButtonReleased: { UVKE_LOG("Event - ButtonReleased - " + std::to_string(m_event.GetMouse().x) + "/" + std::to_string(m_event.GetMouse().y)); } break;
+            default: break;
         } */
+
+        m_window->PollEvents(m_event);
     }
 
     virtual void Render() override {
@@ -61,9 +72,9 @@ public:
 
 private:
     uvke::Event m_event;
-    std::shared_ptr<uvke::Window> m_window;
-    std::shared_ptr<uvke::Base> m_base;
-    std::shared_ptr<uvke::Renderer> m_renderer;
+    std::unique_ptr<uvke::Window> m_window;
+    std::unique_ptr<uvke::Base> m_base;
+    std::unique_ptr<uvke::Renderer> m_renderer;
 
 };
 

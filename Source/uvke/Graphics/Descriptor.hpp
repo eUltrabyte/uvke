@@ -8,18 +8,17 @@
 namespace uvke {
     class UVKE_API Descriptor {
     public:
-        Descriptor(std::shared_ptr<Base> base = nullptr);
+        Descriptor(Base* base = nullptr);
         virtual ~Descriptor();
 
-        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetBase(Base* base);
 
-        virtual std::shared_ptr<Base> GetBase();
         virtual std::array<VkDescriptorSetLayoutBinding, 2>& GetDescriptorSetLayoutBindings();
         virtual VkDescriptorSetLayoutBinding& GetDescriptorSetLayoutBinding(unsigned int index);
         virtual VkDescriptorSetLayout& GetDescriptorSetLayout();
 
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         std::array<VkDescriptorSetLayoutBinding, 2> m_descriptorSetLayoutBindings;

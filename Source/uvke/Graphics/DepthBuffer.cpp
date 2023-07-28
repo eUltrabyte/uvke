@@ -1,48 +1,27 @@
-#include "Texture.hpp"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
+#include "DepthBuffer.hpp"
 
 namespace uvke {
-    Texture::Texture(Base* base, std::string_view filename)
+    DepthBuffer::DepthBuffer(Base* base, Surface* surface)
         : m_base(base) {
-        vec2i size = { 0, 0 };
-        m_pixels = stbi_load(filename.data(), &size.x, &size.y, &m_channel, STBI_rgb_alpha);
-
-        m_size = { static_cast<unsigned int>(size.x), static_cast<unsigned int>(size.y) };
-
         VkImageCreateInfo imageCreateInfo { };
         imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageCreateInfo.pNext = nullptr;
         imageCreateInfo.flags = 0;
         imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-        imageCreateInfo.extent = { m_size.x, m_size.y, 1 };
+        imageCreateInfo.extent = { surface->GetExtent().width, surface->GetExtent().height, 1 };
         imageCreateInfo.mipLevels = 1;
         imageCreateInfo.arrayLayers = 1;
-        imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+        imageCreateInfo.format = m_base->GetDepthFormat();
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
         imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-        imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        imageCreateInfo.queueFamilyIndexCount = 0;
+        imageCreateInfo.pQueueFamilyIndices = nullptr;
         imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         UVKE_ASSERT(vkCreateImage(m_base->GetDevice(), &imageCreateInfo, nullptr, &m_image));
-
-        UVKE_LOG("Texture Created");
-    }
     
-    Texture::~Texture() {
-        if(m_base->GetDevice() != VK_NULL_HANDLE) {
-            vkFreeMemory(m_base->GetDevice(), m_imageMemory, nullptr);
-            vkDestroyImage(m_base->GetDevice(), m_image, nullptr);
-        }
-
-        UVKE_LOG("Texture Destroyed");
-    }
-
-    void Texture::Allocate() {
-        stbi_image_free(m_pixels);
-
         VkMemoryRequirements memoryRequirements { };
         vkGetImageMemoryRequirements(m_base->GetDevice(), m_image, &memoryRequirements);
 
@@ -69,10 +48,31 @@ namespace uvke {
 
         vkBindImageMemory(m_base->GetDevice(), m_image, m_imageMemory, 0);
 
-        UVKE_LOG("Texture Allocated");
+        VkImageViewCreateInfo imageViewCreateInfo { };
+        imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        imageViewCreateInfo.pNext = nullptr;
+        imageViewCreateInfo.flags = 0;
+        imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        imageViewCreateInfo.image = m_image;
+        imageViewCreateInfo.format = m_base->GetDepthFormat();
+        imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+        imageViewCreateInfo.subresourceRange.levelCount = 1;
+        imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+        imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+        UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageView));
     }
 
-    void Texture::LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout) {
+    DepthBuffer::~DepthBuffer() {
+        if(m_base->GetDevice() != VK_NULL_HANDLE) {
+            vkDestroyImageView(m_base->GetDevice(), m_imageView, nullptr);
+            vkFreeMemory(m_base->GetDevice(), m_imageMemory, nullptr);
+            vkDestroyImage(m_base->GetDevice(), m_image, nullptr);
+        }
+    }
+
+    void DepthBuffer::LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout) {
         VkCommandBuffer buffer = commandBuffer->Begin();
 
         VkImageMemoryBarrier imageMemoryBarrier { };
@@ -104,8 +104,20 @@ namespace uvke {
 
             source = VK_PIPELINE_STAGE_TRANSFER_BIT;
             destination = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        } else if(oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+            imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+            if(m_base->HasStencilComponent()) {
+                imageMemoryBarrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+            }
+
+            imageMemoryBarrier.srcAccessMask = 0;
+            imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+            source = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            destination = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         } else {
-            UVKE_ASSERT(-1);
+            UVKE_FATAL("Layout Transition Not Supported");
         }
 
         vkCmdPipelineBarrier(buffer, source, destination, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
@@ -113,85 +125,15 @@ namespace uvke {
         commandBuffer->End(buffer, queue);
     }
 
-    void Texture::CopyFromBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer source) {
-        VkCommandBuffer buffer = commandBuffer->Begin();
-
-        VkBufferImageCopy bufferImageCopy { };
-        bufferImageCopy.bufferOffset = 0;
-        bufferImageCopy.bufferRowLength = 0;
-        bufferImageCopy.bufferImageHeight = 0;
-        bufferImageCopy.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        bufferImageCopy.imageSubresource.mipLevel = 0;
-        bufferImageCopy.imageSubresource.baseArrayLayer = 0;
-        bufferImageCopy.imageSubresource.layerCount = 1;
-        bufferImageCopy.imageOffset = { 0, 0, 0 };
-        bufferImageCopy.imageExtent = { m_size.x, m_size.y, 1 };
-
-        vkCmdCopyBufferToImage(buffer, source, m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
-
-        commandBuffer->End(buffer, queue);
-    }
-
-    void Texture::CopyToBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer destination) {
-        VkCommandBuffer buffer = commandBuffer->Begin();
-
-        VkBufferImageCopy bufferImageCopy { };
-        bufferImageCopy.bufferOffset = 0;
-        bufferImageCopy.bufferRowLength = 0;
-        bufferImageCopy.bufferImageHeight = 0;
-        bufferImageCopy.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        bufferImageCopy.imageSubresource.mipLevel = 0;
-        bufferImageCopy.imageSubresource.baseArrayLayer = 0;
-        bufferImageCopy.imageSubresource.layerCount = 1;
-        bufferImageCopy.imageOffset = { 0, 0, 0 };
-        bufferImageCopy.imageExtent = { m_size.x, m_size.y, 1 };
-
-        vkCmdCopyImageToBuffer(buffer, m_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destination, 1, &bufferImageCopy);
-
-        commandBuffer->End(buffer, queue);
-    }
-    
-    void Texture::SetBase(Base* base) {
-        m_base = base;
-    }
-    
-    void Texture::SetSize(vec2u size) {
-        m_size = size;
-    }
-    
-    void Texture::SetChannel(int channel) {
-        m_channel = channel;
-    }
-    
-    void Texture::SetPixels(unsigned char* pixels) {
-        m_pixels = pixels;
-    }
-    
-    void Texture::SetImage(VkImage image) {
-        m_image = image;
-    }
-    
-    void Texture::SetImageMemory(VkDeviceMemory imageMemory) {
-        m_imageMemory = imageMemory;
-    }
-    
-    vec2u& Texture::GetSize() {
-        return m_size;
-    }
-    
-    int& Texture::GetChannel() {
-        return m_channel;
-    }
-    
-    unsigned char* Texture::GetPixels() {
-        return m_pixels;
-    }
-    
-    VkImage& Texture::GetImage() {
+    VkImage& DepthBuffer::GetImage() {
         return m_image;
     }
     
-    VkDeviceMemory& Texture::GetImageMemory() {
+    VkDeviceMemory& DepthBuffer::GetImageMemory() {
         return m_imageMemory;
+    }
+    
+    VkImageView& DepthBuffer::GetImageView() {
+        return m_imageView;
     }
 };

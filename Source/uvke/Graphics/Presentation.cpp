@@ -1,7 +1,7 @@
 #include "Presentation.hpp"
 
 namespace uvke {
-    Presentation::Presentation(std::shared_ptr<Base> base, std::shared_ptr<Swapchain> swapchain, std::shared_ptr<SyncManager> syncManager)
+    Presentation::Presentation(Base* base, Swapchain* swapchain, SyncManager* syncManager)
         : m_base(base), m_swapchain(swapchain), m_syncManager(syncManager), m_index(0), m_submitInfo({ }), m_presentInfo({ }) {
         m_submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         m_submitInfo.pNext = nullptr;
@@ -13,7 +13,7 @@ namespace uvke {
         m_presentInfo.pResults = nullptr;
     }
 
-    void Presentation::AcquireNextImage(std::shared_ptr<Window> window, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer) {
+    void Presentation::AcquireNextImage(Window* window, Pipeline* pipeline, Framebuffer* framebuffer) {
         m_result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &m_index);
         if(m_result == VK_ERROR_OUT_OF_DATE_KHR) {
             m_swapchain->Recreate(window, pipeline->GetRenderPass());
@@ -23,7 +23,7 @@ namespace uvke {
         }
     }
     
-    void Presentation::Submit(std::shared_ptr<CommandBuffer> commandBuffer, std::shared_ptr<Surface> surface) {
+    void Presentation::Submit(CommandBuffer* commandBuffer, Surface* surface) {
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
         m_submitInfo.pWaitDstStageMask = waitStages;
         m_submitInfo.waitSemaphoreCount = 1;
@@ -36,7 +36,7 @@ namespace uvke {
         UVKE_ASSERT(vkQueueSubmit(surface->GetQueue(0), 1, &m_submitInfo, m_syncManager->GetFence(m_syncManager->GetFrame())));
     }
     
-    void Presentation::Present(std::shared_ptr<Window> window, std::shared_ptr<Surface> surface, std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Framebuffer> framebuffer) {
+    void Presentation::Present(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer) {
         m_presentInfo.waitSemaphoreCount = 1;
         m_presentInfo.pWaitSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
         m_presentInfo.pImageIndices = &m_index;

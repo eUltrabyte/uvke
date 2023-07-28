@@ -1,16 +1,16 @@
-- shared ptr to unique ptr
-- fix issue with closing window
-- add more vkpipelines with different shaders to render different shapes ( like rects, circles, points, triangles and vertex arrays )
+- fix framebuffer resizing
+- add antialiasing support
+- add image class ( for imageviews and images )
 - add scene class
 - add 3d support because why not
 - job manager class ( job queue and job priorities )
 - add multi threading support
 - add audio support
 - asset manager class
-- add smid and avx support in math lib
+- add simd and avx support in math lib
 - own file format for textures, audio, etc
 - reimplement stb_image with own library
 - reimplement audio with own library
 - reimplement imgui with own library
 - reimplement windows with own library
-- add something like vulkan wrapper as alternative for vulkansdk ( with win32, x11, xcb, wayland and android support )
+- add vulkan loader as alternative for vulkan.h ( with win32, x11, xcb, wayland and android support )

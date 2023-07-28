@@ -1,7 +1,7 @@
 #include "SyncManager.hpp"
 
 namespace uvke {
-    SyncManager::SyncManager(std::shared_ptr<Base> base)
+    SyncManager::SyncManager(Base* base)
         : m_base(base){
         m_frame = 0;
         m_size = 2;
@@ -104,7 +104,7 @@ namespace uvke {
         }
     }
 
-    void SyncManager::SetBase(std::shared_ptr<Base> base) {
+    void SyncManager::SetBase(Base* base) {
         m_base = base;
     }
 
@@ -126,10 +126,6 @@ namespace uvke {
     
     void SyncManager::SetFences(std::vector<VkFence> fences) {
         m_fences = fences;
-    }
-
-    std::shared_ptr<Base> SyncManager::GetBase() {
-        return m_base;
     }
 
     unsigned int& SyncManager::GetFrame() {

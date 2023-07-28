@@ -1,7 +1,7 @@
 #include "Sampler.hpp"
 
 namespace uvke {
-    Sampler::Sampler(std::shared_ptr<Base> base, std::shared_ptr<Texture> texture)
+    Sampler::Sampler(Base* base, Texture* texture)
         : m_base(base) {
         {
             VkImageViewCreateInfo imageViewCreateInfo { };
@@ -71,12 +71,8 @@ namespace uvke {
         UVKE_LOG("Sampler Destroyed");
     }
 
-    void Sampler::SetBase(std::shared_ptr<Base> base) {
+    void Sampler::SetBase(Base* base) {
         m_base = base;
-    }
-
-    std::shared_ptr<Base> Sampler::GetBase() {
-        return m_base;
     }
 
     VkImageView& Sampler::GetImageView() {

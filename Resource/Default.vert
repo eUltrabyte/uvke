@@ -14,6 +14,7 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec2 fragTexCoord;
 
 void main() {
+    gl_PointSize = 1.0;
     gl_Position = uniformBuffer.projection * uniformBuffer.view * uniformBuffer.model * vec4(position, 1.0);
     fragColor = vec4(color, 1.0);
     fragTexCoord = texCoord;

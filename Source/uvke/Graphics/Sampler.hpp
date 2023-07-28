@@ -9,17 +9,16 @@
 namespace uvke {
     class UVKE_API Sampler {
     public:
-        Sampler(std::shared_ptr<Base> base = nullptr, std::shared_ptr<Texture> texture = nullptr);
+        Sampler(Base* base = nullptr, Texture* texture = nullptr);
         virtual ~Sampler();
 
-        virtual void SetBase(std::shared_ptr<Base> base);
+        virtual void SetBase(Base* base);
 
-        virtual std::shared_ptr<Base> GetBase();
         virtual VkImageView& GetImageView();
         virtual VkSampler& GetSampler();
 
     protected:
-        std::shared_ptr<Base> m_base;
+        Base* m_base;
 
     private:
         VkImageView m_imageView;

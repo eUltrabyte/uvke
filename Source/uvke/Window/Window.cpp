@@ -1,12 +1,8 @@
 #include "Window.hpp"
+#include <GLFW/glfw3.h>
 
 namespace uvke {
     Window::Window(const WindowProps& windowProps) {
-        glfwSetErrorCallback([](int error, const char* description) {
-            UVKE_LOG("GLFW Error - " + std::string(description));
-            std::exit(error);
-        });
-
         SetWindowProps(windowProps);
 
         glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
@@ -97,6 +93,10 @@ namespace uvke {
 
     void Window::Wait() {
         glfwWaitEvents();
+    }
+
+    void Window::Close() {
+        glfwSetWindowShouldClose(m_window, GLFW_TRUE);
     }
 
     void Window::SetWindowProps(const WindowProps& windowProps) {

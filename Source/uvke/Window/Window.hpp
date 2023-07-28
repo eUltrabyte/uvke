@@ -34,6 +34,7 @@ namespace uvke {
         virtual void PollEvents(Event& event);
         virtual void Update();
         virtual void Wait();
+        virtual void Close();
 
         virtual void SetWindowProps(const WindowProps& windowProps);
     

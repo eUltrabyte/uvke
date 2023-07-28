@@ -1,4 +1,5 @@
 #include "Base.hpp"
+#include <vulkan/vulkan_core.h>
 
 namespace uvke {
     Base::Base(std::string_view name) {
@@ -85,11 +86,15 @@ namespace uvke {
             UVKE_ASSERT(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device));
         }
 
+        FindDepthFormat(VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+
         UVKE_LOG("Base Created");
     }
 
     Base::~Base() {
         if(m_device != VK_NULL_HANDLE) {
+            vkDeviceWaitIdle(m_device);
+
             vkDestroyDevice(m_device, nullptr);
         }
 
@@ -98,6 +103,29 @@ namespace uvke {
         }
 
         UVKE_LOG("Base Destroyed");
+    }
+
+    void Base::FindDepthFormat(VkImageTiling tiling, VkFormatFeatureFlags features) {
+        std::vector<VkFormat> depthFormats = {
+            VK_FORMAT_D32_SFLOAT,
+            VK_FORMAT_D32_SFLOAT_S8_UINT,
+            VK_FORMAT_D24_UNORM_S8_UINT
+        };
+
+        for(auto i = 0; i < depthFormats.size(); ++i) {
+            VkFormatProperties formatProperties;
+            vkGetPhysicalDeviceFormatProperties(m_physicalDevice, depthFormats[i], &formatProperties);
+
+            if(tiling == VK_IMAGE_TILING_LINEAR && (formatProperties.linearTilingFeatures & features) == features) {
+                m_depthFormat = depthFormats[i];
+                break;
+            } else if(tiling == VK_IMAGE_TILING_OPTIMAL && (formatProperties.optimalTilingFeatures & features) == features) {
+                m_depthFormat = depthFormats[i];
+                break;
+            }
+
+            UVKE_FATAL("Supported Format Not Found!");
+        }
     }
     
     void Base::SetInstance(VkInstance instance) {
@@ -124,6 +152,10 @@ namespace uvke {
         return m_device;
     }
 
+    VkFormat Base::GetDepthFormat() {
+        return m_depthFormat;
+    }
+
     unsigned int Base::GetQueueFamily() {
         return m_queueFamilyIndex;
     }
@@ -134,5 +166,9 @@ namespace uvke {
     
     bool Base::IsMultiQueueSupported() {
         return m_multiQueue;
+    }
+
+    bool Base::HasStencilComponent() {
+        return m_depthFormat == VK_FORMAT_D32_SFLOAT_S8_UINT || m_depthFormat == VK_FORMAT_D24_UNORM_S8_UINT;
     }
 };

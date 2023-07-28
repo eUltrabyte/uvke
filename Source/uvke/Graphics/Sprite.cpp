@@ -2,6 +2,8 @@
 
 namespace uvke {
     Sprite::Sprite(const vec2f& size) {
+        m_renderType = RenderType::Triangles;
+
         m_vertices = std::vector<Vertex> {
             { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
             { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
@@ -23,20 +25,37 @@ namespace uvke {
         m_indexBuffer.reset();
         m_vertexBuffer.reset();
 
+        m_sampler.reset();
+        m_texture.reset();
+
         UVKE_LOG("Sprite Destroyed");
     }
 
-    void Sprite::Create(std::shared_ptr<Renderer> renderer) {
-        m_vertexBuffer = std::make_shared<VertexBuffer>(renderer->GetBase(), m_vertices);
-        m_indexBuffer = std::make_shared<IndexBuffer>(renderer->GetBase(), m_indices);
-        m_uniformBuffer = std::make_shared<UniformBuffer>(renderer->GetBase(), renderer->GetSampler(), renderer->GetDescriptor());
+    void Sprite::Create(Renderer* renderer) {
+        m_texture = std::make_unique<Texture>(renderer->GetBase(), "Resource/uvke.png");
 
-        std::shared_ptr<StagingBuffer> m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase(), m_vertexBuffer->GetSize());
+        std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * 4));
+        m_stagingBuffer->Map(m_texture->GetPixels());
+        m_texture->Allocate();
+
+        m_texture->LayoutTransition(renderer->GetCommandBuffer(), renderer->GetSurface()->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        m_texture->CopyFromBuffer(renderer->GetCommandBuffer(), renderer->GetSurface()->GetQueue(0), m_stagingBuffer->GetBuffer());
+        m_texture->LayoutTransition(renderer->GetCommandBuffer(), renderer->GetSurface()->GetQueue(0), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        m_stagingBuffer.reset();
+
+        m_sampler = std::make_unique<Sampler>(renderer->GetBase(), m_texture.get());
+
+        m_vertexBuffer = std::make_unique<VertexBuffer>(renderer->GetBase(), m_vertices);
+        m_indexBuffer = std::make_unique<IndexBuffer>(renderer->GetBase(), m_indices);
+        m_uniformBuffer = std::make_unique<UniformBuffer>(renderer->GetBase(), m_sampler.get(), renderer->GetDescriptor());
+
+        m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), m_vertexBuffer->GetSize());
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
         m_stagingBuffer.reset();
 
-        m_stagingBuffer = std::make_shared<StagingBuffer>(renderer->GetBase(), m_indexBuffer->GetSize());
+        m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), m_indexBuffer->GetSize());
         m_stagingBuffer->Map(m_indexBuffer->GetIndices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_indexBuffer->GetBuffer(), m_indexBuffer->GetSize());
         m_stagingBuffer.reset();
@@ -44,9 +63,9 @@ namespace uvke {
         UVKE_LOG("Sprite Created");
     }
 
-    void Sprite::Update(std::shared_ptr<Camera> camera) {
+    void Sprite::Update(Camera* camera) {
         camera->SetModel(m_model);
-        camera->Update(m_uniformBuffer);
+        camera->Update(m_uniformBuffer.get());
     }
 
     void Sprite::Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) {
@@ -57,12 +76,12 @@ namespace uvke {
         vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
     }
 
-    void Sprite::SetPosition(const vec2f& position) {
-        m_model = Translate<float>(m_model, vec3f(position.x, position.y, 0.0f));
+    void Sprite::SetPosition(const vec3f& position) {
+        m_model = Translate<float>(m_model, vec3f(position.x, position.y, position.z));
     }
 
-    void Sprite::SetScale(const vec2f& scale) {
-        m_model = Scale<float>(m_model, vec3f(scale.x, scale.y, 1.0f));
+    void Sprite::SetScale(const vec3f& scale) {
+        m_model = Scale<float>(m_model, vec3f(scale.x, scale.y, scale.z));
     }
 
     void Sprite::SetRotation(float angle) {
@@ -85,15 +104,15 @@ namespace uvke {
         return m_indices;
     }
 
-    std::shared_ptr<VertexBuffer> Sprite::GetVertexBuffer() {
-        return m_vertexBuffer;
+    VertexBuffer* Sprite::GetVertexBuffer() {
+        return m_vertexBuffer.get();
     }
     
-    std::shared_ptr<IndexBuffer> Sprite::GetIndexBuffer() {
-        return m_indexBuffer;
+    IndexBuffer* Sprite::GetIndexBuffer() {
+        return m_indexBuffer.get();
     }
     
-    std::shared_ptr<UniformBuffer> Sprite::GetUniformBuffer() {
-        return m_uniformBuffer;
+    UniformBuffer* Sprite::GetUniformBuffer() {
+        return m_uniformBuffer.get();
     }
 };
