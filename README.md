@@ -1,4 +1,4 @@
-![uvke logo](https://github.com/eUltrabyte/uvke/blob/main/Resource/uvke.png?raw=true "uvke logo")
+![uvke logo](https://github.com/eUltrabyte/uvke/blob/dev/Resource/uvke.png?raw=true "uvke logo")
 
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
 [![Standard](https://img.shields.io/badge/c%2B%2B-20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
@@ -6,8 +6,9 @@
 [![Pull Requests](https://img.shields.io/github/issues-pr/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke/pulls)
 [![Forks](https://img.shields.io/github/forks/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke)
 
-#### uvke ( Ultrabyte Vulkan Engine ) is open source vulkan based rendering ( and maybe game ) engine written in C++20.
-##### It's Hukan deputy but prepared for 2d and more flexible.
+#### uvke ( Ultrabyte Vulkan Engine ) is open source framework for games development written in C++ 20.
+
+Main goal of uvke is to make using vulkan simple. I want to use it for myself but usage by someone else would be nice.
 
 ### Libraries
 [glfw](https://github.com/glfw/glfw) - Open source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.

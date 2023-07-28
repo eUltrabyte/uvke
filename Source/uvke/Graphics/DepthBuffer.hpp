@@ -13,6 +13,8 @@ namespace uvke {
         DepthBuffer(Base* base = nullptr, Surface* surface = nullptr);
         virtual ~DepthBuffer();
 
+        virtual void Recreate(Base* base, Surface* surface);
+
         virtual void LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout);
 
         virtual VkImage& GetImage();

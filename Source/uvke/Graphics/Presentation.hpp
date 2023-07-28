@@ -18,9 +18,9 @@ namespace uvke {
         Presentation(Base* base = nullptr, Swapchain* swapchain = nullptr, SyncManager* syncManager = nullptr);
         virtual ~Presentation() = default;
 
-        virtual void AcquireNextImage(Window* window, Pipeline* pipeline, Framebuffer* framebuffer);
+        virtual void AcquireNextImage(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer, DepthBuffer* depthBuffer);
         virtual void Submit(CommandBuffer* commandBuffer, Surface* surface);
-        virtual void Present(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer);
+        virtual void Present(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer, DepthBuffer* depthBuffer);
 
         virtual unsigned int& GetIndex();
         virtual VkResult& GetResult();

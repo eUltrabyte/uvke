@@ -13,10 +13,11 @@ namespace uvke {
         m_presentInfo.pResults = nullptr;
     }
 
-    void Presentation::AcquireNextImage(Window* window, Pipeline* pipeline, Framebuffer* framebuffer) {
+    void Presentation::AcquireNextImage(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer, DepthBuffer* depthBuffer) {
         m_result = vkAcquireNextImageKHR(m_base->GetDevice(), m_swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::infinity(), m_syncManager->GetAvailableSemaphore(m_syncManager->GetFrame()), VK_NULL_HANDLE, &m_index);
         if(m_result == VK_ERROR_OUT_OF_DATE_KHR) {
             m_swapchain->Recreate(window, pipeline->GetRenderPass());
+            depthBuffer->Recreate(m_base, surface);
             framebuffer->Recreate();
         } else if(m_result != VK_SUCCESS && m_result != VK_SUBOPTIMAL_KHR) {
             UVKE_FATAL("Swapchain Acquire Image Error");
@@ -36,7 +37,7 @@ namespace uvke {
         UVKE_ASSERT(vkQueueSubmit(surface->GetQueue(0), 1, &m_submitInfo, m_syncManager->GetFence(m_syncManager->GetFrame())));
     }
     
-    void Presentation::Present(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer) {
+    void Presentation::Present(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer, DepthBuffer* depthBuffer) {
         m_presentInfo.waitSemaphoreCount = 1;
         m_presentInfo.pWaitSemaphores = &m_syncManager->GetFinishedSemaphore(m_syncManager->GetFrame());
         m_presentInfo.pImageIndices = &m_index;
@@ -44,6 +45,7 @@ namespace uvke {
         m_result = vkQueuePresentKHR(surface->GetQueue(1), &m_presentInfo);
         if(m_result == VK_ERROR_OUT_OF_DATE_KHR || m_result == VK_SUBOPTIMAL_KHR || m_swapchain->IsRecreated()) {
             m_swapchain->Recreate(window, pipeline->GetRenderPass());
+            depthBuffer->Recreate(m_base, surface);
             framebuffer->Recreate();
         } else if(m_result != VK_SUCCESS) {
             UVKE_FATAL("Framebuffer Recreation Error");
