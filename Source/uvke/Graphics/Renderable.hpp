@@ -3,7 +3,7 @@
 #define UVKE_RENDERABLE_HEADER
 
 #include "../uvke.hpp"
-#include "../Core/Window.hpp"
+#include "../Window/Window.hpp"
 #include "Camera.hpp"
 
 namespace uvke {

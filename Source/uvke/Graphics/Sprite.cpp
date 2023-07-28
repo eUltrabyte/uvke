@@ -25,15 +25,32 @@ namespace uvke {
         m_indexBuffer.reset();
         m_vertexBuffer.reset();
 
+        m_sampler.reset();
+        m_texture.reset();
+
         UVKE_LOG("Sprite Destroyed");
     }
 
     void Sprite::Create(Renderer* renderer) {
+        m_texture = std::make_unique<Texture>(renderer->GetBase(), "Resource/uvke.png");
+
+        std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * 4));
+        m_stagingBuffer->Map(m_texture->GetPixels());
+        m_texture->Allocate();
+
+        m_texture->LayoutTransition(renderer->GetCommandBuffer(), renderer->GetSurface()->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        m_texture->CopyFromBuffer(renderer->GetCommandBuffer(), renderer->GetSurface()->GetQueue(0), m_stagingBuffer->GetBuffer());
+        m_texture->LayoutTransition(renderer->GetCommandBuffer(), renderer->GetSurface()->GetQueue(0), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        m_stagingBuffer.reset();
+
+        m_sampler = std::make_unique<Sampler>(renderer->GetBase(), m_texture.get());
+
         m_vertexBuffer = std::make_unique<VertexBuffer>(renderer->GetBase(), m_vertices);
         m_indexBuffer = std::make_unique<IndexBuffer>(renderer->GetBase(), m_indices);
-        m_uniformBuffer = std::make_unique<UniformBuffer>(renderer->GetBase(), renderer->GetSampler(), renderer->GetDescriptor());
+        m_uniformBuffer = std::make_unique<UniformBuffer>(renderer->GetBase(), m_sampler.get(), renderer->GetDescriptor());
 
-        std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), m_vertexBuffer->GetSize());
+        m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), m_vertexBuffer->GetSize());
         m_stagingBuffer->Map(m_vertexBuffer->GetVertices().data());
         m_stagingBuffer->Copy(renderer->GetCommandBuffer()->GetCommandPool(), renderer->GetSurface()->GetQueue(0), m_vertexBuffer->GetBuffer(), m_vertexBuffer->GetSize());
         m_stagingBuffer.reset();

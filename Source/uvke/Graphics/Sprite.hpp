@@ -7,6 +7,7 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
+#include "Texture.hpp"
 #include "Camera.hpp"
 #include "Renderable.hpp"
 #include "Renderer.hpp"
@@ -37,6 +38,8 @@ namespace uvke {
         mat4x4f m_model;
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;
+        std::unique_ptr<Texture> m_texture;
+        std::unique_ptr<Sampler> m_sampler;
         std::unique_ptr<VertexBuffer> m_vertexBuffer;
         std::unique_ptr<IndexBuffer> m_indexBuffer;
         std::unique_ptr<UniformBuffer> m_uniformBuffer;

@@ -4,7 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
-#include "../Core/Window.hpp"
+#include "../Window/Window.hpp"
 #include "Surface.hpp"
 #include "Swapchain.hpp"
 #include "StagingBuffer.hpp"
@@ -43,8 +43,6 @@ namespace uvke {
         virtual void SetPipeline(Pipeline* pipeline);
         virtual void SetFramebuffer(Framebuffer* framebuffer);
         virtual void SetCommandBuffer(CommandBuffer* commandBuffer);
-        virtual void SetTexture(Texture* texture);
-        virtual void SetSampler(Sampler* sampler);
         virtual void SetSyncManager(SyncManager* syncManager);
 
         virtual Base* GetBase();
@@ -59,8 +57,6 @@ namespace uvke {
         virtual Pipeline* GetPipeline();
         virtual Framebuffer* GetFramebuffer();
         virtual CommandBuffer* GetCommandBuffer();
-        virtual Texture* GetTexture();
-        virtual Sampler* GetSampler();
         virtual SyncManager* GetSyncManager();
 
     private:
@@ -77,9 +73,7 @@ namespace uvke {
         std::unique_ptr<Pipeline> m_pipeline;
         std::unique_ptr<Framebuffer> m_framebuffer;
         std::unique_ptr<CommandBuffer> m_commandBuffer;
-        std::unique_ptr<Texture> m_texture;
         std::unique_ptr<DepthBuffer> m_depthBuffer;
-        std::unique_ptr<Sampler> m_sampler;
         std::unique_ptr<SyncManager> m_syncManager;
         std::unique_ptr<Interface> m_interface;
         std::unique_ptr<Presentation> m_presentation;

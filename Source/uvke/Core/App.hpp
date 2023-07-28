@@ -3,7 +3,7 @@
 #define UVKE_APP_HEADER
 
 #include "../uvke.hpp"
-#include "WindowManager.hpp"
+#include "../Window/WindowManager.hpp"
 
 namespace uvke {
     class UVKE_API App {

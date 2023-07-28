@@ -4,7 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
-#include "../Core/Window.hpp"
+#include "../Window/Window.hpp"
 #include "UniformBuffer.hpp"
 
 namespace uvke {

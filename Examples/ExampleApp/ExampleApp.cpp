@@ -23,11 +23,11 @@ public:
         sprite.Create(m_renderer.get());
         m_renderer->Push(&sprite);
 
-        uvke::Sprite sprite1({ 0.2f, 0.15f });
+        /* uvke::Sprite sprite1({ 0.2f, 0.15f });
         sprite1.SetPosition({ 0.0f, 0.0f, -1.0f });
         sprite1.SetRotation(0.0f);
         sprite1.Create(m_renderer.get());
-        m_renderer->Push(&sprite1);
+        m_renderer->Push(&sprite1); */
 
         while(m_isRunning) {
             Update();

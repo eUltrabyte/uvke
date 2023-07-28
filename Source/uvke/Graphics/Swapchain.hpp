@@ -3,7 +3,7 @@
 #define UVKE_SWAPCHAIN_HEADER
 
 #include "../uvke.hpp"
-#include "../Core/Window.hpp"
+#include "../Window/Window.hpp"
 #include "../Core/Base.hpp"
 #include "Surface.hpp"
 

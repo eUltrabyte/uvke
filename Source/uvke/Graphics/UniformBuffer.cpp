@@ -74,16 +74,13 @@ namespace uvke {
         }
 
         std::array<VkWriteDescriptorSet, 2> writeDescriptorSets { };
+
         for(auto i = 0; i < 2; ++i) {
             VkDescriptorBufferInfo descriptorBufferInfo { };
             descriptorBufferInfo.buffer = m_buffer;
             descriptorBufferInfo.offset = 0;
             descriptorBufferInfo.range = sizeof(UniformBufferObject);
 
-            VkDescriptorImageInfo descriptorImageInfo { };
-            descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            descriptorImageInfo.imageView = sampler->GetImageView();
-            descriptorImageInfo.sampler = sampler->GetSampler();
 
             writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             writeDescriptorSets[0].dstSet = m_descriptorSets[i];
@@ -95,17 +92,26 @@ namespace uvke {
             writeDescriptorSets[0].pImageInfo = nullptr;
             writeDescriptorSets[0].pTexelBufferView = nullptr;
 
-            writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            writeDescriptorSets[1].dstSet = m_descriptorSets[i];
-            writeDescriptorSets[1].dstBinding = 1;
-            writeDescriptorSets[1].dstArrayElement = 0;
-            writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            writeDescriptorSets[1].descriptorCount = 1;
-            writeDescriptorSets[1].pBufferInfo = nullptr;
-            writeDescriptorSets[1].pImageInfo = &descriptorImageInfo;
-            writeDescriptorSets[1].pTexelBufferView = nullptr;
+            if(sampler != nullptr) {
+                VkDescriptorImageInfo descriptorImageInfo { };
+                descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                descriptorImageInfo.imageView = sampler->GetImageView();
+                descriptorImageInfo.sampler = sampler->GetSampler();
+                
+                writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                writeDescriptorSets[1].dstSet = m_descriptorSets[i];
+                writeDescriptorSets[1].dstBinding = 1;
+                writeDescriptorSets[1].dstArrayElement = 0;
+                writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                writeDescriptorSets[1].descriptorCount = 1;
+                writeDescriptorSets[1].pBufferInfo = nullptr;
+                writeDescriptorSets[1].pImageInfo = &descriptorImageInfo;
+                writeDescriptorSets[1].pTexelBufferView = nullptr;
 
-            vkUpdateDescriptorSets(m_base->GetDevice(), writeDescriptorSets.size(), writeDescriptorSets.data(), 0, nullptr);
+                vkUpdateDescriptorSets(m_base->GetDevice(), writeDescriptorSets.size(), writeDescriptorSets.data(), 0, nullptr);
+            } else {
+                vkUpdateDescriptorSets(m_base->GetDevice(), writeDescriptorSets.size() - 1, writeDescriptorSets.data(), 0, nullptr);
+            }
         }
 
         UVKE_LOG("Uniform Buffer Created");

@@ -17,28 +17,15 @@ namespace uvke {
 
         m_commandBuffer = std::make_unique<CommandBuffer>(m_base.get());
 
-        m_texture = std::make_unique<Texture>(m_base.get(), "Resource/uvke.png");
-
-        m_stagingBuffer = std::make_unique<StagingBuffer>(m_base.get(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * 4));
-        m_stagingBuffer->Map(m_texture->GetPixels());
-        m_texture->Allocate();
-
-        m_texture->LayoutTransition(m_commandBuffer.get(), m_surface->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        m_texture->CopyFromBuffer(m_commandBuffer.get(), m_surface->GetQueue(0), m_stagingBuffer->GetBuffer());
-        m_texture->LayoutTransition(m_commandBuffer.get(), m_surface->GetQueue(0), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-        m_stagingBuffer.reset();
-
         m_depthBuffer = std::make_unique<DepthBuffer>(m_base.get(), m_surface.get());
         
         m_depthBuffer->LayoutTransition(m_commandBuffer.get(), m_surface->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
-        m_sampler = std::make_unique<Sampler>(m_base.get(), m_texture.get());
         m_descriptor = std::make_unique<Descriptor>(m_base.get());
 
         m_vertexBuffer = std::make_unique<VertexBuffer>(m_base.get(), std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
         m_indexBuffer = std::make_unique<IndexBuffer>(m_base.get(), std::vector<unsigned int> { 0 } );
-        m_uniformBuffer = std::make_unique<UniformBuffer>(m_base.get(), m_sampler.get(), m_descriptor.get());
+        m_uniformBuffer = std::make_unique<UniformBuffer>(m_base.get(), nullptr, m_descriptor.get());
 
         m_pipeline = std::make_unique<Pipeline>(m_base.get(), m_surface.get(), m_vertexBuffer.get(), m_descriptor.get());
 
@@ -65,11 +52,7 @@ namespace uvke {
 
         m_syncManager.reset();
 
-        m_sampler.reset();
-
         m_depthBuffer.reset();
-
-        m_texture.reset();
 
         m_commandBuffer.reset();
 
@@ -165,14 +148,6 @@ namespace uvke {
     void Renderer::SetCommandBuffer(CommandBuffer* commandBuffer) {
         m_commandBuffer = std::make_unique<CommandBuffer>(*commandBuffer);
     }
-
-    void Renderer::SetTexture(Texture* texture) {
-        m_texture = std::make_unique<Texture>(*texture);
-    }
-    
-    void Renderer::SetSampler(Sampler* sampler) {
-        m_sampler = std::make_unique<Sampler>(*sampler);
-    }
     
     void Renderer::SetSyncManager(SyncManager* syncManager) {
         m_syncManager = std::make_unique<SyncManager>(*syncManager);
@@ -224,14 +199,6 @@ namespace uvke {
 
     CommandBuffer* Renderer::GetCommandBuffer() {
         return m_commandBuffer.get();
-    }
-
-    Texture* Renderer::GetTexture() {
-        return m_texture.get();
-    }
-    
-    Sampler* Renderer::GetSampler() {
-        return m_sampler.get();
     }
     
     SyncManager* Renderer::GetSyncManager() {
