@@ -1,25 +1,8 @@
 #include "Sampler.hpp"
 
 namespace uvke {
-    Sampler::Sampler(Base* base, Texture* texture)
+    Sampler::Sampler(Base* base)
         : m_base(base) {
-        {
-            VkImageViewCreateInfo imageViewCreateInfo { };
-            imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            imageViewCreateInfo.pNext = nullptr;
-            imageViewCreateInfo.flags = 0;
-            imageViewCreateInfo.image = texture->GetImage();
-            imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            imageViewCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-            imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-            imageViewCreateInfo.subresourceRange.levelCount = 1;
-            imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-            imageViewCreateInfo.subresourceRange.layerCount = 1;
-
-            UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageView));
-        }
-
         {
             VkPhysicalDeviceFeatures physicalDeviceFeatures { };
             vkGetPhysicalDeviceFeatures(m_base->GetPhysicalDevice(), &physicalDeviceFeatures);
@@ -62,10 +45,6 @@ namespace uvke {
             if(m_sampler != VK_NULL_HANDLE) {
                 vkDestroySampler(m_base->GetDevice(), m_sampler, nullptr);
             }
-
-            if(m_imageView != VK_NULL_HANDLE) {
-                vkDestroyImageView(m_base->GetDevice(), m_imageView, nullptr);
-            }
         }
 
         UVKE_LOG("Sampler Destroyed");
@@ -73,10 +52,6 @@ namespace uvke {
 
     void Sampler::SetBase(Base* base) {
         m_base = base;
-    }
-
-    VkImageView& Sampler::GetImageView() {
-        return m_imageView;
     }
 
     VkSampler& Sampler::GetSampler() {

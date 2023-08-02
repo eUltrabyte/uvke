@@ -21,11 +21,13 @@ namespace uvke {
         
         m_depthBuffer->LayoutTransition(m_commandBuffer.get(), m_surface->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
+        m_sampler = std::make_unique<Sampler>(m_base.get());
+
         m_descriptor = std::make_unique<Descriptor>(m_base.get());
 
         m_vertexBuffer = std::make_unique<VertexBuffer>(m_base.get(), std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
         m_indexBuffer = std::make_unique<IndexBuffer>(m_base.get(), std::vector<unsigned int> { 0 } );
-        m_uniformBuffer = std::make_unique<UniformBuffer>(m_base.get(), nullptr, m_descriptor.get());
+        m_uniformBuffer = std::make_unique<UniformBuffer>(m_base.get(), nullptr, m_descriptor.get(), nullptr);
 
         m_pipeline = std::make_unique<Pipeline>(m_base.get(), m_surface.get(), m_vertexBuffer.get(), m_descriptor.get());
 
@@ -67,6 +69,8 @@ namespace uvke {
         m_vertexBuffer.reset();
 
         m_descriptor.reset();
+
+        m_sampler.reset();
 
         m_swapchain.reset();
         m_surface.reset();
@@ -120,7 +124,11 @@ namespace uvke {
     void Renderer::SetSwapchain(Swapchain* swapchain) {
         m_swapchain = std::make_unique<Swapchain>(*swapchain);
     }
-    
+
+    void Renderer::SetSampler(Sampler* sampler) {
+        m_sampler = std::make_unique<Sampler>(*sampler);
+    }
+
     void Renderer::SetStagingBuffer(StagingBuffer* stagingBuffer) {
         m_stagingBuffer = std::make_unique<StagingBuffer>(*stagingBuffer);
     }
@@ -167,6 +175,10 @@ namespace uvke {
     
     Swapchain* Renderer::GetSwapchain() {
         return m_swapchain.get();
+    }
+
+    Sampler* Renderer::GetSampler() {
+        return m_sampler.get();
     }
     
     StagingBuffer* Renderer::GetStagingBuffer() {

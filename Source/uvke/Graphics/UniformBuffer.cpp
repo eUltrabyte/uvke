@@ -1,7 +1,7 @@
 #include "UniformBuffer.hpp"
 
 namespace uvke {
-    UniformBuffer::UniformBuffer(Base* base, Sampler* sampler, Descriptor* descriptor)
+    UniformBuffer::UniformBuffer(Base* base, Sampler* sampler, Descriptor* descriptor, Texture* texture)
         : m_base(base) {
         {
             VkBufferCreateInfo bufferCreateInfo = { };
@@ -95,7 +95,7 @@ namespace uvke {
             if(sampler != nullptr) {
                 VkDescriptorImageInfo descriptorImageInfo { };
                 descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                descriptorImageInfo.imageView = sampler->GetImageView();
+                descriptorImageInfo.imageView = texture->GetImageView();
                 descriptorImageInfo.sampler = sampler->GetSampler();
                 
                 writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

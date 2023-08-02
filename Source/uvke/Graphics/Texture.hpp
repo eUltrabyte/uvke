@@ -19,17 +19,13 @@ namespace uvke {
         virtual void CopyToBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer destination);
 
         virtual void SetBase(Base* base);
-        virtual void SetSize(vec2u size);
-        virtual void SetChannel(int channel);
-        virtual void SetPixels(unsigned char* pixels);
-        virtual void SetImage(VkImage image);
-        virtual void SetImageMemory(VkDeviceMemory imageMemory);
 
         virtual vec2u& GetSize();
         virtual int& GetChannel();
         virtual unsigned char* GetPixels();
         virtual VkImage& GetImage();
         virtual VkDeviceMemory& GetImageMemory();
+        virtual VkImageView& GetImageView();
 
     protected:
         Base* m_base;
@@ -41,6 +37,7 @@ namespace uvke {
         VkDeviceSize m_imageSize;
         VkImage m_image;
         VkDeviceMemory m_imageMemory;
+        VkImageView m_imageView;
 
     };
 };

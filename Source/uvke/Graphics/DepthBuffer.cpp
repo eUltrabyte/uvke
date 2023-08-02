@@ -64,6 +64,8 @@ namespace uvke {
 
             UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageView));
         }
+
+        UVKE_LOG("Depth Buffer Created");
     }
 
     DepthBuffer::~DepthBuffer() {
@@ -72,6 +74,8 @@ namespace uvke {
             vkFreeMemory(m_base->GetDevice(), m_imageMemory, nullptr);
             vkDestroyImage(m_base->GetDevice(), m_image, nullptr);
         }
+
+        UVKE_LOG("Depth Buffer Destroyed");
     }
 
     void DepthBuffer::Recreate(Base* base, Surface* surface) {
@@ -142,6 +146,8 @@ namespace uvke {
 
             UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageView));
         }
+
+        UVKE_LOG("Depth Buffer Recreated");
     }
 
     void DepthBuffer::LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout) {

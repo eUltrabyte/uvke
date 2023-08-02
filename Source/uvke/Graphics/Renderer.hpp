@@ -36,6 +36,7 @@ namespace uvke {
 
         virtual void SetSurface(Surface* surface);
         virtual void SetSwapchain(Swapchain* swapchain);
+        virtual void SetSampler(Sampler* sampler);
         virtual void SetStagingBuffer(StagingBuffer* stagingBuffer);
         virtual void SetVertexBuffer(VertexBuffer* vertexBuffer);
         virtual void SetIndexBuffer(IndexBuffer* indexBuffer);
@@ -49,6 +50,7 @@ namespace uvke {
         virtual Window* GetWindow();
         virtual Surface* GetSurface();
         virtual Swapchain* GetSwapchain();
+        virtual Sampler* GetSampler();
         virtual StagingBuffer* GetStagingBuffer();
         virtual VertexBuffer* GetVertexBuffer();
         virtual IndexBuffer* GetIndexBuffer();
@@ -64,6 +66,7 @@ namespace uvke {
         std::unique_ptr<Window> m_window;
         std::unique_ptr<Surface> m_surface;
         std::unique_ptr<Swapchain> m_swapchain;
+        std::unique_ptr<Sampler> m_sampler;
         std::unique_ptr<StagingBuffer> m_stagingBuffer;
         std::unique_ptr<VertexBuffer> m_vertexBuffer;
         std::unique_ptr<IndexBuffer> m_indexBuffer;

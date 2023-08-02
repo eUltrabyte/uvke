@@ -54,11 +54,15 @@ namespace uvke {
         commandBuffer->End(fontsCommandBuffer, surface->GetQueue(0));
 
         ImGui_ImplVulkan_DestroyFontUploadObjects();
+
+        UVKE_LOG("Interface Created");
     }
 
     Interface::~Interface() {
         vkDestroyDescriptorPool(m_base->GetDevice(), m_descriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
+
+        UVKE_LOG("Interface Destroyed");
     }
 
     void Interface::Render(CommandBuffer* commandBuffer, unsigned int frame) {

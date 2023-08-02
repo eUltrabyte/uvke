@@ -11,30 +11,41 @@ namespace uvke {
 
         m_size = { static_cast<unsigned int>(size.x), static_cast<unsigned int>(size.y) };
 
-        VkImageCreateInfo imageCreateInfo { };
-        imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        imageCreateInfo.pNext = nullptr;
-        imageCreateInfo.flags = 0;
-        imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-        imageCreateInfo.extent = { m_size.x, m_size.y, 1 };
-        imageCreateInfo.mipLevels = 1;
-        imageCreateInfo.arrayLayers = 1;
-        imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-        imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-        imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-        imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        {
+            VkImageCreateInfo imageCreateInfo { };
+            imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+            imageCreateInfo.pNext = nullptr;
+            imageCreateInfo.flags = 0;
+            imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+            imageCreateInfo.extent = { m_size.x, m_size.y, 1 };
+            imageCreateInfo.mipLevels = 1;
+            imageCreateInfo.arrayLayers = 1;
+            imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+            imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+            imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+            imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 
-        UVKE_ASSERT(vkCreateImage(m_base->GetDevice(), &imageCreateInfo, nullptr, &m_image));
+            UVKE_ASSERT(vkCreateImage(m_base->GetDevice(), &imageCreateInfo, nullptr, &m_image));
+        }
 
         UVKE_LOG("Texture Created");
     }
     
     Texture::~Texture() {
         if(m_base->GetDevice() != VK_NULL_HANDLE) {
-            vkFreeMemory(m_base->GetDevice(), m_imageMemory, nullptr);
-            vkDestroyImage(m_base->GetDevice(), m_image, nullptr);
+            if(m_imageMemory != VK_NULL_HANDLE) {
+                vkFreeMemory(m_base->GetDevice(), m_imageMemory, nullptr);
+            }
+
+            if(m_image != VK_NULL_HANDLE) {
+                vkDestroyImage(m_base->GetDevice(), m_image, nullptr);
+            }
+
+            if(m_imageView != VK_NULL_HANDLE) {
+                vkDestroyImageView(m_base->GetDevice(), m_imageView, nullptr);
+            }
         }
 
         UVKE_LOG("Texture Destroyed");
@@ -68,6 +79,23 @@ namespace uvke {
         UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_imageMemory));
 
         vkBindImageMemory(m_base->GetDevice(), m_image, m_imageMemory, 0);
+
+        {
+            VkImageViewCreateInfo imageViewCreateInfo { };
+            imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            imageViewCreateInfo.pNext = nullptr;
+            imageViewCreateInfo.flags = 0;
+            imageViewCreateInfo.image = m_image;
+            imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            imageViewCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+            imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+            imageViewCreateInfo.subresourceRange.levelCount = 1;
+            imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+            imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+            UVKE_ASSERT(vkCreateImageView(m_base->GetDevice(), &imageViewCreateInfo, nullptr, &m_imageView));
+        }
 
         UVKE_LOG("Texture Allocated");
     }
@@ -155,26 +183,6 @@ namespace uvke {
         m_base = base;
     }
     
-    void Texture::SetSize(vec2u size) {
-        m_size = size;
-    }
-    
-    void Texture::SetChannel(int channel) {
-        m_channel = channel;
-    }
-    
-    void Texture::SetPixels(unsigned char* pixels) {
-        m_pixels = pixels;
-    }
-    
-    void Texture::SetImage(VkImage image) {
-        m_image = image;
-    }
-    
-    void Texture::SetImageMemory(VkDeviceMemory imageMemory) {
-        m_imageMemory = imageMemory;
-    }
-    
     vec2u& Texture::GetSize() {
         return m_size;
     }
@@ -193,5 +201,9 @@ namespace uvke {
     
     VkDeviceMemory& Texture::GetImageMemory() {
         return m_imageMemory;
+    }
+
+    VkImageView& Texture::GetImageView() {
+        return m_imageView;
     }
 };
