@@ -17,7 +17,7 @@ namespace uvke {
 
     class UVKE_API UniformBuffer {
     public:
-        UniformBuffer(Base* base = nullptr, Sampler* sampler = nullptr, Descriptor* descriptor = nullptr);
+        UniformBuffer(Base* base = nullptr, Sampler* sampler = nullptr, Descriptor* descriptor = nullptr, Texture* texture = nullptr);
         virtual ~UniformBuffer();
 
         virtual void Update(const UniformBufferObject& ubo);

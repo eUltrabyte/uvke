@@ -11,6 +11,8 @@ namespace uvke {
         m_presentInfo.swapchainCount = 1;
         m_presentInfo.pSwapchains = &m_swapchain->GetSwapchain();
         m_presentInfo.pResults = nullptr;
+
+        UVKE_LOG("Presentation Created");
     }
 
     void Presentation::AcquireNextImage(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer, DepthBuffer* depthBuffer) {

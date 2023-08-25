@@ -19,6 +19,8 @@ namespace uvke {
                 m_ubo.projection = Frustum<float>(-size.x, size.x, size.y, -size.y, -150.0f, 100.0f);
             } break;
         }
+
+        UVKE_LOG("Camera Created");
     }
 
     void Camera::Update(UniformBuffer* uniformBuffer) {

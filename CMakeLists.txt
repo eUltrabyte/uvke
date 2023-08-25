@@ -78,6 +78,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Framebuffer.cpp
     Source/uvke/Graphics/CommandBuffer.hpp
     Source/uvke/Graphics/CommandBuffer.cpp
+    Source/uvke/Graphics/Image.hpp
+    Source/uvke/Graphics/Image.cpp
     Source/uvke/Graphics/Texture.hpp
     Source/uvke/Graphics/Texture.cpp
     Source/uvke/Graphics/Sampler.hpp

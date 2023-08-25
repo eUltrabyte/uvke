@@ -1,6 +1,6 @@
 - add antialiasing support
-- add image class ( for imageviews and images )
 - add scene class
+- add some functions to image class ( like copying data, transfering and switching formats )
 - add 3d support because why not
 - job manager class ( job queue and job priorities )
 - add multi threading support
