@@ -33,7 +33,7 @@ namespace uvke {
     void Sprite::Create(Renderer* renderer) {
         m_texture = std::make_unique<Texture>(renderer->GetBase(), "Resource/uvke.png");
 
-        std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetSize().x * m_texture->GetSize().y * 4));
+        std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetImage()->GetSize().x * m_texture->GetImage()->GetSize().y * 4));
         m_stagingBuffer->Map(m_texture->GetPixels());
         m_texture->Allocate();
 

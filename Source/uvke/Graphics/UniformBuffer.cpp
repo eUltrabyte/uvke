@@ -95,7 +95,7 @@ namespace uvke {
             if(sampler != nullptr) {
                 VkDescriptorImageInfo descriptorImageInfo { };
                 descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                descriptorImageInfo.imageView = texture->GetImageView();
+                descriptorImageInfo.imageView = texture->GetImage()->GetImageView();
                 descriptorImageInfo.sampler = sampler->GetSampler();
                 
                 writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

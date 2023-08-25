@@ -1,18 +1,17 @@
 #pragma once
-#ifndef UVKE_TEXTURE_HEADER
-#define UVKE_TEXTURE_HEADER
+#ifndef UVKE_IMAGE_HEADER
+#define UVKE_IMAGE_HEADER
 
 #include "../uvke.hpp"
 #include "Surface.hpp"
 #include "StagingBuffer.hpp"
 #include "CommandBuffer.hpp"
-#include "Image.hpp"
 
 namespace uvke {
-    class UVKE_API Texture {
+    class UVKE_API Image {
     public:
-        Texture(Base* base = nullptr, std::string_view filename = "");
-        virtual ~Texture();
+        Image(Base* base = nullptr, const vec2i& size = { 0, 0 });
+        virtual ~Image();
 
         virtual void Allocate();
         virtual void LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout);
@@ -21,17 +20,19 @@ namespace uvke {
 
         virtual void SetBase(Base* base);
 
-        virtual int& GetChannel();
-        virtual unsigned char* GetPixels();
-        virtual Image* GetImage();
+        virtual vec2u& GetSize();
+        virtual VkImage& GetImage();
+        virtual VkDeviceMemory& GetImageMemory();
+        virtual VkImageView& GetImageView();
 
     protected:
         Base* m_base;
 
     private:
-        int m_channel;
-        unsigned char* m_pixels;
-        std::unique_ptr<Image> m_image;
+        vec2u m_size;
+        VkImage m_image;
+        VkDeviceMemory m_imageMemory;
+        VkImageView m_imageView;
 
     };
 };
