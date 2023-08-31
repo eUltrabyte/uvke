@@ -1,3 +1,4 @@
+- fix to support more windows with imgui
 - add antialiasing support
 - add scene class
 - add some functions to image class ( like copying data, transfering and switching formats )

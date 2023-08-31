@@ -2,13 +2,13 @@
 #include <uvke/Graphics/Sprite.hpp>
 #include <uvke/Core/App.hpp>
 
-class ExampleApp : public uvke::App {
+class Test : public uvke::App {
 public:
-    ExampleApp()
-        : m_window(std::make_unique<uvke::Window>(uvke::WindowProps("uvke Example App", { 1280, 720 }, uvke::Style::Default))), m_base(std::make_unique<uvke::Base>("uvke App")), m_renderer(std::make_unique<uvke::Renderer>(m_base.get(), m_window.get())) {
+    Test()
+        : m_window(std::make_unique<uvke::Window>(uvke::WindowProps("uvke Test", { 1280, 720 }, uvke::Style::Default))), m_base(std::make_unique<uvke::Base>("uvke App")), m_renderer(std::make_unique<uvke::Renderer>(m_base.get(), m_window.get())) {
     }
 
-    virtual ~ExampleApp() {
+    virtual ~Test() {
         m_renderer.reset();
         m_base.reset();
         m_window.reset();
@@ -79,7 +79,7 @@ private:
 };
 
 auto main(int argc, char** argv) -> int {
-    ExampleApp example;
-    example.Run();
+    Test test;
+    test.Run();
     return 0;
 };

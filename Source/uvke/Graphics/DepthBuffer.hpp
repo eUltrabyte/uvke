@@ -4,6 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
+#include "../Core/Helper.hpp"
 #include "Surface.hpp"
 #include "CommandBuffer.hpp"
 

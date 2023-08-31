@@ -16,27 +16,11 @@ namespace uvke {
 
             UVKE_ASSERT(vkCreateBuffer(m_base->GetDevice(), &bufferCreateInfo, nullptr, &m_buffer));
 
-            VkMemoryRequirements memoryRequirements { };
-            vkGetBufferMemoryRequirements(m_base->GetDevice(), m_buffer, &memoryRequirements);
-
-            VkPhysicalDeviceMemoryProperties memoryProperties { };
-            vkGetPhysicalDeviceMemoryProperties(m_base->GetPhysicalDevice(), &memoryProperties);
-
-            unsigned int filter = memoryRequirements.memoryTypeBits;
-            VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-            unsigned int index = 0;
-            for(auto i = 0; i < memoryProperties.memoryTypeCount; ++i) {
-                if(filter & (1 << i) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-                    index = i;
-                    break;
-                }
-            }
-
             VkMemoryAllocateInfo memoryAllocateInfo { };
             memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
             memoryAllocateInfo.pNext = nullptr;
-            memoryAllocateInfo.allocationSize = memoryRequirements.size;
-            memoryAllocateInfo.memoryTypeIndex = index;
+            memoryAllocateInfo.allocationSize = Helper::GetRequirementsSize(m_base, m_buffer);
+            memoryAllocateInfo.memoryTypeIndex = Helper::GetMemoryIndex(m_base, m_buffer);
 
             UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_bufferMemory));
         }

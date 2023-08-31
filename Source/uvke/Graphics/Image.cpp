@@ -46,27 +46,11 @@ namespace uvke {
     }
 
     void Image::Allocate() {
-        VkMemoryRequirements memoryRequirements { };
-        vkGetImageMemoryRequirements(m_base->GetDevice(), m_image, &memoryRequirements);
-
-        VkPhysicalDeviceMemoryProperties memoryProperties { };
-        vkGetPhysicalDeviceMemoryProperties(m_base->GetPhysicalDevice(), &memoryProperties);
-
-        unsigned int filter = memoryRequirements.memoryTypeBits;
-        VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-        unsigned int index = 0;
-        for(auto i = 0; i < memoryProperties.memoryTypeCount; ++i) {
-            if(filter & (1 << i) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-                index = i;
-                break;
-            }
-        }
-
         VkMemoryAllocateInfo memoryAllocateInfo { };
         memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memoryAllocateInfo.pNext = nullptr;
-        memoryAllocateInfo.allocationSize = memoryRequirements.size;
-        memoryAllocateInfo.memoryTypeIndex = index;
+        memoryAllocateInfo.allocationSize = Helper::GetRequirementsSize(m_base, m_image);
+        memoryAllocateInfo.memoryTypeIndex = Helper::GetMemoryIndex(m_base, m_image);
 
         UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_imageMemory));
 

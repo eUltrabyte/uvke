@@ -1,5 +1,4 @@
 #include "Base.hpp"
-#include <vulkan/vulkan_core.h>
 
 namespace uvke {
     Base::Base(std::string_view name) {
@@ -11,7 +10,7 @@ namespace uvke {
             appInfo.pApplicationName = name.data();
             appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
             appInfo.pEngineName = "uvke";
-            appInfo.apiVersion = uvke::Core::GetSupportedVulkan();
+            appInfo.apiVersion = Core::GetVulkanVersion();
 
             std::vector<const char*> layers = {
                 #ifdef UVKE_DEBUG
