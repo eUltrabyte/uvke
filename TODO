@@ -1,4 +1,3 @@
-- write vulkan helper ( with functions to find the best memory type index and more )
 - fix to support more windows with imgui
 - add antialiasing support
 - add scene class

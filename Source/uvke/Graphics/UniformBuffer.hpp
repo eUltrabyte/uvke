@@ -4,6 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
+#include "../Core/Helper.hpp"
 #include "Shader.hpp"
 #include "Sampler.hpp"
 #include "Descriptor.hpp"

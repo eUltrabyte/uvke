@@ -11,7 +11,7 @@ namespace uvke {
         #endif
     }
 
-    unsigned int Core::GetSupportedVulkan() {
+    unsigned int Core::GetVulkanVersion() {
         unsigned int version = VK_API_VERSION_1_0;
         auto EnumerateInstanceVersion = PFN_vkEnumerateInstanceVersion(vkGetInstanceProcAddr(nullptr, "vkEnumerateInstanceVersion"));
         if(EnumerateInstanceVersion != nullptr) {

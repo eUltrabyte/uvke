@@ -4,6 +4,7 @@
 
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
+#include "../Core/Helper.hpp"
 
 namespace uvke {
     class UVKE_API IndexBuffer {

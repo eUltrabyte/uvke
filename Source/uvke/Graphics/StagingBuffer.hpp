@@ -3,7 +3,7 @@
 #define UVKE_STAGING_BUFFER_HEADER
 
 #include "../uvke.hpp"
-#include "../Core/Base.hpp"
+#include "../Core/Helper.hpp"
 
 namespace uvke {
     class UVKE_API StagingBuffer {

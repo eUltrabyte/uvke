@@ -52,7 +52,7 @@ namespace uvke {
         Core();
         virtual ~Core() = default;
 
-        static unsigned int GetSupportedVulkan();
+        static unsigned int GetVulkanVersion();
 
     };
 };

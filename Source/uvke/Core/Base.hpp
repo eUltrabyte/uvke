@@ -1,5 +1,4 @@
 #pragma once
-#include <vulkan/vulkan_core.h>
 #ifndef UVKE_BASE_HEADER
 #define UVKE_BASE_HEADER
 
