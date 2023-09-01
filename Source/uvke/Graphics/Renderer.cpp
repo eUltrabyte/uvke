@@ -19,7 +19,7 @@ namespace uvke {
 
         m_depthBuffer = std::make_unique<DepthBuffer>(m_base.get(), m_surface.get());
         
-        m_depthBuffer->LayoutTransition(m_commandBuffer.get(), m_surface->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+        m_depthBuffer->LayoutTransition(m_commandBuffer.get(), m_surface->GetQueue(0));
 
         m_sampler = std::make_unique<Sampler>(m_base.get());
 
