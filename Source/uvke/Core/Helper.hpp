@@ -14,8 +14,8 @@ namespace uvke {
         static VkDeviceSize GetRequirementsSize(Base* base, VkBuffer buffer);
         static VkDeviceSize GetRequirementsSize(Base* base, VkImage image);
 
-        static int GetMemoryIndex(Base* base, VkBuffer buffer);
-        static int GetMemoryIndex(Base* base, VkImage image);
+        static int FindMemoryIndex(Base* base, VkBuffer buffer);
+        static int FindMemoryIndex(Base* base, VkImage image);
 
     };
 };

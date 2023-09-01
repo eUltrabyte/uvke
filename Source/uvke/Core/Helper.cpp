@@ -13,7 +13,7 @@ namespace uvke {
         return memoryRequirements.size;
     }
 
-    int Helper::GetMemoryIndex(Base* base, VkBuffer buffer) {
+    int Helper::FindMemoryIndex(Base* base, VkBuffer buffer) {
         VkMemoryRequirements memoryRequirements { };
         vkGetBufferMemoryRequirements(base->GetDevice(), buffer, &memoryRequirements);
 
@@ -32,7 +32,7 @@ namespace uvke {
         return 0;
     }
 
-    int Helper::GetMemoryIndex(Base* base, VkImage image) {
+    int Helper::FindMemoryIndex(Base* base, VkImage image) {
         VkMemoryRequirements memoryRequirements { };
         vkGetImageMemoryRequirements(base->GetDevice(), image, &memoryRequirements);
 

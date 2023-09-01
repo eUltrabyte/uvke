@@ -1,7 +1,7 @@
 #include "Image.hpp"
 
 namespace uvke {
-    Image::Image(Base* base, const vec2i& size)
+    Image::Image(Base* base, const vec2i& size, VkFormat format, VkImageUsageFlags usage)
         : m_base(base) {
         m_size = { static_cast<unsigned int>(size.x), static_cast<unsigned int>(size.y) };
 
@@ -14,10 +14,12 @@ namespace uvke {
             imageCreateInfo.extent = { m_size.x, m_size.y, 1 };
             imageCreateInfo.mipLevels = 1;
             imageCreateInfo.arrayLayers = 1;
-            imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+            imageCreateInfo.format = format;
             imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
             imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-            imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+            imageCreateInfo.queueFamilyIndexCount = 0;
+            imageCreateInfo.pQueueFamilyIndices = nullptr;
+            imageCreateInfo.usage = usage;
             imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
             imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 
@@ -45,12 +47,12 @@ namespace uvke {
         UVKE_LOG("Image Destroyed");
     }
 
-    void Image::Allocate() {
+    void Image::Allocate(VkFormat format, VkImageAspectFlags flags) {
         VkMemoryAllocateInfo memoryAllocateInfo { };
         memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memoryAllocateInfo.pNext = nullptr;
         memoryAllocateInfo.allocationSize = Helper::GetRequirementsSize(m_base, m_image);
-        memoryAllocateInfo.memoryTypeIndex = Helper::GetMemoryIndex(m_base, m_image);
+        memoryAllocateInfo.memoryTypeIndex = Helper::FindMemoryIndex(m_base, m_image);
 
         UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_imageMemory));
 
@@ -63,8 +65,8 @@ namespace uvke {
             imageViewCreateInfo.flags = 0;
             imageViewCreateInfo.image = m_image;
             imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            imageViewCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-            imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            imageViewCreateInfo.format = format;
+            imageViewCreateInfo.subresourceRange.aspectMask = flags;
             imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
             imageViewCreateInfo.subresourceRange.levelCount = 1;
             imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
@@ -108,6 +110,18 @@ namespace uvke {
 
             source = VK_PIPELINE_STAGE_TRANSFER_BIT;
             destination = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        } else if(oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+            imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+            if(m_base->HasStencilComponent()) {
+                imageMemoryBarrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+            }
+
+            imageMemoryBarrier.srcAccessMask = 0;
+            imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+            source = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            destination = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         } else {
             UVKE_ASSERT(-1);
         }

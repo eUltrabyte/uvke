@@ -41,7 +41,7 @@ namespace uvke {
             memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
             memoryAllocateInfo.pNext = nullptr;
             memoryAllocateInfo.allocationSize = Helper::GetRequirementsSize(m_base, m_buffer);
-            memoryAllocateInfo.memoryTypeIndex = Helper::GetMemoryIndex(m_base, m_buffer);
+            memoryAllocateInfo.memoryTypeIndex = Helper::FindMemoryIndex(m_base, m_buffer);
 
             UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_bufferMemory));
         }

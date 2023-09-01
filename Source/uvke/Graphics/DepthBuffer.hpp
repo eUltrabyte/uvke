@@ -7,6 +7,7 @@
 #include "../Core/Helper.hpp"
 #include "Surface.hpp"
 #include "CommandBuffer.hpp"
+#include "Image.hpp"
 
 namespace uvke {
     class UVKE_API DepthBuffer {
@@ -16,7 +17,7 @@ namespace uvke {
 
         virtual void Recreate(Base* base, Surface* surface);
 
-        virtual void LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue, VkImageLayout oldLayout, VkImageLayout newLayout);
+        virtual void LayoutTransition(CommandBuffer* commandBuffer, VkQueue queue);
 
         virtual VkImage& GetImage();
         virtual VkDeviceMemory& GetImageMemory();
@@ -26,9 +27,7 @@ namespace uvke {
         Base* m_base;
 
     private:
-        VkImage m_image;
-        VkDeviceMemory m_imageMemory;
-        VkImageView m_imageView;
+        std::unique_ptr<Image> m_image;
 
     };
 };
