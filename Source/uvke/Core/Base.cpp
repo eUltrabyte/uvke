@@ -170,4 +170,8 @@ namespace uvke {
     bool Base::HasStencilComponent() {
         return m_depthFormat == VK_FORMAT_D32_SFLOAT_S8_UINT || m_depthFormat == VK_FORMAT_D24_UNORM_S8_UINT;
     }
+
+    VkSampleCountFlagBits Base::GetSampleCount() {
+        return m_sampleCount;
+    }
 };

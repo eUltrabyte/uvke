@@ -1,9 +1,5 @@
 #include "Window.hpp"
 
-#include <stb/stb_image.h>
-
-#include <GLFW/glfw3.h>
-
 namespace uvke {
     Window::Window(const WindowProps& windowProps) {
         SetWindowProps(windowProps);

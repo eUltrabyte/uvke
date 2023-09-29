@@ -1,7 +1,9 @@
 #include "Camera.hpp"
+#include <GLFW/glfw3.h>
 
 namespace uvke {
-    Camera::Camera(const Projection& projection, const vec2f& size) {
+    Camera::Camera(const Projection& projection, const vec2f& size)
+        : m_position(0.0f, 0.0f, 0.0f) {
         m_ubo.model = Identity<float>();
         m_ubo.view = LookAt<float>(vec3f(0.0f, 0.0f, -2.0f), vec3f(0.0f, 0.0f, 0.0f), vec3f(0.0f, 1.0f, -2.0f));
         
@@ -27,18 +29,29 @@ namespace uvke {
         uniformBuffer->Update(m_ubo);
     }
 
-    void Camera::Move(Window* window, const vec2f& speed) {
-        if(window->GetKey(GLFW_KEY_UP) == GLFW_PRESS) {
-            m_ubo.view = Translate<float>(m_ubo.view, vec3f(0.0f, speed.y, 0.0f));
-        } else if(window->GetKey(GLFW_KEY_DOWN) == GLFW_PRESS) {
-            m_ubo.view = Translate<float>(m_ubo.view, vec3f(0.0f, -speed.y, 0.0f));
+    void Camera::Move(Window* window, float speed) {
+        vec3f translation = vec3f(0.0f, 0.0f, 0.0f);
+
+        if(window->GetKey(GLFW_KEY_W) == GLFW_PRESS) {
+            translation += vec3f(0.0f, 0.0f, speed);
+        } else if(window->GetKey(GLFW_KEY_S) == GLFW_PRESS) {
+            translation -= vec3f(0.0f, 0.0f, speed);
         }
 
-        if(window->GetKey(GLFW_KEY_LEFT) == GLFW_PRESS) {
-            m_ubo.view = Translate<float>(m_ubo.view, vec3f(-speed.x, 0.0f, 0.0f));
-        } else if(window->GetKey(GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            m_ubo.view = Translate<float>(m_ubo.view, vec3f(speed.x, 0.0f, 0.0f));
+        if(window->GetKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
+            translation += vec3f(0.0f, speed, 0.0f);
+        } else if(window->GetKey(GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            translation -= vec3f(0.0f, speed, 0.0f);
         }
+
+        if(window->GetKey(GLFW_KEY_A) == GLFW_PRESS) {
+            translation -= vec3f(speed, 0.0f, 0.0f);
+        } else if(window->GetKey(GLFW_KEY_D) == GLFW_PRESS) {
+            translation += vec3f(speed, 0.0f, 0.0f);
+        }
+
+        m_ubo.view = Translate<float>(m_ubo.view, translation);
+        m_position += translation;
     }
 
     void Camera::SetModel(const mat4x4f& model) {

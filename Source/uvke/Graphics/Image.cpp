@@ -1,7 +1,7 @@
 #include "Image.hpp"
 
 namespace uvke {
-    Image::Image(Base* base, const vec2i& size, VkFormat format, VkImageUsageFlags usage)
+    Image::Image(Base* base, const vec2i& size, VkFormat format, VkImageUsageFlags usage, VkSampleCountFlagBits sampleCount)
         : m_base(base) {
         m_size = { static_cast<unsigned int>(size.x), static_cast<unsigned int>(size.y) };
 
@@ -21,7 +21,7 @@ namespace uvke {
             imageCreateInfo.pQueueFamilyIndices = nullptr;
             imageCreateInfo.usage = usage;
             imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+            imageCreateInfo.samples = sampleCount;
 
             UVKE_ASSERT(vkCreateImage(m_base->GetDevice(), &imageCreateInfo, nullptr, &m_image));
         }

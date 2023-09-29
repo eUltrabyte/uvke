@@ -1,8 +1,9 @@
-- fix to support more windows with imgui
-- add msaa support
+- add push constants support in pipeline ( to draw without texture )
+- add msaa support in framebuffer
+- add component class
 - add scene class
 - add some functions to image class ( like copying data, transfering and switching formats )
-- add 3d support because why not
+- add dynamic allocator
 - job manager class ( job queue and job priorities )
 - add multi threading support
 - add audio support

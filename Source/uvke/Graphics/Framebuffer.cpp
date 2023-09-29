@@ -5,10 +5,17 @@ namespace uvke {
         : m_base(base), m_renderPass(renderPass), m_swapchain(swapchain), m_surface(surface), m_depthBuffer(depthBuffer) {
         m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
 
+        {
+            m_image = std::make_shared<Image>(m_base, vec2i(m_surface->GetExtent().width, m_surface->GetExtent().height), m_surface->GetFormat().format, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, m_base->GetSampleCount());
+
+            m_image->Allocate(m_surface->GetFormat().format);
+        }
+
         for(auto i = 0; i < m_framebuffers.size(); ++i) {
-            std::array<VkImageView, 2> imageViews = {
-                m_swapchain->GetImageView(i),
-                m_depthBuffer->GetImageView()
+            std::array<VkImageView, 3> imageViews = {
+                m_image->GetImageView(),
+                m_depthBuffer->GetImageView(),
+                m_swapchain->GetImageView(i)
             };
 
             VkFramebufferCreateInfo framebufferCreateInfo { };
@@ -29,6 +36,8 @@ namespace uvke {
     }
     
     Framebuffer::~Framebuffer() {
+        m_image.reset();
+
         if(m_base->GetDevice() != VK_NULL_HANDLE) {
             for(auto i = 0; i < m_framebuffers.size(); ++i) {
                 if(m_framebuffers[i] != VK_NULL_HANDLE) {
@@ -41,16 +50,25 @@ namespace uvke {
     }
 
     void Framebuffer::Recreate() {
+        m_image.reset();
+
         for(auto i = 0; i < m_framebuffers.size(); ++i) {
             vkDestroyFramebuffer(m_base->GetDevice(), m_framebuffers[i], nullptr);
         }
 
         m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
 
+        {
+            m_image = std::make_shared<Image>(m_base, vec2i(m_surface->GetExtent().width, m_surface->GetExtent().height), m_surface->GetFormat().format, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, m_base->GetSampleCount());
+
+            m_image->Allocate(m_surface->GetFormat().format);
+        }
+
         for(auto i = 0; i < m_framebuffers.size(); ++i) {
-            std::array<VkImageView, 2> imageViews = {
-                m_swapchain->GetImageView(i),
-                m_depthBuffer->GetImageView()
+            std::array<VkImageView, 3> imageViews = {
+                m_image->GetImageView(),
+                m_depthBuffer->GetImageView(),
+                m_swapchain->GetImageView(i)
             };
 
             VkFramebufferCreateInfo framebufferCreateInfo { };

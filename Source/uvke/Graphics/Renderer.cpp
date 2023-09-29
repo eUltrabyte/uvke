@@ -1,9 +1,8 @@
 #include "Renderer.hpp"
-#include <memory>
 
 namespace uvke {
     Renderer::Renderer(Base* base, Window* window)
-        : m_base(std::make_unique<Base>(*base)), m_window(std::make_unique<Window>(*window)), m_deltaTime(0.0f), m_fps(0) {
+        : m_base(std::make_unique<Base>(*base)), m_window(std::make_unique<Window>(*window)), m_fps(0) {
         m_surface = std::make_unique<Surface>(m_base.get(), m_window.get());
         
         m_surface->CheckQueues();
@@ -25,8 +24,8 @@ namespace uvke {
 
         m_descriptor = std::make_unique<Descriptor>(m_base.get());
 
-        m_vertexBuffer = std::make_unique<VertexBuffer>(m_base.get(), std::vector<Vertex> { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } } } );
-        m_indexBuffer = std::make_unique<IndexBuffer>(m_base.get(), std::vector<unsigned int> { 0 } );
+        m_vertexBuffer = std::make_unique<VertexBuffer>(m_base.get());
+        m_indexBuffer = std::make_unique<IndexBuffer>(m_base.get());
         m_uniformBuffer = std::make_unique<UniformBuffer>(m_base.get(), nullptr, m_descriptor.get(), nullptr);
 
         m_pipeline = std::make_unique<Pipeline>(m_base.get(), m_surface.get(), m_vertexBuffer.get(), m_descriptor.get());
@@ -48,9 +47,11 @@ namespace uvke {
     Renderer::~Renderer() {
         m_syncManager->WaitForDevice();
 
-        m_interface.reset();
+        m_camera.reset();
 
         m_presentation.reset();
+
+        m_interface.reset();
 
         m_syncManager.reset();
 
@@ -79,8 +80,9 @@ namespace uvke {
     }
 
     void Renderer::Render() {
+        m_camera->Move(m_window.get(), 0.01f);
+
         for(auto i = 0; i < m_renderables.size(); ++i) {
-            m_camera->Move(m_window.get(), vec2f(0.01f, 0.01f));
             m_renderables[i]->Update(m_camera.get());
         }
 
@@ -91,20 +93,19 @@ namespace uvke {
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_interface->SetRenderTime(m_deltaTime);
+        m_interface->SetRenderTime(m_frameClock.GetDeltaTime());
         m_pipeline->Render(m_framebuffer.get(), m_commandBuffer.get(), m_syncManager->GetFrame(), m_presentation->GetIndex(), m_renderables, m_interface.get());
 
         m_presentation->Submit(m_commandBuffer.get(), m_surface.get());
         m_presentation->Present(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
 
-        if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_clock.GetStart()) >= std::chrono::seconds(1)) {
+        if(m_clock.GetElapsedTime() >= std::chrono::seconds(1)) {
             m_clock.Restart();
             m_interface->SetFPS(m_fps);
             m_fps = 0;
         }
 
         m_syncManager->Update();
-        m_deltaTime = std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_frameClock.GetStart()).count();
         m_frameClock.Restart();
         ++m_fps;
     }

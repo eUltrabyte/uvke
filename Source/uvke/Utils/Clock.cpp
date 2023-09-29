@@ -23,4 +23,8 @@ namespace uvke {
     std::time_t Clock::GetTime() {
         return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     }
+
+    float Clock::GetDeltaTime() {
+        return std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - m_start).count();
+    }
 };

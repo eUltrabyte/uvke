@@ -45,7 +45,7 @@ namespace uvke {
         imguiVulkanInitInfo.DescriptorPool = m_descriptorPool;
         imguiVulkanInitInfo.MinImageCount = 3;
         imguiVulkanInitInfo.ImageCount = 3;
-        imguiVulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+        imguiVulkanInitInfo.MSAASamples = m_base->GetSampleCount();
 
         ImGui_ImplVulkan_Init(&imguiVulkanInitInfo, renderPass);
 

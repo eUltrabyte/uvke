@@ -24,6 +24,7 @@ namespace uvke {
         virtual unsigned int GetQueueCount();
         virtual bool IsMultiQueueSupported();
         virtual bool HasStencilComponent();
+        virtual VkSampleCountFlagBits GetSampleCount();
 
     private:
         VkPhysicalDevice GetSuitablePhysicalDevice() {
@@ -44,10 +45,12 @@ namespace uvke {
 
                 if(physicalDevicesProperties[i].deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && physicalDevicesFeatures[i].geometryShader == VK_TRUE) {
                     UVKE_LOG("GPU - " + std::string(physicalDevicesProperties[i].deviceName));
+                    m_sampleCount = GetUsableSampleCount(physicalDevicesProperties[i].limits.framebufferColorSampleCounts & physicalDevicesProperties[i].limits.framebufferDepthSampleCounts);
                     return physicalDevices[i];
                 }
             }
 
+            m_sampleCount = GetUsableSampleCount(physicalDevicesProperties[0].limits.framebufferColorSampleCounts & physicalDevicesProperties[0].limits.framebufferDepthSampleCounts);
             return physicalDevices[0];
         }
 
@@ -76,6 +79,34 @@ namespace uvke {
             return 0;
         }
 
+        VkSampleCountFlagBits GetUsableSampleCount(VkSampleCountFlags sampleCountFlags) {
+            if(sampleCountFlags & VK_SAMPLE_COUNT_64_BIT) {
+                return VK_SAMPLE_COUNT_64_BIT;
+            }
+
+            if(sampleCountFlags & VK_SAMPLE_COUNT_32_BIT) {
+                return VK_SAMPLE_COUNT_32_BIT;
+            }
+
+            if(sampleCountFlags & VK_SAMPLE_COUNT_16_BIT) {
+                return VK_SAMPLE_COUNT_16_BIT;
+            }
+
+            if(sampleCountFlags & VK_SAMPLE_COUNT_8_BIT) {
+                return VK_SAMPLE_COUNT_8_BIT;
+            }
+
+            if(sampleCountFlags & VK_SAMPLE_COUNT_4_BIT) {
+                return VK_SAMPLE_COUNT_4_BIT;
+            }
+
+            if(sampleCountFlags & VK_SAMPLE_COUNT_2_BIT) {
+                return VK_SAMPLE_COUNT_2_BIT;
+            }
+
+            return VK_SAMPLE_COUNT_1_BIT;
+        }
+
         VkInstance m_instance;
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
@@ -83,6 +114,7 @@ namespace uvke {
         unsigned int m_queueFamilyIndex;
         unsigned int m_queueCount;
         bool m_multiQueue;
+        VkSampleCountFlagBits m_sampleCount;
 
     };
 };

@@ -25,28 +25,33 @@ namespace uvke {
             m_vertexInputAttributeDescription[2].format = VK_FORMAT_R32G32_SFLOAT;
             m_vertexInputAttributeDescription[2].offset = offsetof(Vertex, Vertex::texCoord);
 
-            VkBufferCreateInfo bufferCreateInfo = { };
-            bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-            bufferCreateInfo.pNext = nullptr;
-            bufferCreateInfo.flags = 0;
-            bufferCreateInfo.size = sizeof(Vertex) * m_vertices.size();
-            bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-            bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            bufferCreateInfo.queueFamilyIndexCount = 0;
-            bufferCreateInfo.pQueueFamilyIndices = nullptr;
+            if(m_vertices.size()) {
+                VkBufferCreateInfo bufferCreateInfo = { };
+                bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+                bufferCreateInfo.pNext = nullptr;
+                bufferCreateInfo.flags = 0;
+                bufferCreateInfo.size = sizeof(Vertex) * m_vertices.size();
+                bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+                bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+                bufferCreateInfo.queueFamilyIndexCount = 0;
+                bufferCreateInfo.pQueueFamilyIndices = nullptr;
 
-            UVKE_ASSERT(vkCreateBuffer(m_base->GetDevice(), &bufferCreateInfo, nullptr, &m_buffer));
+                UVKE_ASSERT(vkCreateBuffer(m_base->GetDevice(), &bufferCreateInfo, nullptr, &m_buffer));
 
-            VkMemoryAllocateInfo memoryAllocateInfo { };
-            memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-            memoryAllocateInfo.pNext = nullptr;
-            memoryAllocateInfo.allocationSize = Helper::GetRequirementsSize(m_base, m_buffer);
-            memoryAllocateInfo.memoryTypeIndex = Helper::FindMemoryIndex(m_base, m_buffer);
+                VkMemoryAllocateInfo memoryAllocateInfo { };
+                memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+                memoryAllocateInfo.pNext = nullptr;
+                memoryAllocateInfo.allocationSize = Helper::GetRequirementsSize(m_base, m_buffer);
+                memoryAllocateInfo.memoryTypeIndex = Helper::FindMemoryIndex(m_base, m_buffer);
 
-            UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_bufferMemory));
+                UVKE_ASSERT(vkAllocateMemory(m_base->GetDevice(), &memoryAllocateInfo, nullptr, &m_bufferMemory));
+
+                vkBindBufferMemory(m_base->GetDevice(), m_buffer, m_bufferMemory, 0);
+            } else {
+                m_buffer = VK_NULL_HANDLE;
+                m_bufferMemory = VK_NULL_HANDLE;
+            }
         }
-
-        vkBindBufferMemory(m_base->GetDevice(), m_buffer, m_bufferMemory, 0);
 
         UVKE_LOG("Vertex Buffer Created");
     }

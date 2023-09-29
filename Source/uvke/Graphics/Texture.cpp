@@ -1,8 +1,5 @@
 #include "Texture.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-
 namespace uvke {
     Texture::Texture(Base* base, std::string_view filename)
         : m_base(base) {
