@@ -1,8 +1,6 @@
 - add push constants support in pipeline ( to draw without texture )
-- add msaa support in framebuffer
 - add component class
 - add scene class
-- add some functions to image class ( like copying data, transfering and switching formats )
 - add dynamic allocator
 - job manager class ( job queue and job priorities )
 - add multi threading support

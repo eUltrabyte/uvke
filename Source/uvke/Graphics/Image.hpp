@@ -20,6 +20,7 @@ namespace uvke {
         virtual void CopyFromBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer source);
         virtual void CopyToBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer destination);
 
+        virtual void SetData(CommandBuffer* commandBuffer, VkQueue queue, const vec2u& size, void* data);
         virtual void SetBase(Base* base);
 
         virtual vec2u& GetSize();

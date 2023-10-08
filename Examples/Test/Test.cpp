@@ -20,7 +20,16 @@ public:
         uvke::Sprite sprite({ 0.4f, 0.3f });
         sprite.SetPosition({ 0.0f, 0.0f, 0.0f });
         sprite.SetRotation(0.0f);
+
         sprite.Create(m_renderer.get());
+
+        /* unsigned int* imageData = new unsigned int[sprite.GetTexture()->GetSize().x * sprite.GetTexture()->GetSize().y];
+        for(auto i = 0; i < sprite.GetTexture()->GetSize().x * sprite.GetTexture()->GetSize().y; ++i) {
+            imageData[i] = 0xffffff00;
+        }
+
+        sprite.GetTexture()->SetData(m_renderer->GetCommandBuffer(), m_renderer->GetSurface()->GetQueue(0), { sprite.GetTexture()->GetSize().x, sprite.GetTexture()->GetSize().y }, imageData); */
+
         m_renderer->Push(&sprite);
 
         /* uvke::Sprite sprite1({ 0.2f, 0.15f });

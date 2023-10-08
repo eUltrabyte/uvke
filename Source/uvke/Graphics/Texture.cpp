@@ -36,9 +36,17 @@ namespace uvke {
     void Texture::CopyToBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer destination) {
         m_image->CopyToBuffer(commandBuffer, queue, destination);
     }
+
+    void Texture::SetData(CommandBuffer* commandBuffer, VkQueue queue, const vec2u& size, void* data) {
+        m_image->SetData(commandBuffer, queue, size, data);
+    }
     
     void Texture::SetBase(Base* base) {
         m_base = base;
+    }
+
+    vec2u& Texture::GetSize() {
+        return m_image->GetSize();
     }
     
     int& Texture::GetChannel() {

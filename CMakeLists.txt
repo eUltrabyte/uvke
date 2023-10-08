@@ -123,13 +123,13 @@ else()
 endif()
 
 file(GLOB_RECURSE GLSL_SOURCE_FILES
-    "Resource/*.frag"
-    "Resource/*.vert"
+    "Resource/Shaders/*.frag"
+    "Resource/Shaders/*.vert"
 )
 
 foreach(GLSL ${GLSL_SOURCE_FILES})
     get_filename_component(FILE_NAME ${GLSL} NAME)
-    set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/${FILE_NAME}.spv")
+    set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/Shaders/${FILE_NAME}.spv")
     add_custom_command(OUTPUT ${SPIRV} COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV} DEPENDS ${GLSL})
     list(APPEND SPIRV_BINARY_FILES ${SPIRV})
 endforeach(GLSL)

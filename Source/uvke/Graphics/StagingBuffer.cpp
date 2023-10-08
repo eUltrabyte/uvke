@@ -48,6 +48,14 @@ namespace uvke {
         void* rawData;
         vkMapMemory(m_base->GetDevice(), m_bufferMemory, 0, m_size, 0, &rawData);
         std::memcpy(rawData, data, m_size);
+
+        VkMappedMemoryRange mappedMemoryRange = { };
+		mappedMemoryRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+		mappedMemoryRange.memory = m_bufferMemory;
+		mappedMemoryRange.size = m_size;
+
+		vkFlushMappedMemoryRanges(m_base->GetDevice(), 1, &mappedMemoryRange);
+
         vkUnmapMemory(m_base->GetDevice(), m_bufferMemory);
     }
 
