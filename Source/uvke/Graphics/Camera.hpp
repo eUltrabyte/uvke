@@ -20,7 +20,7 @@ namespace uvke {
         virtual ~Camera() = default;
 
         virtual void Update(UniformBuffer* uniformBuffer);
-        virtual void Move(Window* window, const vec2f& speed);
+        virtual void Move(Window* window, float speed);
 
         virtual void SetModel(const mat4x4f& model);
         virtual void SetView(const mat4x4f& view);
@@ -32,6 +32,7 @@ namespace uvke {
 
     private:
         UniformBufferObject m_ubo;
+        vec3f m_position;
 
     };
 };

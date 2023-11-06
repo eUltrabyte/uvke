@@ -30,6 +30,7 @@ namespace uvke {
 
         virtual std::vector<Vertex>& GetVertices();
         virtual std::vector<unsigned int>& GetIndices();
+        virtual Texture* GetTexture();
         virtual VertexBuffer* GetVertexBuffer();
         virtual IndexBuffer* GetIndexBuffer();
         virtual UniformBuffer* GetUniformBuffer();

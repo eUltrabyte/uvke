@@ -65,7 +65,6 @@ namespace uvke {
             descriptorBufferInfo.offset = 0;
             descriptorBufferInfo.range = sizeof(UniformBufferObject);
 
-
             writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             writeDescriptorSets[0].dstSet = m_descriptorSets[i];
             writeDescriptorSets[0].dstBinding = 0;

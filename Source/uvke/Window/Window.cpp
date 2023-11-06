@@ -1,9 +1,5 @@
 #include "Window.hpp"
 
-#include <stb/stb_image.h>
-
-#include <GLFW/glfw3.h>
-
 namespace uvke {
     Window::Window(const WindowProps& windowProps) {
         SetWindowProps(windowProps);
@@ -125,19 +121,19 @@ namespace uvke {
         GLFWimage images[3];
 
         int width = 0, height = 0, channel = 0;
-        stbi_uc* iconx16 = stbi_load("Resource/uvke-icon-x16.png", &width, &height, &channel, STBI_rgb_alpha);
+        stbi_uc* iconx16 = stbi_load("Resource/Textures/uvke-icon-x16.png", &width, &height, &channel, STBI_rgb_alpha);
 
         images[0].width = width;
         images[0].height = height;
         images[0].pixels = iconx16;
 
-        stbi_uc* iconx32 = stbi_load("Resource/uvke-icon-x32.png", &width, &height, &channel, STBI_rgb_alpha);
+        stbi_uc* iconx32 = stbi_load("Resource/Textures/uvke-icon-x32.png", &width, &height, &channel, STBI_rgb_alpha);
 
         images[1].width = width;
         images[1].height = height;
         images[1].pixels = iconx32;
 
-        stbi_uc* iconx48 = stbi_load("Resource/uvke-icon-x48.png", &width, &height, &channel, STBI_rgb_alpha);
+        stbi_uc* iconx48 = stbi_load("Resource/Textures/uvke-icon-x48.png", &width, &height, &channel, STBI_rgb_alpha);
 
         images[2].width = width;
         images[2].height = height;

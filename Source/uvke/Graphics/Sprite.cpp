@@ -31,7 +31,7 @@ namespace uvke {
     }
 
     void Sprite::Create(Renderer* renderer) {
-        m_texture = std::make_unique<Texture>(renderer->GetBase(), "Resource/uvke.png");
+        m_texture = std::make_unique<Texture>(renderer->GetBase(), "Resource/Textures/uvke.png");
 
         std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetImage()->GetSize().x * m_texture->GetImage()->GetSize().y * 4));
         m_stagingBuffer->Map(m_texture->GetPixels());
@@ -99,6 +99,10 @@ namespace uvke {
 
     std::vector<unsigned int>& Sprite::GetIndices() {
         return m_indices;
+    }
+
+    Texture* Sprite::GetTexture() {
+        return m_texture.get();
     }
 
     VertexBuffer* Sprite::GetVertexBuffer() {

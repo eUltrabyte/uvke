@@ -83,7 +83,6 @@ namespace uvke {
         std::unique_ptr<Camera> m_camera;
         Clock m_clock;
         Clock m_frameClock;
-        float m_deltaTime;
         unsigned int m_fps;
 
     };

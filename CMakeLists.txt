@@ -76,12 +76,12 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/DepthBuffer.cpp
     Source/uvke/Graphics/Pipeline.hpp
     Source/uvke/Graphics/Pipeline.cpp
-    Source/uvke/Graphics/Framebuffer.hpp
-    Source/uvke/Graphics/Framebuffer.cpp
     Source/uvke/Graphics/CommandBuffer.hpp
     Source/uvke/Graphics/CommandBuffer.cpp
     Source/uvke/Graphics/Image.hpp
     Source/uvke/Graphics/Image.cpp
+    Source/uvke/Graphics/Framebuffer.hpp
+    Source/uvke/Graphics/Framebuffer.cpp
     Source/uvke/Graphics/Texture.hpp
     Source/uvke/Graphics/Texture.cpp
     Source/uvke/Graphics/Sampler.hpp
@@ -123,13 +123,13 @@ else()
 endif()
 
 file(GLOB_RECURSE GLSL_SOURCE_FILES
-    "Resource/*.frag"
-    "Resource/*.vert"
+    "Resource/Shaders/*.frag"
+    "Resource/Shaders/*.vert"
 )
 
 foreach(GLSL ${GLSL_SOURCE_FILES})
     get_filename_component(FILE_NAME ${GLSL} NAME)
-    set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/${FILE_NAME}.spv")
+    set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/Shaders/${FILE_NAME}.spv")
     add_custom_command(OUTPUT ${SPIRV} COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV} DEPENDS ${GLSL})
     list(APPEND SPIRV_BINARY_FILES ${SPIRV})
 endforeach(GLSL)

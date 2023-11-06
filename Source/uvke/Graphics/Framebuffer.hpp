@@ -7,6 +7,7 @@
 #include "Surface.hpp"
 #include "Swapchain.hpp"
 #include "DepthBuffer.hpp"
+#include "Image.hpp"
 
 namespace uvke {
     class UVKE_API Framebuffer {
@@ -34,6 +35,7 @@ namespace uvke {
 
     private:
         std::vector<VkFramebuffer> m_framebuffers;
+        std::shared_ptr<Image> m_image;
 
     };
 };

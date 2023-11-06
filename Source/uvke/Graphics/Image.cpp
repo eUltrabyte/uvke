@@ -1,7 +1,7 @@
 #include "Image.hpp"
 
 namespace uvke {
-    Image::Image(Base* base, const vec2i& size, VkFormat format, VkImageUsageFlags usage)
+    Image::Image(Base* base, const vec2i& size, VkFormat format, VkImageUsageFlags usage, VkSampleCountFlagBits sampleCount)
         : m_base(base) {
         m_size = { static_cast<unsigned int>(size.x), static_cast<unsigned int>(size.y) };
 
@@ -21,7 +21,7 @@ namespace uvke {
             imageCreateInfo.pQueueFamilyIndices = nullptr;
             imageCreateInfo.usage = usage;
             imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+            imageCreateInfo.samples = sampleCount;
 
             UVKE_ASSERT(vkCreateImage(m_base->GetDevice(), &imageCreateInfo, nullptr, &m_image));
         }
@@ -167,6 +167,68 @@ namespace uvke {
         vkCmdCopyImageToBuffer(buffer, m_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destination, 1, &bufferImageCopy);
 
         commandBuffer->End(buffer, queue);
+    }
+
+    void Image::SetData(CommandBuffer* commandBuffer, VkQueue queue, const vec2u& size, void* data) {
+        unsigned int imageSize = size.x * size.y * 4;
+        std::unique_ptr<StagingBuffer> stagingBuffer = std::make_unique<StagingBuffer>(m_base, imageSize);
+        VkCommandBuffer buffer = commandBuffer->Begin();
+
+        stagingBuffer->Map(data);
+
+		{
+        	VkImageMemoryBarrier imageCopyMemoryBarrier = {};
+			imageCopyMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            imageCopyMemoryBarrier.pNext = nullptr;
+			imageCopyMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			imageCopyMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			imageCopyMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			imageCopyMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageCopyMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageCopyMemoryBarrier.image = m_image;
+			imageCopyMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            imageCopyMemoryBarrier.subresourceRange.baseMipLevel = 0;
+			imageCopyMemoryBarrier.subresourceRange.levelCount = 1;
+            imageCopyMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+			imageCopyMemoryBarrier.subresourceRange.layerCount = 1;
+
+			vkCmdPipelineBarrier(buffer, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageCopyMemoryBarrier);
+
+			VkBufferImageCopy bufferImageCopy = {};
+			bufferImageCopy.bufferOffset = 0;
+            bufferImageCopy.bufferRowLength = 0;
+            bufferImageCopy.bufferImageHeight = 0;
+            bufferImageCopy.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            bufferImageCopy.imageSubresource.mipLevel = 0;
+            bufferImageCopy.imageSubresource.baseArrayLayer = 0;
+            bufferImageCopy.imageSubresource.layerCount = 1;
+            bufferImageCopy.imageOffset = { 0, 0, 0 };
+            bufferImageCopy.imageExtent = { m_size.x, m_size.y, 1 };
+
+			vkCmdCopyBufferToImage(buffer, stagingBuffer->GetBuffer(), m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+
+			VkImageMemoryBarrier imageUseMemoryBarrier = {};
+			imageUseMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            imageUseMemoryBarrier.pNext = nullptr;
+			imageUseMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			imageUseMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			imageUseMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			imageUseMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageUseMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageUseMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageUseMemoryBarrier.image = m_image;
+			imageUseMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            imageUseMemoryBarrier.subresourceRange.baseMipLevel = 0;
+			imageUseMemoryBarrier.subresourceRange.levelCount = 1;
+            imageUseMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+			imageUseMemoryBarrier.subresourceRange.layerCount = 1;
+
+			vkCmdPipelineBarrier(buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageUseMemoryBarrier);
+
+			commandBuffer->End(buffer, queue);
+		}
+
+        UVKE_LOG("Image Changed Data");
     }
     
     void Image::SetBase(Base* base) {

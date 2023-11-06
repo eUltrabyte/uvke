@@ -1,9 +1,10 @@
 #include "Pipeline.hpp"
+#include <vulkan/vulkan_core.h>
 
 namespace uvke {
     Pipeline::Pipeline(Base* base, Surface* surface, VertexBuffer* vertexBuffer, Descriptor* descriptor)
         : m_base(base), m_surface(surface), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
-        m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Default.vert.spv"), File::Load("Resource/Default.frag.spv"));
+        m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Shaders/Default.vert.spv"), File::Load("Resource/Shaders/Default.frag.spv"));
 
         {
             VkPipelineCacheCreateInfo pipelineCacheCreateInfo { };
@@ -88,7 +89,7 @@ namespace uvke {
             pipelineMultisampleStateCreateInfo.pNext = nullptr;
             pipelineMultisampleStateCreateInfo.flags = 0;
             pipelineMultisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
-            pipelineMultisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+            pipelineMultisampleStateCreateInfo.rasterizationSamples = m_base->GetSampleCount();
             pipelineMultisampleStateCreateInfo.minSampleShading = 1.0f;
             pipelineMultisampleStateCreateInfo.pSampleMask = nullptr;
             pipelineMultisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE;
@@ -133,13 +134,13 @@ namespace uvke {
 
             VkAttachmentDescription colorAttachmentDescription { };
             colorAttachmentDescription.format = m_surface->GetFormat().format;
-            colorAttachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+            colorAttachmentDescription.samples = m_base->GetSampleCount();
             colorAttachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             colorAttachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
             colorAttachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
             colorAttachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
             colorAttachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-            colorAttachmentDescription.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            colorAttachmentDescription.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
             VkAttachmentReference colorAttachmentReference { };
             colorAttachmentReference.attachment = 0;
@@ -147,7 +148,7 @@ namespace uvke {
 
             VkAttachmentDescription depthAttachmentDescription { };
             depthAttachmentDescription.format = m_base->GetDepthFormat();
-            depthAttachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+            depthAttachmentDescription.samples = m_base->GetSampleCount();
             depthAttachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             depthAttachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
             depthAttachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -158,6 +159,20 @@ namespace uvke {
             VkAttachmentReference depthAttachmentReference { };
             depthAttachmentReference.attachment = 1;
             depthAttachmentReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+            VkAttachmentDescription colorAttachmentResolveDescription { };
+            colorAttachmentResolveDescription.format = m_surface->GetFormat().format;
+            colorAttachmentResolveDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+            colorAttachmentResolveDescription.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            colorAttachmentResolveDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+            colorAttachmentResolveDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            colorAttachmentResolveDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+            colorAttachmentResolveDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            colorAttachmentResolveDescription.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+            VkAttachmentReference colorAttachmentResolveReference { };
+            colorAttachmentResolveReference.attachment = 2;
+            colorAttachmentResolveReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             
             VkSubpassDescription subpassDescription { };
             subpassDescription.flags = 0;
@@ -165,6 +180,7 @@ namespace uvke {
             subpassDescription.colorAttachmentCount = 1;
             subpassDescription.pColorAttachments = &colorAttachmentReference;
             subpassDescription.pDepthStencilAttachment = &depthAttachmentReference;
+            subpassDescription.pResolveAttachments = &colorAttachmentResolveReference;
 
             VkSubpassDependency colorSubpassDependency { };
             colorSubpassDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -182,9 +198,10 @@ namespace uvke {
             depthSubpassDependency.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
             depthSubpassDependency.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-            std::array<VkAttachmentDescription, 2> attachmentDescriptions { };
+            std::array<VkAttachmentDescription, 3> attachmentDescriptions { };
             attachmentDescriptions[0] = colorAttachmentDescription;
             attachmentDescriptions[1] = depthAttachmentDescription;
+            attachmentDescriptions[2] = colorAttachmentResolveDescription;
 
             std::array<VkSubpassDependency, 2> subpassDependencies { };
             subpassDependencies[0] = colorSubpassDependency;
@@ -362,7 +379,7 @@ namespace uvke {
             pipelineMultisampleStateCreateInfo.pNext = nullptr;
             pipelineMultisampleStateCreateInfo.flags = 0;
             pipelineMultisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
-            pipelineMultisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+            pipelineMultisampleStateCreateInfo.rasterizationSamples = m_base->GetSampleCount();
             pipelineMultisampleStateCreateInfo.minSampleShading = 1.0f;
             pipelineMultisampleStateCreateInfo.pSampleMask = nullptr;
             pipelineMultisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE;
@@ -407,21 +424,21 @@ namespace uvke {
 
             VkAttachmentDescription colorAttachmentDescription { };
             colorAttachmentDescription.format = m_surface->GetFormat().format;
-            colorAttachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+            colorAttachmentDescription.samples = m_base->GetSampleCount();
             colorAttachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             colorAttachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
             colorAttachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
             colorAttachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
             colorAttachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-            colorAttachmentDescription.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            colorAttachmentDescription.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
             VkAttachmentReference colorAttachmentReference { };
             colorAttachmentReference.attachment = 0;
             colorAttachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
             VkAttachmentDescription depthAttachmentDescription { };
-            depthAttachmentDescription.format = m_surface->GetFormat().format;
-            depthAttachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+            depthAttachmentDescription.format = m_base->GetDepthFormat();
+            depthAttachmentDescription.samples = m_base->GetSampleCount();
             depthAttachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             depthAttachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
             depthAttachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -432,6 +449,20 @@ namespace uvke {
             VkAttachmentReference depthAttachmentReference { };
             depthAttachmentReference.attachment = 1;
             depthAttachmentReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+            VkAttachmentDescription colorAttachmentResolveDescription { };
+            colorAttachmentResolveDescription.format = m_surface->GetFormat().format;
+            colorAttachmentResolveDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+            colorAttachmentResolveDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+            colorAttachmentResolveDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+            colorAttachmentResolveDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            colorAttachmentResolveDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+            colorAttachmentResolveDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            colorAttachmentResolveDescription.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+            VkAttachmentReference colorAttachmentResolveReference { };
+            colorAttachmentResolveReference.attachment = 2;
+            colorAttachmentResolveReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             
             VkSubpassDescription subpassDescription { };
             subpassDescription.flags = 0;
@@ -439,6 +470,7 @@ namespace uvke {
             subpassDescription.colorAttachmentCount = 1;
             subpassDescription.pColorAttachments = &colorAttachmentReference;
             subpassDescription.pDepthStencilAttachment = &depthAttachmentReference;
+            subpassDescription.pResolveAttachments = &colorAttachmentResolveReference;
 
             VkSubpassDependency subpassDependency { };
             subpassDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -451,6 +483,7 @@ namespace uvke {
             std::array<VkAttachmentDescription, 2> attachmentDescriptions { };
             attachmentDescriptions[0] = colorAttachmentDescription;
             attachmentDescriptions[1] = depthAttachmentDescription;
+            attachmentDescriptions[2] = colorAttachmentResolveDescription;
 
             VkRenderPassCreateInfo renderPassCreateInfo { };
             renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
