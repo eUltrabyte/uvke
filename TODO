@@ -12,4 +12,3 @@
 - reimplement audio with own library
 - reimplement imgui with own library
 - reimplement windows with own library
-- add vulkan loader as alternative for vulkan.h ( with win32, x11, xcb, wayland and android support )
