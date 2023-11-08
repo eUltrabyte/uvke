@@ -14,6 +14,13 @@
 #include "Renderable.hpp"
 
 namespace uvke {
+    struct UVKE_API ObjectPushConstant {
+        bool hasTexture;
+        bool dump1;
+        bool dump2;
+        bool dump3;
+    };
+
     class UVKE_API Pipeline {
     public:
         Pipeline(Base* base = nullptr, Surface* surface = nullptr, VertexBuffer* vertexBuffer = nullptr, Descriptor* descriptor = nullptr);

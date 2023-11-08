@@ -1,5 +1,4 @@
 #include "Pipeline.hpp"
-#include <vulkan/vulkan_core.h>
 
 namespace uvke {
     Pipeline::Pipeline(Base* base, Surface* surface, VertexBuffer* vertexBuffer, Descriptor* descriptor)
@@ -219,6 +218,11 @@ namespace uvke {
             renderPassCreateInfo.pDependencies = subpassDependencies.data();
 
             UVKE_ASSERT(vkCreateRenderPass(m_base->GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
+
+            /* VkPushConstantRange pushConstantsRange { };
+            pushConstantsRange.offset = 0;
+            pushConstantsRange.size = sizeof(ObjectPushConstant);
+            pushConstantsRange.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; */
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -498,6 +502,11 @@ namespace uvke {
 
             UVKE_ASSERT(vkCreateRenderPass(m_base->GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
 
+            /* VkPushConstantRange pushConstantsRange { };
+            pushConstantsRange.offset = 0;
+            pushConstantsRange.size = sizeof(ObjectPushConstant);
+            pushConstantsRange.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; */
+
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
             pipelineLayoutCreateInfo.pNext = nullptr;
@@ -605,6 +614,11 @@ namespace uvke {
             scissor.extent = m_surface->GetExtent();
 
             vkCmdSetScissor(commandBuffer->GetCommandBuffer(frame), 0, 1, &scissor);
+
+            /* ObjectPushConstant pushConstants { };
+            pushConstants.hasTexture = false;
+
+            vkCmdPushConstants(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(pushConstants), &pushConstants); */
 
             renderables[i]->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
         }

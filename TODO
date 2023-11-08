@@ -1,7 +1,5 @@
-- add push constants support in pipeline ( to draw without texture )
 - add component class
 - add scene class
-- add dynamic allocator
 - job manager class ( job queue and job priorities )
 - add multi threading support
 - add audio support
