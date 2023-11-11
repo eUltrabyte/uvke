@@ -9,8 +9,13 @@ public:
     }
 
     virtual ~Test() {
+        m_renderer.release();
         m_renderer.reset();
+
+        m_base.release();
         m_base.reset();
+
+        m_window.release();
         m_window.reset();
     }
 

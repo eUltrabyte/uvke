@@ -25,10 +25,6 @@ namespace uvke {
         UVKE_LOG("Camera Created");
     }
 
-    void Camera::Update(UniformBuffer* uniformBuffer) {
-        uniformBuffer->Update(m_ubo);
-    }
-
     void Camera::Move(Window* window, float speed) {
         vec3f translation = vec3f(0.0f, 0.0f, 0.0f);
 
@@ -66,15 +62,7 @@ namespace uvke {
         m_ubo.projection = projection;
     }
 
-    mat4x4f& Camera::GetModel() {
-        return m_ubo.model;
-    }
-        
-    mat4x4f& Camera::GetView() {
-        return m_ubo.view;
-    }
-    
-    mat4x4f& Camera::GetProjection() {
-        return m_ubo.projection;
+    UniformBufferObject& Camera::GetUBO() {
+        return m_ubo;
     }
 };

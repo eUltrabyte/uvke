@@ -108,6 +108,11 @@ namespace uvke {
         }
 
         VkInstance m_instance;
+
+        #ifdef UVKE_DEBUG
+            VkDebugUtilsMessengerEXT m_debugUtilsMessenger;
+        #endif UVKE_DEBUG
+
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
         VkFormat m_depthFormat;

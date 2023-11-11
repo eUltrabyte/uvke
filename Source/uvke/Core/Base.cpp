@@ -33,9 +33,28 @@ namespace uvke {
                 UVKE_LOG("Extension #" + std::to_string(i) + " - " + std::string(extensions.at(i)));
             }
 
+            #ifdef UVKE_DEBUG
+                extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+            #endif
+
             VkInstanceCreateInfo instanceCreateInfo { };
             instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-            instanceCreateInfo.pNext = nullptr;
+
+            #ifdef UVKE_DEBUG
+                VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo { };
+                debugUtilsMessengerCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+                debugUtilsMessengerCreateInfo.pNext = nullptr;
+                debugUtilsMessengerCreateInfo.flags = 0;
+                debugUtilsMessengerCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+                debugUtilsMessengerCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+                debugUtilsMessengerCreateInfo.pfnUserCallback = Core::DebugUtilsMessengerCallback;
+                debugUtilsMessengerCreateInfo.pUserData = nullptr;
+
+                instanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugUtilsMessengerCreateInfo;
+            #elif
+                instanceCreateInfo.pNext = nullptr;
+            #endif UVKE_DEBUG
+
             instanceCreateInfo.flags = 0;
             instanceCreateInfo.pApplicationInfo = &appInfo;
             instanceCreateInfo.enabledLayerCount = layers.size();
@@ -43,7 +62,12 @@ namespace uvke {
             instanceCreateInfo.enabledExtensionCount = extensions.size();
             instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
 
+
             UVKE_ASSERT(vkCreateInstance(&instanceCreateInfo, nullptr, &m_instance));
+
+            #ifdef UVKE_DEBUG
+                 UVKE_ASSERT(Core::CreateDebugUtilsMessengerEXT(m_instance, &debugUtilsMessengerCreateInfo, nullptr, &m_debugUtilsMessenger));
+            #endif
         }
 
         m_physicalDevice = GetSuitablePhysicalDevice();
@@ -96,6 +120,12 @@ namespace uvke {
 
             vkDestroyDevice(m_device, nullptr);
         }
+
+        #ifdef UVKE_DEBUG
+            if(m_debugUtilsMessenger != VK_NULL_HANDLE) {
+                Core::DestroyDebugUtilsMessengerEXT(m_instance, m_debugUtilsMessenger, nullptr);
+            }
+        #endif
 
         if(m_instance != VK_NULL_HANDLE) {
             vkDestroyInstance(m_instance, nullptr);

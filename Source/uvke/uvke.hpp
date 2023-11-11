@@ -5,7 +5,6 @@
 #include "uvkepch.hpp"
 
 #include "Core/Core.hpp"
-#include "Core/Logger.hpp"
 
 #ifdef UVKE_DEBUG
     #define UVKE_LOG(x) { uvke::Logger::Log(std::string(x), uvke::Severity::Debug); }
@@ -20,7 +19,7 @@
 #endif
 
 #define UVKE_BYTE(x) (1 << x)
-#define UVKE_ASSERT(x) if(x <= -1) { UVKE_TRACE(); }
+#define UVKE_ASSERT(x) if(x <= -1) { UVKE_LOG("Result - " + std::to_string(x)); UVKE_TRACE(); }
 
 #include "Utils/Utils.hpp"
 #include "Utils/Vec2.hpp"

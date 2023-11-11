@@ -9,7 +9,7 @@
 namespace uvke {
     struct UVKE_API Vertex {
         vec3f position;
-        vec3f color;
+        vec4f color;
         vec2f texCoord;
     };
 
