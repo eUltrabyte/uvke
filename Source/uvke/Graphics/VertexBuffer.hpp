@@ -7,9 +7,9 @@
 #include "../Core/Helper.hpp"
 
 namespace uvke {
-    struct Vertex {
+    struct UVKE_API Vertex {
         vec3f position;
-        vec3f color;
+        vec4f color;
         vec2f texCoord;
     };
 

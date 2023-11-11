@@ -5,10 +5,10 @@ namespace uvke {
         m_renderType = RenderType::Triangles;
 
         m_vertices = std::vector<Vertex> {
-            { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { size.x, size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -size.x, size.y, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } }
+            { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
+            { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
+            { { size.x, size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+            { { -size.x, size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } }
         };
 
         m_indices = std::vector<unsigned int> {
@@ -62,7 +62,7 @@ namespace uvke {
 
     void Sprite::Update(Camera* camera) {
         camera->SetModel(m_model);
-        camera->Update(m_uniformBuffer.get());
+        m_uniformBuffer->Update(camera->GetUBO());
     }
 
     void Sprite::Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) {

@@ -1,5 +1,4 @@
 #include "Pipeline.hpp"
-#include <vulkan/vulkan_core.h>
 
 namespace uvke {
     Pipeline::Pipeline(Base* base, Surface* surface, VertexBuffer* vertexBuffer, Descriptor* descriptor)
@@ -219,6 +218,11 @@ namespace uvke {
             renderPassCreateInfo.pDependencies = subpassDependencies.data();
 
             UVKE_ASSERT(vkCreateRenderPass(m_base->GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
+
+            /* VkPushConstantRange pushConstantsRange { };
+            pushConstantsRange.offset = 0;
+            pushConstantsRange.size = sizeof(ObjectPushConstant);
+            pushConstantsRange.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; */
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -498,6 +502,11 @@ namespace uvke {
 
             UVKE_ASSERT(vkCreateRenderPass(m_base->GetDevice(), &renderPassCreateInfo, nullptr, &m_renderPass));
 
+            /* VkPushConstantRange pushConstantsRange { };
+            pushConstantsRange.offset = 0;
+            pushConstantsRange.size = sizeof(ObjectPushConstant);
+            pushConstantsRange.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; */
+
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo { };
             pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
             pipelineLayoutCreateInfo.pNext = nullptr;
@@ -529,15 +538,21 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_trianglesPipeline));
-            
-            pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+            switch(renderType) {
+                case RenderType::Triangles: {
+                    UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_trianglesPipeline));
+                } break;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_linesPipeline));
-            
-            pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
-            
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pointsPipeline));
+                case RenderType::Lines: {
+                    pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+                    UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_linesPipeline));
+                } break;
+
+                case RenderType::Points: {
+                    pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+                    UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pointsPipeline));
+                } break;
+            }
         }
         
         UVKE_LOG("Graphics Pipeline Recreated");
@@ -605,6 +620,11 @@ namespace uvke {
             scissor.extent = m_surface->GetExtent();
 
             vkCmdSetScissor(commandBuffer->GetCommandBuffer(frame), 0, 1, &scissor);
+
+            /* ObjectPushConstant pushConstants { };
+            pushConstants.hasTexture = false;
+
+            vkCmdPushConstants(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(pushConstants), &pushConstants); */
 
             renderables[i]->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
         }

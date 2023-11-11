@@ -17,7 +17,7 @@ namespace uvke {
 
             m_vertexInputAttributeDescription[1].binding = 0;
             m_vertexInputAttributeDescription[1].location = 1;
-            m_vertexInputAttributeDescription[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+            m_vertexInputAttributeDescription[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
             m_vertexInputAttributeDescription[1].offset = offsetof(Vertex, Vertex::color);
 
             m_vertexInputAttributeDescription[2].binding = 0;

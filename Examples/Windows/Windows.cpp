@@ -11,9 +11,11 @@ public:
     }
 
     virtual ~Windows() {
+        m_base.release();
         m_base.reset();
 
         for(auto& window : m_windows) {
+            window.release();
             window.reset();
         }
 

@@ -22,4 +22,38 @@ namespace uvke {
 
         return version;
     }
+
+    VkResult Core::CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
+        auto FunctionPointer = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+        if(FunctionPointer != nullptr) {
+            return FunctionPointer(instance, pCreateInfo, pAllocator, pDebugMessenger);
+        } else {
+            return VK_ERROR_EXTENSION_NOT_PRESENT;
+        }
+    }
+    
+    void Core::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
+        auto FunctionPointer = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+        if (FunctionPointer != nullptr) {
+            return FunctionPointer(instance, debugMessenger, pAllocator);
+        }
+    }
+
+    VKAPI_ATTR VkBool32 VKAPI_CALL Core::DebugUtilsMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+        switch(messageSeverity) {
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: {
+                UVKE_LOG(pCallbackData->pMessage);
+            } break;
+
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: {
+                UVKE_LOG(pCallbackData->pMessage);
+            } break;
+
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: {
+                UVKE_FATAL(pCallbackData->pMessage);
+            } break;
+        }
+
+        return VK_FALSE;
+    }
 };

@@ -66,7 +66,9 @@ namespace uvke {
         m_renderables.clear();
 
         m_uniformBuffer.reset();
+
         m_indexBuffer.reset();
+
         m_vertexBuffer.reset();
 
         m_descriptor.reset();
@@ -74,6 +76,7 @@ namespace uvke {
         m_sampler.reset();
 
         m_swapchain.reset();
+
         m_surface.reset();
 
         UVKE_LOG("Renderer Destroyed");

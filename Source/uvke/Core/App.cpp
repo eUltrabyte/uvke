@@ -6,7 +6,9 @@ namespace uvke {
 
     App::~App() {
         m_windowManager.reset();
+
         m_core.reset();
+
         m_clock.reset();
     }
 };
