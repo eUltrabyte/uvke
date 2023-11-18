@@ -98,6 +98,22 @@ namespace uvke {
         glfwSetWindowShouldClose(m_window, GLFW_TRUE);
     }
 
+    void Window::ChangeCursorVisibility(CursorType cursorType) {
+        switch(cursorType) {
+            case CursorType::Shown: {
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            } break;
+
+            case CursorType::Hidden: {
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            } break;
+
+            case CursorType::Disabled: {
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            } break;
+        }
+    }
+
     void Window::SetWindowProps(const WindowProps& windowProps) {
         m_windowProps = std::make_shared<WindowProps>(windowProps);
         std::string title = "";
@@ -177,5 +193,11 @@ namespace uvke {
 
     int Window::GetButton(int button) {
         return glfwGetMouseButton(m_window, button);
+    }
+
+    vec2d Window::GetMouse() {
+        double x = 0, y = 0;
+        glfwGetCursorPos(m_window, &x, &y);
+        return vec2d(x, y);
     }
 };

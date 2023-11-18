@@ -26,10 +26,21 @@ namespace uvke {
         virtual void SetProjection(const mat4x4f& projection);
 
         virtual UniformBufferObject& GetUBO();
+        virtual vec3f& GetPosition();
+        virtual float& GetYaw();
+        virtual float& GetPitch();
+        virtual vec3f& GetDirection();
 
     private:
         UniformBufferObject m_ubo;
         vec3f m_position;
+        vec3f m_front;
+        vec3f m_up;
+        float m_yaw;
+        float m_pitch;
+        vec3f m_direction;
+        bool m_firstMouseMove;
+        vec2d m_lastMousePosition;
 
     };
 };

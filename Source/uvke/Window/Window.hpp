@@ -14,6 +14,12 @@ namespace uvke {
         Default = UVKE_BYTE(1) | UVKE_BYTE(2),
     };
 
+    enum UVKE_API CursorType {
+        Shown = 0,
+        Hidden = UVKE_BYTE(0),
+        Disabled = UVKE_BYTE(1),
+    };
+
     struct UVKE_API WindowProps {
     public:
         std::string title;
@@ -35,6 +41,7 @@ namespace uvke {
         virtual void Update();
         virtual void Wait();
         virtual void Close();
+        virtual void ChangeCursorVisibility(CursorType cursorType = CursorType::Shown);
 
         virtual void SetWindowProps(const WindowProps& windowProps);
     
@@ -44,6 +51,7 @@ namespace uvke {
         virtual Event& GetEvent();
         virtual int GetKey(int key);
         virtual int GetButton(int button);
+        virtual vec2d GetMouse();
     
     private:
         std::shared_ptr<WindowProps> m_windowProps;

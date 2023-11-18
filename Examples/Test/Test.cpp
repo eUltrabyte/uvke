@@ -22,6 +22,8 @@ public:
     virtual void Run() override {
         m_isRunning = true;
 
+        m_window->ChangeCursorVisibility(uvke::CursorType::Disabled);
+
         uvke::Sprite sprite({ 0.4f, 0.3f });
         sprite.SetPosition({ 0.0f, 0.0f, 0.0f });
         sprite.SetRotation(0.0f);

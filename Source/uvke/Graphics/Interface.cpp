@@ -2,7 +2,7 @@
 
 namespace uvke {
     Interface::Interface(Base* base, Window* window, Surface* surface, CommandBuffer* commandBuffer, VkRenderPass renderPass)
-        : m_base(base), m_renderTime(0.0f), m_fps(0) {
+        : m_base(base), m_stats({ }) {
         std::vector<VkDescriptorPoolSize> poolSizes = {
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
@@ -72,8 +72,12 @@ namespace uvke {
 
         ImGui::Begin("Stats");
 
-        ImGui::Text("Render Time: %.4fms", m_renderTime);
-        ImGui::Text("FPS: %i", m_fps);
+        ImGui::Text("Render Time - %.4fms", m_stats.renderTime);
+        ImGui::Text("FPS - %i", m_stats.fps);
+        ImGui::Text("Position - %f, %f, %f", m_stats.position.x, m_stats.position.y, m_stats.position.z);
+        ImGui::Text("Yaw - %f", m_stats.yaw);
+        ImGui::Text("Pitch - %f", m_stats.pitch);
+        ImGui::Text("Direction - %f, %f, %f", m_stats.direction.x, m_stats.direction.y, m_stats.direction.z);
 
         ImGui::End();
 
@@ -81,11 +85,7 @@ namespace uvke {
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer->GetCommandBuffer(frame));
     }
 
-    void Interface::SetRenderTime(float renderTime) {
-        m_renderTime = renderTime;
-    }
-
-    void Interface::SetFPS(int fps) {
-        m_fps = fps;
+    void Interface::SetStats(Stats stats) {
+        m_stats = stats;
     }
 };

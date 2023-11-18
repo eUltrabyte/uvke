@@ -9,6 +9,16 @@
 #include "CommandBuffer.hpp"
 
 namespace uvke {
+    struct UVKE_API Stats {
+    public:
+        float renderTime = 0.0f;
+        int fps = 0;
+        vec3f position = vec3f(0.0f, 0.0f, 0.0f);
+        float yaw = 0.0f;
+        float pitch = 0.0f;
+        vec3f direction = vec3f(0.0f, 0.0f, 0.0f);
+    };
+
     class UVKE_API Interface {
     public:
         Interface(Base* base = nullptr, Window* window = nullptr, Surface* surface = nullptr, CommandBuffer* commandBuffer = nullptr, VkRenderPass renderPass = nullptr);
@@ -16,16 +26,14 @@ namespace uvke {
 
         virtual void Render(CommandBuffer* commandBuffer, unsigned int frame);
 
-        virtual void SetRenderTime(float renderTime);
-        virtual void SetFPS(int fps);
+        virtual void SetStats(Stats stats);
 
     protected:
         Base* m_base;
 
     private:
         VkDescriptorPool m_descriptorPool;
-        float m_renderTime;
-        int m_fps;
+        Stats m_stats;
 
     };
 };

@@ -83,6 +83,7 @@ namespace uvke {
         std::unique_ptr<Camera> m_camera;
         Clock m_clock;
         Clock m_frameClock;
+        Stats m_stats;
         unsigned int m_fps;
 
     };

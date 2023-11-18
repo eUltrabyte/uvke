@@ -1,3 +1,4 @@
+- add delta time in every movement
 - add component class
 - add scene class
 - job manager class ( job queue and job priorities )
