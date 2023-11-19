@@ -52,11 +52,19 @@ public:
     }
 
     virtual void Update() override {
-        // UVKE_LOG("App Timer - " + std::to_string(m_clock->GetElapsedTime().count()) + "ms");
         m_window->Update();
 
         switch(m_event.GetType()) {
-            case uvke::EventType::Closed: { m_window->Close(); Shutdown(); } break;
+            case uvke::EventType::Closed: {
+                m_window->Close(); Shutdown();
+            } break;
+
+            case uvke::EventType::KeyReleased: {
+                if(m_event.GetKey().x == GLFW_KEY_ESCAPE) {
+                    m_window->ChangeCursorVisibility(uvke::CursorType::Shown);
+                }
+            } break;
+
             default: break;
         }
 

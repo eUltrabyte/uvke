@@ -25,7 +25,7 @@ namespace uvke {
         UVKE_LOG("Camera Created");
     }
 
-    void Camera::Move(Window* window, float speed) {
+    void Camera::Move(Window* window, float speed, float sensitivity) {
         if(window->GetKey(GLFW_KEY_W) == GLFW_PRESS) {
             m_position += m_front * speed;
         } else if(window->GetKey(GLFW_KEY_S) == GLFW_PRESS) {
@@ -52,7 +52,7 @@ namespace uvke {
         vec2f offset = vec2f(window->GetMouse().x - m_lastMousePosition.x, window->GetMouse().y - m_lastMousePosition.y);
         m_lastMousePosition = vec2d(window->GetMouse().x, window->GetMouse().y);
 
-        offset *= vec2f(0.1f, 0.1f);
+        offset *= sensitivity;
 
         m_yaw += offset.x;
         m_pitch += offset.y;

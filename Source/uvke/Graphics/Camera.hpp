@@ -19,7 +19,7 @@ namespace uvke {
         Camera(const Projection& projection = Projection::Orthographic, const vec2f& size = { 1.0f, 1.0f });
         virtual ~Camera() = default;
 
-        virtual void Move(Window* window, float speed);
+        virtual void Move(Window* window, float speed, float sensitivity);
 
         virtual void SetModel(const mat4x4f& model);
         virtual void SetView(const mat4x4f& view);

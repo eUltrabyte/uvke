@@ -83,7 +83,8 @@ namespace uvke {
     }
 
     void Renderer::Render() {
-        m_camera->Move(m_window.get(), 0.01f);
+        m_camera->Move(m_window.get(), 0.01f * m_deltaClock.GetDeltaTime(), 0.1f);
+        m_deltaClock.Restart();
 
         for(auto i = 0; i < m_renderables.size(); ++i) {
             m_renderables[i]->Update(m_camera.get());

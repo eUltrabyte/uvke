@@ -20,6 +20,7 @@
 
 #define UVKE_BYTE(x) (1 << x)
 #define UVKE_ASSERT(x) if(x <= -1) { UVKE_LOG("Result - " + std::to_string(x)); UVKE_TRACE(); }
+#define UVKE_STRINGIFY(x) #x
 
 #include "Utils/Utils.hpp"
 #include "Utils/Vec2.hpp"
