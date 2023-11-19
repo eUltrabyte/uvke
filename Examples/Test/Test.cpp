@@ -22,6 +22,8 @@ public:
     virtual void Run() override {
         m_isRunning = true;
 
+        m_window->ChangeCursorVisibility(uvke::CursorType::Disabled);
+
         uvke::Sprite sprite({ 0.4f, 0.3f });
         sprite.SetPosition({ 0.0f, 0.0f, 0.0f });
         sprite.SetRotation(0.0f);
@@ -50,11 +52,19 @@ public:
     }
 
     virtual void Update() override {
-        // UVKE_LOG("App Timer - " + std::to_string(m_clock->GetElapsedTime().count()) + "ms");
         m_window->Update();
 
         switch(m_event.GetType()) {
-            case uvke::EventType::Closed: { m_window->Close(); Shutdown(); } break;
+            case uvke::EventType::Closed: {
+                m_window->Close(); Shutdown();
+            } break;
+
+            case uvke::EventType::KeyReleased: {
+                if(m_event.GetKey().x == GLFW_KEY_ESCAPE) {
+                    m_window->ChangeCursorVisibility(uvke::CursorType::Shown);
+                }
+            } break;
+
             default: break;
         }
 
