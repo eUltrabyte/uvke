@@ -7,13 +7,13 @@ namespace uvke {
 
         m_image->Allocate(m_base->GetDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT);
 
-        UVKE_LOG("Depth Buffer Created");
+        UVKE_LOG_ADDRESS("Depth Buffer Created");
     }
 
     DepthBuffer::~DepthBuffer() {
         m_image.reset();
 
-        UVKE_LOG("Depth Buffer Destroyed");
+        UVKE_LOG_ADDRESS("Depth Buffer Destroyed");
     }
 
     void DepthBuffer::Recreate(Base* base, Surface* surface) {

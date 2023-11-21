@@ -30,7 +30,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateDescriptorSetLayout(m_base->GetDevice(), &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout));
         }
 
-        UVKE_LOG("Descriptor Created");
+        UVKE_LOG_ADDRESS("Descriptor Created");
     }
     
     Descriptor::~Descriptor() {
@@ -40,7 +40,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Descriptor Destroyed");
+        UVKE_LOG_ADDRESS("Descriptor Destroyed");
     }
 
     void Descriptor::SetBase(Base* base) {

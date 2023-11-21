@@ -17,7 +17,7 @@ namespace uvke {
     class UVKE_API Camera {
     public:
         Camera(const Projection& projection = Projection::Orthographic, const vec2f& size = { 1.0f, 1.0f });
-        virtual ~Camera() = default;
+        virtual ~Camera();
 
         virtual void Move(Window* window, float speed, float sensitivity);
 

@@ -26,7 +26,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateImage(m_base->GetDevice(), &imageCreateInfo, nullptr, &m_image));
         }
 
-        UVKE_LOG("Image Created");
+        UVKE_LOG_ADDRESS("Image Created");
     }
     
     Image::~Image() {
@@ -44,7 +44,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Image Destroyed");
+        UVKE_LOG_ADDRESS("Image Destroyed");
     }
 
     void Image::Allocate(VkFormat format, VkImageAspectFlags flags) {

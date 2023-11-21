@@ -266,7 +266,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pointsPipeline));
         }
         
-        UVKE_LOG("Graphics Pipeline Created");
+        UVKE_LOG_ADDRESS("Graphics Pipeline Created");
     }
     
     Pipeline::~Pipeline() {
@@ -298,7 +298,7 @@ namespace uvke {
 
         m_shader.reset();
 
-        UVKE_LOG("Graphics Pipeline Destroyed");
+        UVKE_LOG_ADDRESS("Graphics Pipeline Destroyed");
     }
 
     void Pipeline::Recreate(RenderType renderType) {

@@ -17,7 +17,7 @@ namespace uvke {
 
         m_model = Identity<float>();
 
-        UVKE_LOG("Sprite Setup");
+        UVKE_LOG_ADDRESS("Sprite Setup");
     }
 
     Sprite::~Sprite() {
@@ -27,7 +27,7 @@ namespace uvke {
 
         m_texture.reset();
 
-        UVKE_LOG("Sprite Destroyed");
+        UVKE_LOG_ADDRESS("Sprite Destroyed");
     }
 
     void Sprite::Create(Renderer* renderer) {

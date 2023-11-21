@@ -48,7 +48,7 @@ namespace uvke {
         m_fragmentShaderStageCreateInfo.pName = "main";
         m_fragmentShaderStageCreateInfo.pSpecializationInfo = nullptr;
 
-        UVKE_LOG("Shaders Created");
+        UVKE_LOG_ADDRESS("Shaders Created");
     }
 
     Shader::~Shader() {
@@ -62,7 +62,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Shaders Destroyed");
+        UVKE_LOG_ADDRESS("Shaders Destroyed");
     }
 
     void Shader::SetBase(Base* base) {

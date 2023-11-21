@@ -53,7 +53,7 @@ namespace uvke {
                 instanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugUtilsMessengerCreateInfo;
             #elif
                 instanceCreateInfo.pNext = nullptr;
-            #endif UVKE_DEBUG
+            #endif
 
             instanceCreateInfo.flags = 0;
             instanceCreateInfo.pApplicationInfo = &appInfo;
@@ -111,7 +111,7 @@ namespace uvke {
 
         FindDepthFormat(VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
-        UVKE_LOG("Base Created");
+        UVKE_LOG_ADDRESS("Base Created");
     }
 
     Base::~Base() {
@@ -131,7 +131,7 @@ namespace uvke {
             vkDestroyInstance(m_instance, nullptr);
         }
 
-        UVKE_LOG("Base Destroyed");
+        UVKE_LOG_ADDRESS("Base Destroyed");
     }
 
     void Base::FindDepthFormat(VkImageTiling tiling, VkFormatFeatureFlags features) {

@@ -8,7 +8,7 @@ namespace uvke {
         m_queueFamilyIndex = m_base->GetQueueFamily();
         m_multiQueue = m_base->IsMultiQueueSupported();
 
-        UVKE_LOG("Surface Created");
+        UVKE_LOG_ADDRESS("Surface Created");
     }
 
     Surface::~Surface() {
@@ -18,7 +18,7 @@ namespace uvke {
 
         m_queues.clear();
 
-        UVKE_LOG("Surface Destroyed");
+        UVKE_LOG_ADDRESS("Surface Destroyed");
     }
 
     void Surface::CheckQueues() {

@@ -97,7 +97,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Uniform Buffer Created");
+        UVKE_LOG_ADDRESS("Uniform Buffer Created");
     }
 
     UniformBuffer::~UniformBuffer() {
@@ -117,7 +117,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Uniform Buffer Destroyed");
+        UVKE_LOG_ADDRESS("Uniform Buffer Destroyed");
     }
 
     void UniformBuffer::Update(const UniformBufferObject& ubo) {

@@ -16,7 +16,7 @@ namespace uvke {
     class UVKE_API Presentation {
     public:
         Presentation(Base* base = nullptr, Swapchain* swapchain = nullptr, SyncManager* syncManager = nullptr);
-        virtual ~Presentation() = default;
+        virtual ~Presentation();
 
         virtual void AcquireNextImage(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer, DepthBuffer* depthBuffer);
         virtual void Submit(CommandBuffer* commandBuffer, Surface* surface);

@@ -4,6 +4,14 @@
 
 #include "../uvkepch.hpp"
 
+#ifdef __SSE__
+    #define UVKE_USE_SSE
+#elif __AVX__
+    #define UVKE_USE_AVX2
+#else
+    #define UVKE_USE_DEFAULT
+#endif
+
 namespace uvke {
     namespace priv {
         inline static const float PI = 3.141592653f;

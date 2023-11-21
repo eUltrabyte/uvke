@@ -32,7 +32,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateFramebuffer(m_base->GetDevice(), &framebufferCreateInfo, nullptr, &m_framebuffers[i]));
         }
 
-        UVKE_LOG("Framebuffers Created");
+        UVKE_LOG_ADDRESS("Framebuffers Created");
     }
     
     Framebuffer::~Framebuffer() {
@@ -46,7 +46,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Framebuffers Destroyed");
+        UVKE_LOG_ADDRESS("Framebuffers Destroyed");
     }
 
     void Framebuffer::Recreate() {

@@ -70,7 +70,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Swapchain Created");
+        UVKE_LOG_ADDRESS("Swapchain Created");
     }
     
     Swapchain::~Swapchain() {
@@ -89,7 +89,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Swapchain Destroyed");
+        UVKE_LOG_ADDRESS("Swapchain Destroyed");
     }
 
     void Swapchain::Recreate(Window* window, VkRenderPass renderPass) {

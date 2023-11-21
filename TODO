@@ -1,4 +1,3 @@
-- with every creation and deletion print address of object
 - add component class
 - add scene class
 - job manager class ( job queue and job priorities )

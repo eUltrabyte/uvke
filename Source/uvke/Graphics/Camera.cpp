@@ -22,7 +22,11 @@ namespace uvke {
             } break;
         }
 
-        UVKE_LOG("Camera Created");
+        UVKE_LOG_ADDRESS("Camera Created");
+    }
+
+    Camera::~Camera() {
+        UVKE_LOG_ADDRESS("Camera Destroyed");
     }
 
     void Camera::Move(Window* window, float speed, float sensitivity) {

@@ -30,7 +30,7 @@ namespace uvke {
             m_bufferMemory = VK_NULL_HANDLE;
         }
 
-        UVKE_LOG("Index Buffer Created");
+        UVKE_LOG_ADDRESS("Index Buffer Created");
     }
 
     IndexBuffer::~IndexBuffer() {
@@ -44,7 +44,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Index Buffer Desroyed");
+        UVKE_LOG_ADDRESS("Index Buffer Desroyed");
     }
 
     void IndexBuffer::Bind(VkCommandBuffer commandBuffer) {

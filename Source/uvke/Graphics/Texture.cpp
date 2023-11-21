@@ -8,13 +8,13 @@ namespace uvke {
 
         m_image = std::make_unique<Image>(m_base, size);
 
-        UVKE_LOG("Texture Created");
+        UVKE_LOG_ADDRESS("Texture Created");
     }
     
     Texture::~Texture() {
         m_image.reset();
 
-        UVKE_LOG("Texture Destroyed");
+        UVKE_LOG_ADDRESS("Texture Destroyed");
     }
 
     void Texture::Allocate() {

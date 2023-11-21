@@ -27,7 +27,7 @@ namespace uvke {
 
         vkBindBufferMemory(m_base->GetDevice(), m_buffer, m_bufferMemory, 0);
 
-        UVKE_LOG("Staging Buffer Created");
+        UVKE_LOG_ADDRESS("Staging Buffer Created");
     }
 
     StagingBuffer::~StagingBuffer() {
@@ -41,7 +41,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Staging Buffer Destroyed");
+        UVKE_LOG_ADDRESS("Staging Buffer Destroyed");
     }
 
     void StagingBuffer::Map(void* data) {

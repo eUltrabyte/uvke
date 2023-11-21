@@ -25,7 +25,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateFence(m_base->GetDevice(), &fenceCreateInfo, nullptr, &m_fences[i]));
         }
 
-        UVKE_LOG("Sync Manager Created");
+        UVKE_LOG_ADDRESS("Sync Manager Created");
     }
 
     SyncManager::~SyncManager() {
@@ -39,7 +39,7 @@ namespace uvke {
         m_finishedSemaphores.clear();
         m_availableSemaphores.clear();
 
-        UVKE_LOG("Sync Manager Destroyed");
+        UVKE_LOG_ADDRESS("Sync Manager Destroyed");
     }
 
     void SyncManager::Update() {
