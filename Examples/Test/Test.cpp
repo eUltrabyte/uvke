@@ -45,6 +45,9 @@ public:
         sprite1.Create(m_renderer.get());
         m_renderer->Push(&sprite1); */
 
+        uvke::vec4f test = { 0.0f, 0.0f, 0.0f, 0.0f };
+        test + 1.0f;
+
         while(m_isRunning) {
             Update();
             Render();

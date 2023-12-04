@@ -25,6 +25,7 @@
 #include <memory>
 #include <iomanip>
 #include <complex>
+#include <typeinfo>
 
 #include <cmath>
 #include <ctime>

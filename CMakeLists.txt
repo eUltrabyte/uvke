@@ -122,19 +122,19 @@ else()
     set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/bin/glslangValidator")
 endif()
 
-file(GLOB_RECURSE GLSL_SOURCE_FILES
+file(GLOB_RECURSE UVKE_GLSL_SOURCE
     "Resource/Shaders/*.frag"
     "Resource/Shaders/*.vert"
 )
 
-foreach(GLSL ${GLSL_SOURCE_FILES})
-    get_filename_component(FILE_NAME ${GLSL} NAME)
+foreach(UVKE_GLSL_FILE ${UVKE_GLSL_SOURCE})
+    get_filename_component(FILE_NAME ${UVKE_GLSL_FILE} NAME)
     set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/Shaders/${FILE_NAME}.spv")
-    add_custom_command(OUTPUT ${SPIRV} COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV} DEPENDS ${GLSL})
+    add_custom_command(OUTPUT ${SPIRV} COMMAND ${GLSL_VALIDATOR} -V ${UVKE_GLSL_FILE} -o ${SPIRV} DEPENDS ${UVKE_GLSL_FILE})
     list(APPEND SPIRV_BINARY_FILES ${SPIRV})
-endforeach(GLSL)
+endforeach(UVKE_GLSL_FILE)
 
-add_custom_target(uvke-Shaders DEPENDS ${SPIRV_BINARY_FILES})
+add_custom_target(${PROJECT_NAME}-Shaders DEPENDS ${SPIRV_BINARY_FILES})
 
 option(UVKE_SHARED_LIBRARY "uvke build using shared libraries" OFF)
 option(UVKE_SHARED_BUILD "uvke build shared libraries files" OFF)
@@ -162,19 +162,22 @@ else()
     add_library(${PROJECT_NAME} STATIC ${UVKE_SOURCE})
 endif()
 
-add_dependencies(uvke uvke-Shaders)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-Shaders)
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC Source/uvke/uvkepch.hpp Source/uvke/uvkepch.cpp)
+
 target_compile_definitions(${PROJECT_NAME}-Core PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME}-Window PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME}-Utils PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME}-Graphics PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
+
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}-Core PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}-Window PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}-Utils PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}-Graphics PUBLIC ${UVKE_LIBRARIES})
+
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Window ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics)
 
 file(COPY Resource/ DESTINATION Resource/)

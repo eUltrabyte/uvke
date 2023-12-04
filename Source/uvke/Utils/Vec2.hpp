@@ -185,26 +185,6 @@ namespace uvke {
         T length = Length(vec);
         return vec2<T>(vec.x / length, vec.y / length);
     }
-
-    template<typename T>
-    inline constexpr T DotProduct(const vec2<T>& x, const vec2<T>& y) {
-        return x.x * y.x + x.y * y.y;
-    }
-
-    template<typename T>
-    inline constexpr vec2<T> CrossProduct(const vec2<T>& x, const vec2<T>& y) {
-        return vec2<T>(x.x * y.y - x.y * y.x, x.y * y.x - x.x * y.y);
-    }
-
-    template<typename T, typename U>
-    inline constexpr T DotProduct(const vec2<T>& x, const vec2<U>& y) {
-        return x.x * y.x + x.y * y.y;
-    }
-
-    template<typename T, typename U>
-    inline constexpr vec2<T> CrossProduct(const vec2<T>& x, const vec2<U>& y) {
-        return vec2<T>(x.x * y.y - x.y * y.x, x.y * y.x - x.x * y.y);
-    }
 };
 
 #endif

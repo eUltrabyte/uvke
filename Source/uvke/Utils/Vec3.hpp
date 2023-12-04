@@ -198,12 +198,12 @@ namespace uvke {
 
     template<typename T, typename U>
     inline constexpr T DotProduct(const vec3<T>& x, const vec3<U>& y) {
-        return x.x * y.x + x.y * y.y + x.z * y.z;
+        return x.x * static_cast<T>(y.x) + x.y * static_cast<T>(y.y) + x.z * static_cast<T>(y.z);
     }
 
     template<typename T, typename U>
     inline constexpr vec3<T> CrossProduct(const vec3<T>& x, const vec3<U>& y) {
-        return vec3<T>(x.y * y.z - x.z * y.y, x.z * y.x - x.x * y.z, x.x * y.y - x.y * y.x);
+        return vec3<T>(x.y * static_cast<T>(y.z) - x.z * static_cast<T>(y.y), x.z * static_cast<T>(y.x) - x.x * static_cast<T>(y.z), x.x * static_cast<T>(y.y) - x.y * static_cast<T>(y.x));
     }
 };
 

@@ -1,10 +1,11 @@
+- fix simd vec4 types
+- add simd support to mat4x4
 - add component class
 - add scene class
 - job manager class ( job queue and job priorities )
 - add multi threading support
 - add audio support
 - asset manager class
-- add simd and avx support in math lib
 - own file format for textures, audio, etc
 - reimplement stb_image with own library
 - reimplement audio with own library
