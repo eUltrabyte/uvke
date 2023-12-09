@@ -53,7 +53,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Vertex Buffer Created");
+        UVKE_LOG_ADDRESS("Vertex Buffer Created");
     }
 
     VertexBuffer::~VertexBuffer() {
@@ -67,7 +67,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Vertex Buffer Destroyed");
+        UVKE_LOG_ADDRESS("Vertex Buffer Destroyed");
     }
 
     void VertexBuffer::Bind(VkCommandBuffer commandBuffer) {

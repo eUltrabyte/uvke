@@ -62,7 +62,7 @@ namespace uvke {
             target->GetEvent().SetMouse({ button, mods });
         });
 
-        UVKE_LOG("Window Created");
+        UVKE_LOG_ADDRESS("Window Created");
     }
 
     Window::~Window() {
@@ -70,7 +70,7 @@ namespace uvke {
             glfwDestroyWindow(m_window);
         }
 
-        UVKE_LOG("Window Destroyed");
+        UVKE_LOG_ADDRESS("Window Destroyed");
     }
 
     void Window::CreatePlatformSurface(VkInstance instance, VkSurfaceKHR* surface) {

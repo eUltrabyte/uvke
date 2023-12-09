@@ -24,7 +24,7 @@ namespace uvke {
             UVKE_ASSERT(vkAllocateCommandBuffers(m_base->GetDevice(), &commandBufferAllocateInfo, m_commandBuffers.data()));
         }
 
-        UVKE_LOG("Command Buffer Created");
+        UVKE_LOG_ADDRESS("Command Buffer Created");
     }
     
     CommandBuffer::~CommandBuffer() {
@@ -38,7 +38,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Command Buffer Destroyed");
+        UVKE_LOG_ADDRESS("Command Buffer Destroyed");
     }
 
     VkCommandBuffer CommandBuffer::Begin() {

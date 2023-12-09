@@ -37,7 +37,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateSampler(m_base->GetDevice(), &samplerCreateInfo, nullptr, &m_sampler));
         }
 
-        UVKE_LOG("Sampler Created");
+        UVKE_LOG_ADDRESS("Sampler Created");
     }
 
     Sampler::~Sampler() {
@@ -47,7 +47,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Sampler Destroyed");
+        UVKE_LOG_ADDRESS("Sampler Destroyed");
     }
 
     void Sampler::SetBase(Base* base) {

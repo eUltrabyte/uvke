@@ -15,12 +15,12 @@ namespace uvke {
             std::exit(error);
         });
 
-        UVKE_LOG("Window Manager Created");
+        UVKE_LOG_ADDRESS("Window Manager Created");
     }
 
     WindowManager::~WindowManager() {
         glfwTerminate();
 
-        UVKE_LOG("Window Manager Destroyed");
+        UVKE_LOG_ADDRESS("Window Manager Destroyed");
     }
 };

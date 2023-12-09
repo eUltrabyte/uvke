@@ -42,6 +42,24 @@
     #error "uvke Doesn't Support This Platform"
 #endif
 
+#ifdef __SSE__
+    #define UVKE_MATH_USE_SIMD
+#elif __AVX__
+    #define UVKE_MATH_USE_SIMD
+#endif
+
+#ifdef UVKE_MATH_USE_SIMD
+    #include <x86intrin.h>
+
+    namespace uvke {
+        namespace simd {
+            #ifdef UVKE_MATH_USE_SIMD
+                using vec4 = __m128;
+            #endif
+        };
+    };
+#endif
+
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>

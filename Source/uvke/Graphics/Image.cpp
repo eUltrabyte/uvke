@@ -26,7 +26,7 @@ namespace uvke {
             UVKE_ASSERT(vkCreateImage(m_base->GetDevice(), &imageCreateInfo, nullptr, &m_image));
         }
 
-        UVKE_LOG("Image Created");
+        UVKE_LOG_ADDRESS("Image Created");
     }
     
     Image::~Image() {
@@ -44,7 +44,7 @@ namespace uvke {
             }
         }
 
-        UVKE_LOG("Image Destroyed");
+        UVKE_LOG_ADDRESS("Image Destroyed");
     }
 
     void Image::Allocate(VkFormat format, VkImageAspectFlags flags) {
@@ -170,7 +170,8 @@ namespace uvke {
     }
 
     void Image::SetData(CommandBuffer* commandBuffer, VkQueue queue, const vec2u& size, void* data) {
-        unsigned int imageSize = size.x * size.y * 4;
+        m_size = size;
+        unsigned int imageSize = m_size.x * m_size.y * 4;
         std::unique_ptr<StagingBuffer> stagingBuffer = std::make_unique<StagingBuffer>(m_base, imageSize);
         VkCommandBuffer buffer = commandBuffer->Begin();
 

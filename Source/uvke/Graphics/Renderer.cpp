@@ -41,7 +41,7 @@ namespace uvke {
         // m_camera = std::make_unique<Camera>();
         m_camera = std::make_unique<Camera>(Projection::Perspectivic, vec2f(m_window->GetWindowProps()->size.x, m_window->GetWindowProps()->size.y));
 
-        UVKE_LOG("Renderer Created");
+        UVKE_LOG_ADDRESS("Renderer Created");
     }
 
     Renderer::~Renderer() {
@@ -79,7 +79,7 @@ namespace uvke {
 
         m_surface.reset();
 
-        UVKE_LOG("Renderer Destroyed");
+        UVKE_LOG_ADDRESS("Renderer Destroyed");
     }
 
     void Renderer::Render() {

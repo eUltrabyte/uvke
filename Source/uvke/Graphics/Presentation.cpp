@@ -12,7 +12,11 @@ namespace uvke {
         m_presentInfo.pSwapchains = &m_swapchain->GetSwapchain();
         m_presentInfo.pResults = nullptr;
 
-        UVKE_LOG("Presentation Created");
+        UVKE_LOG_ADDRESS("Presentation Created");
+    }
+
+    Presentation::~Presentation() {
+        UVKE_LOG_ADDRESS("Presentation Destroyed");
     }
 
     void Presentation::AcquireNextImage(Window* window, Surface* surface, Pipeline* pipeline, Framebuffer* framebuffer, DepthBuffer* depthBuffer) {

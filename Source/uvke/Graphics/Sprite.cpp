@@ -17,7 +17,7 @@ namespace uvke {
 
         m_model = Identity<float>();
 
-        UVKE_LOG("Sprite Setup");
+        UVKE_LOG_ADDRESS("Sprite Setup");
     }
 
     Sprite::~Sprite() {
@@ -27,12 +27,12 @@ namespace uvke {
 
         m_texture.reset();
 
-        UVKE_LOG("Sprite Destroyed");
+        UVKE_LOG_ADDRESS("Sprite Destroyed");
     }
 
     void Sprite::Create(Renderer* renderer) {
         m_texture = std::make_unique<Texture>(renderer->GetBase(), "Resource/Textures/uvke.png");
-
+     
         std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetImage()->GetSize().x * m_texture->GetImage()->GetSize().y * 4));
         m_stagingBuffer->Map(m_texture->GetPixels());
         m_texture->Allocate();
