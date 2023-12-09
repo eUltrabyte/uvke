@@ -1,4 +1,4 @@
-- fix simd vec4 types
+- rewrite sprite class ( default = no texture, just color )
 - add simd support to mat4x4
 - add component class
 - add scene class

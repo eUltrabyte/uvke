@@ -32,7 +32,7 @@ public:
 
         /* unsigned int* imageData = new unsigned int[sprite.GetTexture()->GetSize().x * sprite.GetTexture()->GetSize().y];
         for(auto i = 0; i < sprite.GetTexture()->GetSize().x * sprite.GetTexture()->GetSize().y; ++i) {
-            imageData[i] = 0xffffff00;
+            imageData[i] = 0xffff00ff;
         }
 
         sprite.GetTexture()->SetData(m_renderer->GetCommandBuffer(), m_renderer->GetSurface()->GetQueue(0), { sprite.GetTexture()->GetSize().x, sprite.GetTexture()->GetSize().y }, imageData); */
@@ -43,6 +43,7 @@ public:
         sprite1.SetPosition({ 0.0f, 0.0f, -1.0f });
         sprite1.SetRotation(0.0f);
         sprite1.Create(m_renderer.get());
+
         m_renderer->Push(&sprite1); */
 
         uvke::vec4f test = { 0.0f, 0.0f, 0.0f, 0.0f };

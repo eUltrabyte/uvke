@@ -170,7 +170,8 @@ namespace uvke {
     }
 
     void Image::SetData(CommandBuffer* commandBuffer, VkQueue queue, const vec2u& size, void* data) {
-        unsigned int imageSize = size.x * size.y * 4;
+        m_size = size;
+        unsigned int imageSize = m_size.x * m_size.y * 4;
         std::unique_ptr<StagingBuffer> stagingBuffer = std::make_unique<StagingBuffer>(m_base, imageSize);
         VkCommandBuffer buffer = commandBuffer->Begin();
 

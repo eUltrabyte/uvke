@@ -26,9 +26,9 @@ namespace uvke {
 
         vec4<T> operator+(const T& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value, value, value, value };
-                simd::vec4f result = _mm_add_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value, value, value, value };
+                simd::vec4 result = _mm_add_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x + value, y + value, z + value, w + value);
@@ -37,9 +37,9 @@ namespace uvke {
 
         vec4<T> operator-(const T& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value, value, value, value };
-                simd::vec4f result = _mm_sub_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value, value, value, value };
+                simd::vec4 result = _mm_sub_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x - value, y - value, z - value, w - value);
@@ -48,9 +48,9 @@ namespace uvke {
 
         vec4<T> operator*(const T& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value, value, value, value };
-                simd::vec4f result = _mm_mul_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value, value, value, value };
+                simd::vec4 result = _mm_mul_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x * value, y * value, z * value, w * value);
@@ -59,9 +59,9 @@ namespace uvke {
 
         vec4<T> operator/(const T& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value, value, value, value };
-                simd::vec4f result = _mm_div_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value, value, value, value };
+                simd::vec4 result = _mm_div_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x / value, y / value, z / value, w / value);
@@ -70,9 +70,9 @@ namespace uvke {
 
         vec4<T> operator+(const vec4<T>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value.x, value.y, value.z, value.w };
-                simd::vec4f result = _mm_add_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value.x, value.y, value.z, value.w };
+                simd::vec4 result = _mm_add_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x + value.x, y + value.y, z + value.z, w + value.w);
@@ -81,9 +81,9 @@ namespace uvke {
 
         vec4<T> operator-(const vec4<T>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value.x, value.y, value.z, value.w };
-                simd::vec4f result = _mm_sub_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value.x, value.y, value.z, value.w };
+                simd::vec4 result = _mm_sub_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x - value.x, y - value.y, z - value.z, w - value.w);
@@ -92,9 +92,9 @@ namespace uvke {
 
         vec4<T> operator*(const vec4<T>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value.x, value.y, value.z, value.w };
-                simd::vec4f result = _mm_mul_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value.x, value.y, value.z, value.w };
+                simd::vec4 result = _mm_mul_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x * value.x, y * value.y, z * value.z, w * value.w);
@@ -103,9 +103,9 @@ namespace uvke {
 
         vec4<T> operator/(const vec4<T>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value.x, value.y, value.z, value.w };
-                simd::vec4f result = _mm_div_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value.x, value.y, value.z, value.w };
+                simd::vec4 result = _mm_div_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x / value.x, y / value.y, z / value.z, w / value.w);
@@ -114,9 +114,9 @@ namespace uvke {
 
         vec4<T> operator+=(const T& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value, value, value, value };
-                simd::vec4f result = _mm_add_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value, value, value, value };
+                simd::vec4 result = _mm_add_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x += value, y += value, z += value, w += value);
@@ -125,9 +125,9 @@ namespace uvke {
 
         vec4<T> operator-=(const T& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value, value, value, value };
-                simd::vec4f result = _mm_sub_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value, value, value, value };
+                simd::vec4 result = _mm_sub_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x -= value, y -= value, z -= value, w -= value);
@@ -136,9 +136,9 @@ namespace uvke {
 
         vec4<T> operator*=(const T& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value, value, value, value };
-                simd::vec4f result = _mm_mul_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value, value, value, value };
+                simd::vec4 result = _mm_mul_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x *= value, y *= value, z *= value, w *= value);
@@ -147,9 +147,9 @@ namespace uvke {
 
         vec4<T> operator/=(const T& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value, value, value, value };
-                simd::vec4f result = _mm_div_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value, value, value, value };
+                simd::vec4 result = _mm_div_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x /= value, y /= value, z /= value, w /= value);
@@ -158,9 +158,9 @@ namespace uvke {
 
         vec4<T> operator+=(const vec4<T>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value.x, value.y, value.z, value.w };
-                simd::vec4f result = _mm_add_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value.x, value.y, value.z, value.w };
+                simd::vec4 result = _mm_add_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x += value.x, y += value.y, z += value.z, w += value.w);
@@ -169,9 +169,9 @@ namespace uvke {
 
         vec4<T> operator-=(const vec4<T>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value.x, value.y, value.z, value.w };
-                simd::vec4f result = _mm_sub_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value.x, value.y, value.z, value.w };
+                simd::vec4 result = _mm_sub_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x -= value.x, y -= value.y, z -= value.z, w -= value.w);
@@ -180,9 +180,9 @@ namespace uvke {
 
         vec4<T> operator*=(const vec4<T>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value.x, value.y, value.z, value.w };
-                simd::vec4f result = _mm_mul_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value.x, value.y, value.z, value.w };
+                simd::vec4 result = _mm_mul_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x *= value.x, y *= value.y, z *= value.z, w *= value.w);
@@ -191,9 +191,9 @@ namespace uvke {
 
         vec4<T> operator/=(const vec4<T>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { value.x, value.y, value.z, value.w };
-                simd::vec4f result = _mm_div_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { value.x, value.y, value.z, value.w };
+                simd::vec4 result = _mm_div_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x /= value.x, y /= value.y, z /= value.z, w /= value.w);
@@ -203,9 +203,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator+(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
-                simd::vec4f result = _mm_add_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                simd::vec4 result = _mm_add_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x + static_cast<T>(value), y + static_cast<T>(value), z + static_cast<T>(value), w + static_cast<T>(value));
@@ -215,9 +215,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator-(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
-                simd::vec4f result = _mm_sub_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                simd::vec4 result = _mm_sub_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x - static_cast<T>(value), y - static_cast<T>(value), z - static_cast<T>(value), w - static_cast<T>(value));
@@ -227,9 +227,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator*(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
-                simd::vec4f result = _mm_mul_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                simd::vec4 result = _mm_mul_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x * static_cast<T>(value), y * static_cast<T>(value), z * static_cast<T>(value), w * static_cast<T>(value));
@@ -239,9 +239,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator/(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
-                simd::vec4f result = _mm_div_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                simd::vec4 result = _mm_div_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x / static_cast<T>(value), y / static_cast<T>(value), z / static_cast<T>(value), w / static_cast<T>(value));
@@ -251,9 +251,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator+(const vec4<U>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
-                simd::vec4f result = _mm_add_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
+                simd::vec4 result = _mm_add_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x + static_cast<T>(value.x), y + static_cast<T>(value.y), z + static_cast<T>(value.z), w + static_cast<T>(value.w));
@@ -263,9 +263,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator-(const vec4<U>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
-                simd::vec4f result = _mm_sub_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
+                simd::vec4 result = _mm_sub_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x - static_cast<T>(value.x), y - static_cast<T>(value.y), z - static_cast<T>(value.z), w - static_cast<T>(value.w));
@@ -275,9 +275,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator*(const vec4<U>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
-                simd::vec4f result = _mm_mul_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
+                simd::vec4 result = _mm_mul_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x * static_cast<T>(value.x), y * static_cast<T>(value.y), z * static_cast<T>(value.z), w * static_cast<T>(value.w));
@@ -287,9 +287,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator/(const vec4<U>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
-                simd::vec4f result = _mm_div_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
+                simd::vec4 result = _mm_div_ps(p, r);
                 return vec4<T>(static_cast<T>(result[0]), static_cast<T>(result[1]), static_cast<T>(result[2]), static_cast<T>(result[3]));
             #else
                 return vec4<T>(x / static_cast<T>(value.x), y / static_cast<T>(value.y), z / static_cast<T>(value.z), w / static_cast<T>(value.w));
@@ -299,9 +299,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator+=(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
-                simd::vec4f result = _mm_add_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                simd::vec4 result = _mm_add_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x += static_cast<T>(value), y += static_cast<T>(value), z += static_cast<T>(value), w += static_cast<T>(value));
@@ -311,9 +311,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator-=(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
-                simd::vec4f result = _mm_sub_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                simd::vec4 result = _mm_sub_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x -= static_cast<T>(value), y -= static_cast<T>(value), z -= static_cast<T>(value), w -= static_cast<T>(value));
@@ -323,9 +323,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator*=(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
-                simd::vec4f result = _mm_mul_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                simd::vec4 result = _mm_mul_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x *= static_cast<T>(value), y *= static_cast<T>(value), z *= static_cast<T>(value), w *= static_cast<T>(value));
@@ -335,9 +335,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator/=(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
-                simd::vec4f result = _mm_div_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                simd::vec4 result = _mm_div_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x /= static_cast<T>(value), y /= static_cast<T>(value), z /= static_cast<T>(value), w /= static_cast<T>(value));
@@ -347,9 +347,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator+=(const vec4<U>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
-                simd::vec4f result = _mm_add_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
+                simd::vec4 result = _mm_add_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x += static_cast<T>(value.x), y += static_cast<T>(value.y), z += static_cast<T>(value.z), w += static_cast<T>(value.w));
@@ -359,9 +359,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator-=(const vec4<U>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
-                simd::vec4f result = _mm_sub_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
+                simd::vec4 result = _mm_sub_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x -= static_cast<T>(value.x), y -= static_cast<T>(value.y), z -= static_cast<T>(value.z), w -= static_cast<T>(value.w));
@@ -371,9 +371,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator*=(const vec4<U>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
-                simd::vec4f result = _mm_mul_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
+                simd::vec4 result = _mm_mul_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x *= static_cast<T>(value.x), y *= static_cast<T>(value.y), z *= static_cast<T>(value.z), w *= static_cast<T>(value.w));
@@ -383,9 +383,9 @@ namespace uvke {
         template<typename U>
         vec4<T> operator/=(const vec4<U>& value) {
             #ifdef UVKE_MATH_USE_SIMD
-                simd::vec4f p = { x, y, z, w };
-                simd::vec4f r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
-                simd::vec4f result = _mm_div_ps(p, r);
+                simd::vec4 p = { x, y, z, w };
+                simd::vec4 r = { static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z), static_cast<T>(value.w) };
+                simd::vec4 result = _mm_div_ps(p, r);
                 return vec4<T>(x = static_cast<T>(result[0]), y = static_cast<T>(result[1]), z = static_cast<T>(result[2]), w = static_cast<T>(result[3]));
             #else
                 return vec4<T>(x /= static_cast<T>(value.x), y /= static_cast<T>(value.y), z /= static_cast<T>(value.z), w /= static_cast<T>(value.w));
@@ -402,9 +402,9 @@ namespace uvke {
     template<typename T>
     inline constexpr T Length(const vec4<T>& vec) {
         #ifdef UVKE_MATH_USE_SIMD
-            simd::vec4f p = { vec.x, vec.y, vec.z, vec.w };
-            simd::vec4f r = { vec.x, vec.y, vec.z, vec.w };
-            simd::vec4f multiplied = _mm_mul_ps(p, r);
+            simd::vec4 p = { vec.x, vec.y, vec.z, vec.w };
+            simd::vec4 r = { vec.x, vec.y, vec.z, vec.w };
+            simd::vec4 multiplied = _mm_mul_ps(p, r);
             return Sqrt<T>(multiplied[0] + multiplied[1] + multiplied[2] + multiplied[3]);
         #else
             return Sqrt<T>((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z) + (vec.w * vec.w));
@@ -416,9 +416,9 @@ namespace uvke {
         T length = Length(vec);
 
         #ifdef UVKE_MATH_USE_SIMD
-            simd::vec4f p = { vec.x, vec.y, vec.z, vec.w };
-            simd::vec4f r = { length, length, length, length };
-            simd::vec4f divided = _mm_div_ps(p, r);
+            simd::vec4 p = { vec.x, vec.y, vec.z, vec.w };
+            simd::vec4 r = { length, length, length, length };
+            simd::vec4 divided = _mm_div_ps(p, r);
             return vec4<T>(divided[0], divided[1], divided[2], divided[3]);
         #else
             return vec4<T>(vec.x / length, vec.y / length, vec.z / length, vec.w / length);

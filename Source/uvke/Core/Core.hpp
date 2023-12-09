@@ -44,10 +44,8 @@
 
 #ifdef __SSE__
     #define UVKE_MATH_USE_SIMD
-    #define UVKE_MATH_USE_SSE
 #elif __AVX__
     #define UVKE_MATH_USE_SIMD
-    #define UVKE_MATH_USE_AVX
 #endif
 
 #ifdef UVKE_MATH_USE_SIMD
@@ -55,15 +53,8 @@
 
     namespace uvke {
         namespace simd {
-            #ifdef UVKE_MATH_USE_SSE
-                using vec4f = __m128;
-                using vec4i = __m128i;
-                using vec4u = __m128i;
-            #endif
-
-            #ifdef UVKE_MATH_USE_AVX
-                using vec4d = __m256d;
-                using vec4l = __m256i;
+            #ifdef UVKE_MATH_USE_SIMD
+                using vec4 = __m128;
             #endif
         };
     };
