@@ -1,12 +1,12 @@
 #include "Texture.hpp"
 
 namespace uvke {
-    Texture::Texture(Base* base, std::string_view filename)
+    Texture::Texture(Base* base, const vec2i& size, std::string_view filename)
         : m_base(base) {
-        vec2i size = { 0, 0 };
-        m_pixels = stbi_load(filename.data(), &size.x, &size.y, &m_channel, STBI_rgb_alpha);
+        vec2i imageSize = size;
+        m_pixels = stbi_load(filename.data(), &imageSize.x, &imageSize.y, &m_channel, STBI_rgb_alpha);
 
-        m_image = std::make_unique<Image>(m_base, size);
+        m_image = std::make_unique<Image>(m_base, imageSize);
 
         UVKE_LOG_ADDRESS("Texture Created");
     }

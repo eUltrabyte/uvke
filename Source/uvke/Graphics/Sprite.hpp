@@ -15,7 +15,7 @@
 namespace uvke {
     class UVKE_API Sprite : public Renderable {
     public:
-        Sprite(const vec2f& size = { 1.0f, 1.0f });
+        Sprite(const vec2f& size = { 1.0f, 1.0f }, std::string_view filename = "");
         virtual ~Sprite();
 
         virtual void Create(Renderer* renderer) override;
@@ -39,6 +39,7 @@ namespace uvke {
         mat4x4f m_model;
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;
+        std::string_view m_filename;
         std::unique_ptr<Texture> m_texture;
         std::unique_ptr<VertexBuffer> m_vertexBuffer;
         std::unique_ptr<IndexBuffer> m_indexBuffer;

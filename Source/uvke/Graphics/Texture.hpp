@@ -11,7 +11,7 @@
 namespace uvke {
     class UVKE_API Texture {
     public:
-        Texture(Base* base = nullptr, std::string_view filename = "");
+        Texture(Base* base = nullptr, const vec2i& size = { 0, 0 }, std::string_view filename = "");
         virtual ~Texture();
 
         virtual void Allocate();
