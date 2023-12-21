@@ -6,7 +6,7 @@
 [![Pull Requests](https://img.shields.io/github/issues-pr/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke/pulls)
 [![Forks](https://img.shields.io/github/forks/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke)
 
-#### uvke ( Ultrabyte Vulkan Engine ) is open source framework for games development written in C++ 20.
+#### uvke ( Ultrabyte Vulkan Engine ) is open source framework for Vulkan based apps development written in C++ 20.
 
 Main goal of uvke is to make using vulkan simple. I want to use it for myself but usage by someone else would be nice.
 

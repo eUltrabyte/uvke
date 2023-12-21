@@ -1,5 +1,4 @@
-- rewrite sprite class ( default = no texture, just color )
-- add simd support to mat4x4
+- add full simd support to mat4x4
 - add component class
 - add scene class
 - job manager class ( job queue and job priorities )
