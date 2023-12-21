@@ -24,339 +24,347 @@ namespace uvke {
         ~mat4x4() = default;
 
         mat4x4<T> operator+(const T& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] += value;
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value, value, value, value };
+                    simd::vec4 result = _mm_add_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] += value;
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         mat4x4<T> operator-(const T& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] -= value;
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value, value, value, value };
+                    simd::vec4 result = _mm_sub_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] -= value;
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         mat4x4<T> operator*(const T& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] *= value;
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value, value, value, value };
+                    simd::vec4 result = _mm_mul_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] *= value;
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         mat4x4<T> operator/(const T& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] /= value;
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value, value, value, value };
+                    simd::vec4 result = _mm_div_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] /= value;
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         mat4x4<T> operator+(const mat4x4<T>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] += value.data[x][y];
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value.data[i][0], value.data[i][1], value.data[i][2], value.data[i][3] };
+                    simd::vec4 result = _mm_add_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] += value.data[x][y];
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         mat4x4<T> operator-(const mat4x4<T>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] -= value.data[x][y];
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value.data[i][0], value.data[i][1], value.data[i][2], value.data[i][3] };
+                    simd::vec4 result = _mm_sub_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] -= value.data[x][y];
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         mat4x4<T> operator*(const mat4x4<T>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] *= value.data[x][y];
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value.data[i][0], value.data[i][1], value.data[i][2], value.data[i][3] };
+                    simd::vec4 result = _mm_mul_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] *= value.data[x][y];
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         mat4x4<T> operator/(const mat4x4<T>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] /= value.data[x][y];
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value.data[i][0], value.data[i][1], value.data[i][2], value.data[i][3] };
+                    simd::vec4 result = _mm_div_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
-        }
-
-        mat4x4<T> operator+=(const T& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] += value;
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] /= value.data[x][y];
+                    }
                 }
-            }
 
-            return mat4x4<T>(data);
-        }
-
-        mat4x4<T> operator-=(const T& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] -= value;
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        mat4x4<T> operator*=(const T& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] *= value;
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        mat4x4<T> operator/=(const T& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] /= value;
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        mat4x4<T> operator+=(const mat4x4<T>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] += value.data[x][y];
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        mat4x4<T> operator-=(const mat4x4<T>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] -= value.data[x][y];
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        mat4x4<T> operator*=(const mat4x4<T>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] *= value.data[x][y];
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        mat4x4<T> operator/=(const mat4x4<T>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] /= value.data[x][y];
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        template<typename U>
-        mat4x4<T> operator+(const U& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] += static_cast<T>(value);
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        template<typename U>
-        mat4x4<T> operator-(const U& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] -= static_cast<T>(value);
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        template<typename U>
-        mat4x4<T> operator*(const U& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] *= static_cast<T>(value);
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        template<typename U>
-        mat4x4<T> operator/(const U& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] /= static_cast<T>(value);
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        template<typename U>
-        mat4x4<T> operator+(const mat4x4<U>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] += static_cast<T>(value.data[x][y]);
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        template<typename U>
-        mat4x4<T> operator-(const mat4x4<U>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] -= static_cast<T>(value.data[x][y]);
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        template<typename U>
-        mat4x4<T> operator*(const mat4x4<U>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] *= static_cast<T>(value.data[x][y]);
-                }
-            }
-
-            return mat4x4<T>(data);
-        }
-
-        template<typename U>
-        mat4x4<T> operator/(const mat4x4<U>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] /= static_cast<T>(value.data[x][y]);
-                }
-            }
-
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #endif
         }
 
         template<typename U>
         mat4x4<T> operator+=(const U& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] += static_cast<T>(value);
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                    simd::vec4 result = _mm_add_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] += static_cast<T>(value);
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         template<typename U>
         mat4x4<T> operator-=(const U& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] -= static_cast<T>(value);
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                    simd::vec4 result = _mm_sub_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] -= static_cast<T>(value);
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         template<typename U>
         mat4x4<T> operator*=(const U& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] *= static_cast<T>(value);
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                    simd::vec4 result = _mm_mul_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] *= static_cast<T>(value);
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         template<typename U>
         mat4x4<T> operator/=(const U& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] /= static_cast<T>(value);
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { static_cast<T>(value), static_cast<T>(value), static_cast<T>(value), static_cast<T>(value) };
+                    simd::vec4 result = _mm_div_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] /= static_cast<T>(value);
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         template<typename U>
         mat4x4<T> operator+=(const mat4x4<U>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] += static_cast<T>(value.data[x][y]);
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { static_cast<T>(value.data[i][0]), static_cast<T>(value.data[i][1]), static_cast<T>(value.data[i][2]), static_cast<T>(value.data[i][3]) };
+                    simd::vec4 result = _mm_add_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] += static_cast<T>(value.data[x][y]);
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         template<typename U>
         mat4x4<T> operator-=(const mat4x4<U>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] -= static_cast<T>(value.data[x][y]);
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { static_cast<T>(value.data[i][0]), static_cast<T>(value.data[i][1]), static_cast<T>(value.data[i][2]), static_cast<T>(value.data[i][3]) };
+                    simd::vec4 result = _mm_sub_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] -= static_cast<T>(value.data[x][y]);
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         template<typename U>
         mat4x4<T> operator*=(const mat4x4<U>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] *= static_cast<T>(value.data[x][y]);
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { static_cast<T>(value.data[i][0]), static_cast<T>(value.data[i][1]), static_cast<T>(value.data[i][2]), static_cast<T>(value.data[i][3]) };
+                    simd::vec4 result = _mm_mul_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] *= static_cast<T>(value.data[x][y]);
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
 
         template<typename U>
         mat4x4<T> operator/=(const mat4x4<U>& value) {
-            for(int x = 0; x < data.size(); ++x) {
-                for(int y = 0; y < data[x].size(); ++y) {
-                    data[x][y] /= static_cast<T>(value.data[x][y]);
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { static_cast<T>(value.data[i][0]), static_cast<T>(value.data[i][1]), static_cast<T>(value.data[i][2]), static_cast<T>(value.data[i][3]) };
+                    simd::vec4 result = _mm_div_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
                 }
-            }
 
-            return mat4x4<T>(data);
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] /= static_cast<T>(value.data[x][y]);
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
         }
     };
 

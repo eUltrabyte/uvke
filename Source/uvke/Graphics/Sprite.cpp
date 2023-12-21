@@ -1,7 +1,7 @@
 #include "Sprite.hpp"
 
 namespace uvke {
-    Sprite::Sprite(const vec2f& size) {
+    Sprite::Sprite(const vec2f& size, std::string_view filename) {
         m_renderType = RenderType::Triangles;
 
         m_vertices = std::vector<Vertex> {
@@ -14,6 +14,8 @@ namespace uvke {
         m_indices = std::vector<unsigned int> {
             0, 1, 2, 2, 3, 0
         };
+
+        m_filename = filename;
 
         m_model = Identity<float>();
 
@@ -31,11 +33,26 @@ namespace uvke {
     }
 
     void Sprite::Create(Renderer* renderer) {
-        m_texture = std::make_unique<Texture>(renderer->GetBase(), "Resource/Textures/uvke.png");
-     
-        std::unique_ptr<StagingBuffer> m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetImage()->GetSize().x * m_texture->GetImage()->GetSize().y * 4));
-        m_stagingBuffer->Map(m_texture->GetPixels());
-        m_texture->Allocate();
+        std::unique_ptr<StagingBuffer> m_stagingBuffer;
+
+        if(m_filename.empty()) {
+            m_texture = std::make_unique<Texture>(renderer->GetBase(), vec2i { 1, 1 });
+
+            unsigned int* imageData = new unsigned int[m_texture->GetSize().x * m_texture->GetSize().y];
+            for(auto i = 0; i < m_texture->GetSize().x * m_texture->GetSize().y; ++i) {
+                imageData[i] = 0xffffffff;
+            }
+
+            m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetImage()->GetSize().x * m_texture->GetImage()->GetSize().y * 4));
+            m_stagingBuffer->Map(imageData);
+            m_texture->Allocate();
+        } else {
+            m_texture = std::make_unique<Texture>(renderer->GetBase(), vec2i { 0, 0 }, m_filename);
+            
+            m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetImage()->GetSize().x * m_texture->GetImage()->GetSize().y * 4));
+            m_stagingBuffer->Map(m_texture->GetPixels());
+            m_texture->Allocate();
+        }
 
         m_texture->LayoutTransition(renderer->GetCommandBuffer(), renderer->GetSurface()->GetQueue(0), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         m_texture->CopyFromBuffer(renderer->GetCommandBuffer(), renderer->GetSurface()->GetQueue(0), m_stagingBuffer->GetBuffer());
