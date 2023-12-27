@@ -39,7 +39,6 @@ set(UVKE_CORE_SOURCE
     Source/uvke/Core/Base.hpp
     Source/uvke/Core/Base.cpp
     Source/uvke/Core/Helper.hpp
-    Source/uvke/Core/Helper.cpp
     Source/uvke/Core/App.hpp
     Source/uvke/Core/App.cpp
 )
