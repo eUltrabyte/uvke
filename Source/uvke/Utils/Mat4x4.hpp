@@ -381,6 +381,7 @@ namespace uvke {
         result.data[1][1] = 1;
         result.data[2][2] = 1;
         result.data[3][3] = 1;
+
         return result;
     }
 
@@ -394,6 +395,7 @@ namespace uvke {
         result.data[2][2] = zFar / (zFar - zNear);
         result.data[2][3] = 1;
         result.data[3][2] = -(2 * zFar * zNear) / (zFar - zNear);
+
         return result;
     }
 
@@ -435,12 +437,15 @@ namespace uvke {
         result.data[0][0] = normalizedCrossProduct.x;
         result.data[1][0] = normalizedCrossProduct.y;
         result.data[2][0] = normalizedCrossProduct.z;
+        
         result.data[0][1] = crossProduct.x;
         result.data[1][1] = crossProduct.y;
         result.data[2][1] = crossProduct.z;
+
         result.data[0][2] = normalized.x;
         result.data[1][2] = normalized.y;
         result.data[2][2] = normalized.z;
+
         result.data[3][0] = -DotProduct(normalizedCrossProduct, eye);
         result.data[3][1] = -DotProduct(crossProduct, eye);
         result.data[3][2] = -DotProduct(normalized, eye);
@@ -504,14 +509,26 @@ namespace uvke {
 
     template<typename T>
     inline constexpr mat4x4<T> Inverse(const mat4x4<T>& matrix) {
-        mat4x4<T> result;
-        for(int x = 0; x < result.data.size(); ++x) {
-            for(int y = 0; y < result.data[x].size(); ++y) {
-                result.data[x][y] = -matrix.data[x][y];
-            }
-        }
+        mat4x4<T> result = matrix;
 
-        return result;
+        #ifdef UVKE_MATH_USE_SIMD
+            for(int i = 0; i < result.data.size(); ++i) {
+                simd::vec4 p = { result.data[i][0], result.data[i][1], result.data[i][2], result.data[i][3], };
+                simd::vec4 r = { -1, -1, -1, -1 };
+                simd::vec4 data = _mm_mul_ps(p, r);
+                result.data[i] = std::array<T, 4> { data[0], data[1], data[2], data[3] };
+            }
+
+            return result;
+        #else
+            for(int x = 0; x < result.data.size(); ++x) {
+                for(int y = 0; y < result.data[x].size(); ++y) {
+                    result.data[x][y] = -matrix.data[x][y];
+                }
+            }
+
+            return result;
+        #endif
     }
 };
 
