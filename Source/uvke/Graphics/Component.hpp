@@ -1,6 +1,6 @@
 #pragma once
-#ifndef UVKE_RENDERABLE_HEADER
-#define UVKE_RENDERABLE_HEADER
+#ifndef UVKE_COMPONENT_HEADER
+#define UVKE_COMPONENT_HEADER
 
 #include "../uvke.hpp"
 #include "../Window/Window.hpp"
@@ -15,10 +15,10 @@ namespace uvke {
 
     class UVKE_API Renderer;
 
-    class UVKE_API Renderable {
+    class UVKE_API Component {
     public:
-        Renderable() = default;
-        virtual ~Renderable() = default;
+        Component() = default;
+        virtual ~Component() = default;
 
         virtual void Create(Renderer* renderer) = 0;
         virtual void Update(Camera* camera) = 0;

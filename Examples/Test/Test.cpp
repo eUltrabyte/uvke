@@ -30,24 +30,21 @@ public:
 
         sprite.Create(m_renderer.get());
 
-        /* unsigned int* imageData = new unsigned int[sprite.GetTexture()->GetSize().x * sprite.GetTexture()->GetSize().y];
-        for(auto i = 0; i < sprite.GetTexture()->GetSize().x * sprite.GetTexture()->GetSize().y; ++i) {
-            imageData[i] = 0xffff00ff;
-        }
-
-        sprite.GetTexture()->SetData(m_renderer->GetCommandBuffer(), m_renderer->GetSurface()->GetQueue(0), { sprite.GetTexture()->GetSize().x, sprite.GetTexture()->GetSize().y }, imageData); */
-
         m_renderer->Push(&sprite);
 
         /* uvke::Sprite sprite1({ 0.2f, 0.15f });
-        sprite1.SetPosition({ 0.0f, 0.0f, -1.0f });
+        sprite1.SetPosition({ 0.0f, 0.0f, -0.1f });
         sprite1.SetRotation(0.0f);
         sprite1.Create(m_renderer.get());
 
-        m_renderer->Push(&sprite1); */
+        unsigned int* imageData = new unsigned int[sprite1.GetTexture()->GetSize().x * sprite1.GetTexture()->GetSize().y];
+        for(auto i = 0; i < sprite1.GetTexture()->GetSize().x * sprite1.GetTexture()->GetSize().y; ++i) {
+            imageData[i] = 0xffff00ff;
+        }
 
-        uvke::vec4f test = { 0.0f, 0.0f, 0.0f, 0.0f };
-        test + 1.0f;
+        sprite1.GetTexture()->SetData(m_renderer->GetCommandBuffer(), m_renderer->GetSurface()->GetQueue(0), { sprite1.GetTexture()->GetSize().x, sprite1.GetTexture()->GetSize().y }, imageData);
+
+        m_renderer->Push(&sprite1); */
 
         while(m_isRunning) {
             Update();

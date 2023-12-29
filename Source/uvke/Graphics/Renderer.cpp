@@ -63,7 +63,7 @@ namespace uvke {
 
         m_pipeline.reset();
 
-        m_renderables.clear();
+        m_components.clear();
 
         m_uniformBuffer.reset();
 
@@ -86,8 +86,8 @@ namespace uvke {
         m_camera->Move(m_window.get(), 0.01f * m_deltaClock.GetDeltaTime(), 0.1f);
         m_deltaClock.Restart();
 
-        for(auto i = 0; i < m_renderables.size(); ++i) {
-            m_renderables[i]->Update(m_camera.get());
+        for(auto i = 0; i < m_components.size(); ++i) {
+            m_components[i]->Update(m_camera.get());
         }
 
         m_syncManager->WaitForQueue(m_surface->GetQueue(1));
@@ -97,7 +97,7 @@ namespace uvke {
         m_syncManager->WaitForFence(m_syncManager->GetFrame());
         m_syncManager->ResetFence(m_syncManager->GetFrame());
 
-        m_pipeline->Render(m_framebuffer.get(), m_commandBuffer.get(), m_syncManager->GetFrame(), m_presentation->GetIndex(), m_renderables, m_interface.get());
+        m_pipeline->Render(m_framebuffer.get(), m_commandBuffer.get(), m_syncManager->GetFrame(), m_presentation->GetIndex(), m_components, m_interface.get());
 
         m_presentation->Submit(m_commandBuffer.get(), m_surface.get());
         m_presentation->Present(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
@@ -121,12 +121,12 @@ namespace uvke {
         ++m_fps;
     }
 
-    void Renderer::Push(Renderable* renderable) {
-        m_renderables.emplace_back(renderable);
+    void Renderer::Push(Component* component) {
+        m_components.emplace_back(component);
     }
 
     void Renderer::Erase() {
-        m_renderables.erase(m_renderables.begin());
+        m_components.erase(m_components.begin());
     }
     
     void Renderer::SetSurface(Surface* surface) {

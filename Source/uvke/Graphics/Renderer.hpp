@@ -22,7 +22,7 @@
 #include "Interface.hpp"
 #include "Presentation.hpp"
 #include "Camera.hpp"
-#include "Renderable.hpp"
+#include "Component.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
@@ -31,7 +31,7 @@ namespace uvke {
         virtual ~Renderer();
 
         virtual void Render();
-        virtual void Push(Renderable* renderable);
+        virtual void Push(Component* component);
         virtual void Erase();
 
         virtual void SetSurface(Surface* surface);
@@ -72,7 +72,7 @@ namespace uvke {
         std::unique_ptr<IndexBuffer> m_indexBuffer;
         std::unique_ptr<Descriptor> m_descriptor;
         std::unique_ptr<UniformBuffer> m_uniformBuffer;
-        std::vector<Renderable*> m_renderables;
+        std::vector<Component*> m_components;
         std::unique_ptr<Pipeline> m_pipeline;
         std::unique_ptr<Framebuffer> m_framebuffer;
         std::unique_ptr<CommandBuffer> m_commandBuffer;

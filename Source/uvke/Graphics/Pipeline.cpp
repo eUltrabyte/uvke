@@ -558,7 +558,7 @@ namespace uvke {
         UVKE_LOG("Graphics Pipeline Recreated");
     }
 
-    void Pipeline::Render(Framebuffer* framebuffer, CommandBuffer* commandBuffer, unsigned int frame, unsigned int index, std::vector<Renderable*> renderables, Interface* interfaces) {
+    void Pipeline::Render(Framebuffer* framebuffer, CommandBuffer* commandBuffer, unsigned int frame, unsigned int index, std::vector<Component*> components, Interface* interfaces) {
         vkResetCommandBuffer(commandBuffer->GetCommandBuffer(frame), 0);
 
         VkCommandBufferBeginInfo commandBufferBeginInfo { };
@@ -586,8 +586,8 @@ namespace uvke {
 
         vkCmdBeginRenderPass(commandBuffer->GetCommandBuffer(frame), &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-        for(auto i = 0; i < renderables.size(); ++i) {
-            switch(renderables[i]->GetRenderType()) {
+        for(auto i = 0; i < components.size(); ++i) {
+            switch(components[i]->GetRenderType()) {
                 case RenderType::Triangles: {
                     vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglesPipeline);
                 } break;
@@ -626,7 +626,7 @@ namespace uvke {
 
             vkCmdPushConstants(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(pushConstants), &pushConstants); */
 
-            renderables[i]->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
+            components[i]->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
         }
 
         interfaces->Render(commandBuffer, frame);

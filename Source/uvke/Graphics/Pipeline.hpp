@@ -11,7 +11,7 @@
 #include "Descriptor.hpp"
 #include "UniformBuffer.hpp"
 #include "Interface.hpp"
-#include "Renderable.hpp"
+#include "Component.hpp"
 
 namespace uvke {
     struct UVKE_API ObjectPushConstant {
@@ -27,7 +27,7 @@ namespace uvke {
         virtual ~Pipeline();
 
         virtual void Recreate(RenderType renderType = RenderType::Triangles);
-        virtual void Render(Framebuffer* framebuffer, CommandBuffer* commandBuffer, unsigned int frame, unsigned int index, std::vector<Renderable*> renderables, Interface* interfaces);
+        virtual void Render(Framebuffer* framebuffer, CommandBuffer* commandBuffer, unsigned int frame, unsigned int index, std::vector<Component*> components, Interface* interfaces);
 
         virtual void SetBase(Base* base);
 

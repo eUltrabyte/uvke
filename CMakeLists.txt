@@ -93,7 +93,7 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Presentation.cpp
     Source/uvke/Graphics/Camera.hpp
     Source/uvke/Graphics/Camera.cpp
-    Source/uvke/Graphics/Renderable.hpp
+    Source/uvke/Graphics/Component.hpp
     Source/uvke/Graphics/Sprite.hpp
     Source/uvke/Graphics/Sprite.cpp
 )
