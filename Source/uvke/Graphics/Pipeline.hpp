@@ -12,6 +12,7 @@
 #include "UniformBuffer.hpp"
 #include "Interface.hpp"
 #include "Component.hpp"
+#include "RenderableComponent.hpp"
 
 namespace uvke {
     struct UVKE_API ObjectPushConstant {

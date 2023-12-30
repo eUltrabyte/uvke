@@ -9,11 +9,11 @@
 #include "UniformBuffer.hpp"
 #include "Texture.hpp"
 #include "Camera.hpp"
-#include "Component.hpp"
+#include "RenderableComponent.hpp"
 #include "Renderer.hpp"
 
 namespace uvke {
-    class UVKE_API Sprite : public Component {
+    class UVKE_API Sprite : public RenderableComponent {
     public:
         Sprite(const vec2f& size = { 1.0f, 1.0f }, std::string_view filename = "");
         virtual ~Sprite();

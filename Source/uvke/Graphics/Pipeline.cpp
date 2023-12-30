@@ -587,46 +587,48 @@ namespace uvke {
         vkCmdBeginRenderPass(commandBuffer->GetCommandBuffer(frame), &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         for(auto i = 0; i < components.size(); ++i) {
-            switch(components[i]->GetRenderType()) {
-                case RenderType::Triangles: {
-                    vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglesPipeline);
-                } break;
+            if(const auto renderableComponent = dynamic_cast<RenderableComponent*>(components[i])) {
+                switch(renderableComponent->GetRenderType()) {
+                    case RenderType::Triangles: {
+                        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglesPipeline);
+                    } break;
 
-                case RenderType::Lines: {
-                    vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_linesPipeline);
-                } break;
+                    case RenderType::Lines: {
+                        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_linesPipeline);
+                    } break;
 
-                case RenderType::Points: {
-                    vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pointsPipeline);
-                } break;
+                    case RenderType::Points: {
+                        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pointsPipeline);
+                    } break;
 
-                default: {
-                    vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglesPipeline);
-                } break;
+                    default: {
+                        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglesPipeline);
+                    } break;
+                }
+
+                VkViewport viewport { };
+                viewport.x = 0.0f;
+                viewport.y = 0.0f;
+                viewport.width = m_surface->GetExtent().width;
+                viewport.height = m_surface->GetExtent().height;
+                viewport.minDepth = 0.0f;
+                viewport.maxDepth = 1.0f;
+
+                vkCmdSetViewport(commandBuffer->GetCommandBuffer(frame), 0, 1, &viewport);
+
+                VkRect2D scissor { };
+                scissor.offset = { 0, 0 };
+                scissor.extent = m_surface->GetExtent();
+
+                vkCmdSetScissor(commandBuffer->GetCommandBuffer(frame), 0, 1, &scissor);
+
+                /* ObjectPushConstant pushConstants { };
+                pushConstants.hasTexture = false;
+
+                vkCmdPushConstants(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(pushConstants), &pushConstants); */
+
+                renderableComponent->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
             }
-
-            VkViewport viewport { };
-            viewport.x = 0.0f;
-            viewport.y = 0.0f;
-            viewport.width = m_surface->GetExtent().width;
-            viewport.height = m_surface->GetExtent().height;
-            viewport.minDepth = 0.0f;
-            viewport.maxDepth = 1.0f;
-
-            vkCmdSetViewport(commandBuffer->GetCommandBuffer(frame), 0, 1, &viewport);
-
-            VkRect2D scissor { };
-            scissor.offset = { 0, 0 };
-            scissor.extent = m_surface->GetExtent();
-
-            vkCmdSetScissor(commandBuffer->GetCommandBuffer(frame), 0, 1, &scissor);
-
-            /* ObjectPushConstant pushConstants { };
-            pushConstants.hasTexture = false;
-
-            vkCmdPushConstants(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(pushConstants), &pushConstants); */
-
-            components[i]->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
         }
 
         interfaces->Render(commandBuffer, frame);

@@ -23,6 +23,7 @@
 #include "Presentation.hpp"
 #include "Camera.hpp"
 #include "Component.hpp"
+#include "RenderableComponent.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {
