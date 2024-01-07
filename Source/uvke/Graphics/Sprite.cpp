@@ -121,16 +121,4 @@ namespace uvke {
     Texture* Sprite::GetTexture() {
         return m_texture.get();
     }
-
-    VertexBuffer* Sprite::GetVertexBuffer() {
-        return m_vertexBuffer.get();
-    }
-    
-    IndexBuffer* Sprite::GetIndexBuffer() {
-        return m_indexBuffer.get();
-    }
-    
-    UniformBuffer* Sprite::GetUniformBuffer() {
-        return m_uniformBuffer.get();
-    }
 };

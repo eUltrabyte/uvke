@@ -1,4 +1,4 @@
-- add component class
+- add light components
 - add scene class
 - job manager class ( job queue and job priorities )
 - add multi threading support

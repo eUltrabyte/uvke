@@ -63,7 +63,7 @@ namespace uvke {
 
         m_pipeline.reset();
 
-        m_renderables.clear();
+        m_components.clear();
 
         m_uniformBuffer.reset();
 
@@ -82,25 +82,15 @@ namespace uvke {
         UVKE_LOG_ADDRESS("Renderer Destroyed");
     }
 
-    void Renderer::Render() {
+    void Renderer::Update() {
         m_camera->Move(m_window.get(), 0.01f * m_deltaClock.GetDeltaTime(), 0.1f);
         m_deltaClock.Restart();
 
-        for(auto i = 0; i < m_renderables.size(); ++i) {
-            m_renderables[i]->Update(m_camera.get());
+        for(auto i = 0; i < m_components.size(); ++i) {
+            if(const auto renderableComponent = dynamic_cast<RenderableComponent*>(m_components[i])) {
+                renderableComponent->Update(m_camera.get());
+            }
         }
-
-        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
-
-        m_presentation->AcquireNextImage(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
-
-        m_syncManager->WaitForFence(m_syncManager->GetFrame());
-        m_syncManager->ResetFence(m_syncManager->GetFrame());
-
-        m_pipeline->Render(m_framebuffer.get(), m_commandBuffer.get(), m_syncManager->GetFrame(), m_presentation->GetIndex(), m_renderables, m_interface.get());
-
-        m_presentation->Submit(m_commandBuffer.get(), m_surface.get());
-        m_presentation->Present(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
 
         m_stats.renderTime = m_frameClock.GetDeltaTime();
         m_stats.position = m_camera->GetPosition();
@@ -116,17 +106,32 @@ namespace uvke {
 
         m_interface->SetStats(m_stats);
 
-        m_syncManager->Update();
         m_frameClock.Restart();
         ++m_fps;
     }
 
-    void Renderer::Push(Renderable* renderable) {
-        m_renderables.emplace_back(renderable);
+    void Renderer::Render() {
+        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
+
+        m_presentation->AcquireNextImage(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
+
+        m_syncManager->WaitForFence(m_syncManager->GetFrame());
+        m_syncManager->ResetFence(m_syncManager->GetFrame());
+
+        m_pipeline->Render(m_framebuffer.get(), m_commandBuffer.get(), m_syncManager->GetFrame(), m_presentation->GetIndex(), m_components, m_interface.get());
+
+        m_presentation->Submit(m_commandBuffer.get(), m_surface.get());
+        m_presentation->Present(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
+
+        m_syncManager->Update();
+    }
+
+    void Renderer::Push(Component* component) {
+        m_components.emplace_back(component);
     }
 
     void Renderer::Erase() {
-        m_renderables.erase(m_renderables.begin());
+        m_components.erase(m_components.begin());
     }
     
     void Renderer::SetSurface(Surface* surface) {
