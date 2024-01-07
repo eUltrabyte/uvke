@@ -19,3 +19,4 @@ cmake-build-release/
 .clangd
 justfile
 CMakeSettings.json
+log.txt

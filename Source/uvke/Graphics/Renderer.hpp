@@ -31,6 +31,7 @@ namespace uvke {
         Renderer(Base* base, Window* window);
         virtual ~Renderer();
 
+        virtual void Update();
         virtual void Render();
         virtual void Push(Component* component);
         virtual void Erase();

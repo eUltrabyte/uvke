@@ -85,6 +85,8 @@ public:
         } */
 
         m_window->PollEvents(m_event);
+
+        m_renderer->Update();
     }
 
     virtual void Render() override {

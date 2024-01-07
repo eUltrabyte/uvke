@@ -136,9 +136,14 @@ endforeach(UVKE_GLSL_FILE)
 
 add_custom_target(${PROJECT_NAME}-Shaders DEPENDS ${SPIRV_BINARY_FILES})
 
+option(UVKE_LOGFILE "uvke saves logs to file" ON)
 option(UVKE_SHARED_LIBRARY "uvke build using shared libraries" OFF)
 option(UVKE_SHARED_BUILD "uvke build shared libraries files" OFF)
 option(UVKE_EXAMPLES "uvke build examples" ON)
+
+if(UVKE_LOGFILE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_LOGFILE")
+endif()
 
 if(UVKE_SHARED_LIBRARY)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_SHARED_LIBRARY")

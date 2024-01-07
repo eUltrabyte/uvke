@@ -7,15 +7,13 @@
 #include "Core/Core.hpp"
 
 #ifdef UVKE_DEBUG
-    #define UVKE_LOG(x) { uvke::Logger::Log(std::string(x), uvke::Severity::Debug); }
-    #define UVKE_LOG_ADDRESS(x) { uvke::Logger::Log(std::string(x) + " - " + std::format("{:#x}", reinterpret_cast<unsigned long long>(this)), uvke::Severity::Debug); }
-    #define UVKE_LOG_FILE(x) { uvke::Logger::Log(std::string(x), uvke::Severity::Debug, "log.txt"); }
-    #define UVKE_TRACE() { uvke::Logger::Log(std::string(__FILE__) + " - " + std::to_string(__LINE__) + " - " + std::string(__FUNCTION__), uvke::Severity::Trace); }
-    #define UVKE_FATAL(x) { uvke::Logger::Log(std::string(x), uvke::Severity::Fatal); }
+    #define UVKE_LOG(x) { uvke::Log(std::string(x), uvke::Severity::Debug); }
+    #define UVKE_LOG_ADDRESS(x) { uvke::Log(std::string(x) + " - " + std::format("{:#x}", reinterpret_cast<unsigned long long>(this)), uvke::Severity::Debug); }
+    #define UVKE_TRACE() { uvke::Log(std::string(__FILE__) + " - " + std::to_string(__LINE__) + " - " + std::string(__FUNCTION__), uvke::Severity::Trace); }
+    #define UVKE_FATAL(x) { uvke::Log(std::string(x), uvke::Severity::Fatal); }
 #else
     #define UVKE_LOG(x)
     #define UVKE_LOG_ADDRESS(x)
-    #define UVKE_LOG_FILE(x)
     #define UVKE_TRACE()
     #define UVKE_FATAL(x)
 #endif

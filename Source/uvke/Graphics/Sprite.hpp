@@ -3,10 +3,6 @@
 #define UVKE_SPRITE_HEADER
 
 #include "../uvke.hpp"
-#include "StagingBuffer.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
-#include "UniformBuffer.hpp"
 #include "Texture.hpp"
 #include "Camera.hpp"
 #include "RenderableComponent.hpp"
@@ -31,9 +27,6 @@ namespace uvke {
         virtual std::vector<Vertex>& GetVertices();
         virtual std::vector<unsigned int>& GetIndices();
         virtual Texture* GetTexture();
-        virtual VertexBuffer* GetVertexBuffer();
-        virtual IndexBuffer* GetIndexBuffer();
-        virtual UniformBuffer* GetUniformBuffer();
 
     private:
         mat4x4f m_model;
@@ -41,9 +34,6 @@ namespace uvke {
         std::vector<unsigned int> m_indices;
         std::string_view m_filename;
         std::unique_ptr<Texture> m_texture;
-        std::unique_ptr<VertexBuffer> m_vertexBuffer;
-        std::unique_ptr<IndexBuffer> m_indexBuffer;
-        std::unique_ptr<UniformBuffer> m_uniformBuffer;
       
     };
 };

@@ -15,7 +15,6 @@ namespace uvke {
         virtual ~Component() = default;
 
         virtual void Create(Renderer* renderer) = 0;
-        virtual void Update(Camera* camera) = 0;
 
     };
 };

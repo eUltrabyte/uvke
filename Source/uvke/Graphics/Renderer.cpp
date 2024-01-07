@@ -82,25 +82,15 @@ namespace uvke {
         UVKE_LOG_ADDRESS("Renderer Destroyed");
     }
 
-    void Renderer::Render() {
+    void Renderer::Update() {
         m_camera->Move(m_window.get(), 0.01f * m_deltaClock.GetDeltaTime(), 0.1f);
         m_deltaClock.Restart();
 
         for(auto i = 0; i < m_components.size(); ++i) {
-            m_components[i]->Update(m_camera.get());
+            if(const auto renderableComponent = dynamic_cast<RenderableComponent*>(m_components[i])) {
+                renderableComponent->Update(m_camera.get());
+            }
         }
-
-        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
-
-        m_presentation->AcquireNextImage(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
-
-        m_syncManager->WaitForFence(m_syncManager->GetFrame());
-        m_syncManager->ResetFence(m_syncManager->GetFrame());
-
-        m_pipeline->Render(m_framebuffer.get(), m_commandBuffer.get(), m_syncManager->GetFrame(), m_presentation->GetIndex(), m_components, m_interface.get());
-
-        m_presentation->Submit(m_commandBuffer.get(), m_surface.get());
-        m_presentation->Present(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
 
         m_stats.renderTime = m_frameClock.GetDeltaTime();
         m_stats.position = m_camera->GetPosition();
@@ -116,9 +106,24 @@ namespace uvke {
 
         m_interface->SetStats(m_stats);
 
-        m_syncManager->Update();
         m_frameClock.Restart();
         ++m_fps;
+    }
+
+    void Renderer::Render() {
+        m_syncManager->WaitForQueue(m_surface->GetQueue(1));
+
+        m_presentation->AcquireNextImage(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
+
+        m_syncManager->WaitForFence(m_syncManager->GetFrame());
+        m_syncManager->ResetFence(m_syncManager->GetFrame());
+
+        m_pipeline->Render(m_framebuffer.get(), m_commandBuffer.get(), m_syncManager->GetFrame(), m_presentation->GetIndex(), m_components, m_interface.get());
+
+        m_presentation->Submit(m_commandBuffer.get(), m_surface.get());
+        m_presentation->Present(m_window.get(), m_surface.get(), m_pipeline.get(), m_framebuffer.get(), m_depthBuffer.get());
+
+        m_syncManager->Update();
     }
 
     void Renderer::Push(Component* component) {
