@@ -109,6 +109,8 @@ set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Clock.cpp
     Source/uvke/Utils/File.hpp
     Source/uvke/Utils/File.cpp
+    Source/uvke/Utils/Random.hpp
+    Source/uvke/Utils/Random.cpp
 )
 
 set(UVKE_SOURCE

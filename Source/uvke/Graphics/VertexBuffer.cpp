@@ -25,6 +25,11 @@ namespace uvke {
             m_vertexInputAttributeDescription[2].format = VK_FORMAT_R32G32_SFLOAT;
             m_vertexInputAttributeDescription[2].offset = offsetof(Vertex, Vertex::texCoord);
 
+            /* m_vertexInputAttributeDescription[3].binding = 0;
+            m_vertexInputAttributeDescription[3].location = 3;
+            m_vertexInputAttributeDescription[3].format = VK_FORMAT_R32G32B32_SFLOAT;
+            m_vertexInputAttributeDescription[3].offset = offsetof(Vertex, Vertex::normal); */
+
             if(m_vertices.size()) {
                 VkBufferCreateInfo bufferCreateInfo = { };
                 bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
