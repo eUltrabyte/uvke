@@ -11,6 +11,7 @@ namespace uvke {
         vec3f position;
         vec4f color;
         vec2f texCoord;
+        // vec3f normal;
     };
 
     class UVKE_API VertexBuffer {

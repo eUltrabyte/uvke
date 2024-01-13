@@ -29,5 +29,6 @@
 #include "Utils/Mat4x4.hpp"
 #include "Utils/Clock.hpp"
 #include "Utils/File.hpp"
+#include "Utils/Random.hpp"
 
 #endif
