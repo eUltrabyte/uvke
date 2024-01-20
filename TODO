@@ -1,3 +1,5 @@
+- add colors enum ( for sprites )
+- fix model loading ( it doesn't work properly )
 - add light components
 - add scene class
 - job manager class ( job queue and job priorities )

@@ -24,13 +24,13 @@ public:
 
         m_window->ChangeCursorVisibility(uvke::CursorType::Disabled);
 
-        uvke::Sprite sprite({ 0.4f, 0.3f }, "Resource/Textures/uvke.png");
+        /* uvke::Sprite sprite({ 0.4f, 0.3f }, "Resource/Textures/uvke.png");
         sprite.SetPosition({ 0.0f, 0.0f, 0.0f });
         sprite.SetRotation(0.0f);
 
         sprite.Create(m_renderer.get());
 
-        m_renderer->Push(&sprite);
+        m_renderer->Push(&sprite); */
 
         /* uvke::Sprite sprite1({ 0.2f, 0.15f });
         sprite1.SetPosition({ 0.0f, 0.0f, -0.1f });
@@ -45,6 +45,19 @@ public:
         sprite1.GetTexture()->SetData(m_renderer->GetCommandBuffer(), m_renderer->GetSurface()->GetQueue(0), { sprite1.GetTexture()->GetSize().x, sprite1.GetTexture()->GetSize().y }, imageData);
 
         m_renderer->Push(&sprite1); */
+
+        uvke::MeshLoader meshLoader("Resource/Models/Teapot.obj");
+
+        uvke::Sprite model;
+        model.SetPosition({ 0.0f, 0.0f, 0.0f });
+        model.SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
+        model.SetVertices(meshLoader.GetVertices());
+        model.SetIndices(meshLoader.GetIndices());
+        model.SetScale({ 5.0f, 5.0f, 5.0f });
+
+        model.Create(m_renderer.get());
+
+        m_renderer->Push(&model);
 
         while(m_isRunning) {
             Update();

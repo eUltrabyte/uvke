@@ -111,6 +111,8 @@ set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/File.cpp
     Source/uvke/Utils/Random.hpp
     Source/uvke/Utils/Random.cpp
+    Source/uvke/Utils/MeshLoader.hpp
+    Source/uvke/Utils/MeshLoader.cpp
 )
 
 set(UVKE_SOURCE

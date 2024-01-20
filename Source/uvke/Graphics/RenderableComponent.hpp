@@ -10,12 +10,6 @@
 #include "Component.hpp"
 
 namespace uvke {
-    enum UVKE_API RenderType {
-        Triangles = 0,
-        Lines = UVKE_BYTE(0),
-        Points = UVKE_BYTE(1),
-    };
-
     class UVKE_API Renderer;
 
     class UVKE_API RenderableComponent : public Component {
@@ -25,10 +19,6 @@ namespace uvke {
 
         virtual void Update(Camera* camera) = 0;
         virtual void Render(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, unsigned int frame) = 0;
-
-        virtual RenderType& GetRenderType() {
-            return m_renderType;
-        }
 
         virtual VertexBuffer* GetVertexBuffer() {
             return m_vertexBuffer.get();
@@ -43,7 +33,6 @@ namespace uvke {
         }
 
     protected:
-        RenderType m_renderType = RenderType::Triangles;
         std::unique_ptr<VertexBuffer> m_vertexBuffer;
         std::unique_ptr<IndexBuffer> m_indexBuffer;
         std::unique_ptr<UniformBuffer> m_uniformBuffer;

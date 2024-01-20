@@ -255,15 +255,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_trianglesPipeline));
-            
-            pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
-
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_linesPipeline));
-            
-            pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
-            
-            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pointsPipeline));
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
         }
         
         UVKE_LOG_ADDRESS("Graphics Pipeline Created");
@@ -271,16 +263,8 @@ namespace uvke {
     
     Pipeline::~Pipeline() {
         if(m_base->GetDevice() != VK_NULL_HANDLE) {
-            if(m_trianglesPipeline != VK_NULL_HANDLE) {
-                vkDestroyPipeline(m_base->GetDevice(), m_trianglesPipeline, nullptr);
-            }
-
-            if(m_linesPipeline != VK_NULL_HANDLE) {
-                vkDestroyPipeline(m_base->GetDevice(), m_linesPipeline, nullptr);
-            }
-
-            if(m_pointsPipeline != VK_NULL_HANDLE) {
-                vkDestroyPipeline(m_base->GetDevice(), m_pointsPipeline, nullptr);
+            if(m_pipeline != VK_NULL_HANDLE) {
+                vkDestroyPipeline(m_base->GetDevice(), m_pipeline, nullptr);
             }
 
             if(m_pipelineLayout != VK_NULL_HANDLE) {
@@ -301,13 +285,9 @@ namespace uvke {
         UVKE_LOG_ADDRESS("Graphics Pipeline Destroyed");
     }
 
-    void Pipeline::Recreate(RenderType renderType) {
+    void Pipeline::Recreate() {
         {
-            switch(renderType) {
-                case RenderType::Triangles: { vkDestroyPipeline(m_base->GetDevice(), m_trianglesPipeline, nullptr); } break;
-                case RenderType::Lines: { vkDestroyPipeline(m_base->GetDevice(), m_linesPipeline, nullptr); } break;
-                case RenderType::Points: { vkDestroyPipeline(m_base->GetDevice(), m_pointsPipeline, nullptr); } break;
-            }
+            vkDestroyPipeline(m_base->GetDevice(), m_pipeline, nullptr);
 
             vkDestroyPipelineLayout(m_base->GetDevice(), m_pipelineLayout, nullptr);
             vkDestroyRenderPass(m_base->GetDevice(), m_renderPass, nullptr);
@@ -538,21 +518,7 @@ namespace uvke {
             graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
             graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-            switch(renderType) {
-                case RenderType::Triangles: {
-                    UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_trianglesPipeline));
-                } break;
-
-                case RenderType::Lines: {
-                    pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
-                    UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_linesPipeline));
-                } break;
-
-                case RenderType::Points: {
-                    pipelineInputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
-                    UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pointsPipeline));
-                } break;
-            }
+            UVKE_ASSERT(vkCreateGraphicsPipelines(m_base->GetDevice(), m_pipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &m_pipeline));
         }
         
         UVKE_LOG("Graphics Pipeline Recreated");
@@ -588,23 +554,7 @@ namespace uvke {
 
         for(auto i = 0; i < components.size(); ++i) {
             if(const auto renderableComponent = dynamic_cast<RenderableComponent*>(components[i])) {
-                switch(renderableComponent->GetRenderType()) {
-                    case RenderType::Triangles: {
-                        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglesPipeline);
-                    } break;
-
-                    case RenderType::Lines: {
-                        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_linesPipeline);
-                    } break;
-
-                    case RenderType::Points: {
-                        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pointsPipeline);
-                    } break;
-
-                    default: {
-                        vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglesPipeline);
-                    } break;
-                }
+                vkCmdBindPipeline(commandBuffer->GetCommandBuffer(frame), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
                 VkViewport viewport { };
                 viewport.x = 0.0f;
@@ -658,15 +608,7 @@ namespace uvke {
         return m_pipelineLayout;
     }
     
-    VkPipeline& Pipeline::GetTrianglesPipeline() {
-        return m_trianglesPipeline;
-    }
-    
-    VkPipeline& Pipeline::GetLinesPipeline() {
-        return m_linesPipeline;
-    }
-    
-    VkPipeline& Pipeline::GetPointsPipeline() {
-        return m_pointsPipeline;
+    VkPipeline& Pipeline::GetPipeline() {
+        return m_pipeline;
     }
 };
