@@ -178,6 +178,10 @@ namespace uvke {
         m_syncManager = std::make_unique<SyncManager>(*syncManager);
     }
 
+    void Renderer::SetCamera(Camera* camera) {
+        m_camera = std::make_unique<Camera>(*camera);
+    }
+
     Base* Renderer::GetBase() {
         return m_base.get();
     }
@@ -232,5 +236,9 @@ namespace uvke {
     
     SyncManager* Renderer::GetSyncManager() {
         return m_syncManager.get();
+    }
+
+    Camera* Renderer::GetCamera() {
+        return m_camera.get();
     }
 };

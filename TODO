@@ -1,4 +1,4 @@
-- fix example
+- interface should show render time as plot lines in imgui
 - add colors enum ( for sprites )
 - fix model loading ( it doesn't work properly, add mtl support )
 - add light components

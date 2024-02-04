@@ -24,6 +24,9 @@ namespace uvke {
         virtual void SetModel(const mat4x4f& model);
         virtual void SetView(const mat4x4f& view);
         virtual void SetProjection(const mat4x4f& projection);
+        virtual void SetYaw(float yaw);
+        virtual void SetPitch(float pitch);
+        virtual void SetDirection(const vec3f& direction);
 
         virtual UniformBufferObject& GetUBO();
         virtual vec3f& GetPosition();
