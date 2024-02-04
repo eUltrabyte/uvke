@@ -27,7 +27,7 @@ namespace uvke {
         Pipeline(Base* base = nullptr, Surface* surface = nullptr, VertexBuffer* vertexBuffer = nullptr, Descriptor* descriptor = nullptr);
         virtual ~Pipeline();
 
-        virtual void Recreate(RenderType renderType = RenderType::Triangles);
+        virtual void Recreate();
         virtual void Render(Framebuffer* framebuffer, CommandBuffer* commandBuffer, unsigned int frame, unsigned int index, std::vector<Component*> components, Interface* interfaces);
 
         virtual void SetBase(Base* base);
@@ -36,9 +36,7 @@ namespace uvke {
         virtual VkRenderPass& GetRenderPass();
         virtual VkPipelineCache& GetPipelineCache();
         virtual VkPipelineLayout& GetPipelineLayout();
-        virtual VkPipeline& GetTrianglesPipeline();
-        virtual VkPipeline& GetLinesPipeline();
-        virtual VkPipeline& GetPointsPipeline();
+        virtual VkPipeline& GetPipeline();
 
     protected:
         Base* m_base;
@@ -51,9 +49,7 @@ namespace uvke {
         VkRenderPass m_renderPass;
         VkPipelineCache m_pipelineCache;
         VkPipelineLayout m_pipelineLayout;
-        VkPipeline m_trianglesPipeline;
-        VkPipeline m_linesPipeline;
-        VkPipeline m_pointsPipeline;
+        VkPipeline m_pipeline;
 
     };
 };

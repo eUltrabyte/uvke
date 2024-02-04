@@ -2,8 +2,6 @@
 
 namespace uvke {
     Sprite::Sprite(const vec2f& size, std::string_view filename) {
-        m_renderType = RenderType::Triangles;
-
         m_vertices = std::vector<Vertex> {
             { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
             { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
@@ -98,8 +96,8 @@ namespace uvke {
         m_model = Scale<float>(m_model, vec3f(scale.x, scale.y, scale.z));
     }
 
-    void Sprite::SetRotation(float angle) {
-        m_model = Rotate<float>(m_model, vec3f(0.0f, 1.0f, 0.0f), Radians<float>(angle));
+    void Sprite::SetRotation(float angle, const vec3f& direction) {
+        m_model = Rotate<float>(m_model, direction, Radians<float>(angle));
     }
 
     void Sprite::SetVertices(const std::vector<Vertex>& vertices) {

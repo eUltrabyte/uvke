@@ -25,7 +25,9 @@ public:
         uvke::Sprite sprite({ 0.4f, 0.3f });
         sprite.SetPosition({ 0.0f, 0.0f, 0.0f });
         sprite.SetRotation(0.0f);
+
         sprite.Create(m_renderer.get());
+
         m_renderer->Push(&sprite);
 
         while(m_isRunning) {
@@ -43,6 +45,8 @@ public:
         }
 
         m_window->PollEvents(m_event);
+        
+        m_renderer->Update();
     }
 
     virtual void Render() override {

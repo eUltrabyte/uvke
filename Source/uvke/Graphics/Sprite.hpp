@@ -20,7 +20,7 @@ namespace uvke {
 
         virtual void SetPosition(const vec3f& position);
         virtual void SetScale(const vec3f& scale);
-        virtual void SetRotation(float angle);
+        virtual void SetRotation(float angle, const vec3f& direction = { 0.0f, 1.0f, 0.0f });
         virtual void SetVertices(const std::vector<Vertex>& vertices);
         virtual void SetIndices(const std::vector<unsigned int>& indices);
 
