@@ -7,9 +7,9 @@ namespace uvke {
 
         std::vector<vec3f> vertices = std::vector<vec3f>(0);
         std::vector<vec2f> texCoords = std::vector<vec2f>(0);
-        std::string line;
-        std::ifstream file(filename.data(), std::ios::in);
 
+        std::ifstream file(filename.data(), std::ios::in);
+        std::string line = "";
         while(std::getline(file, line)) {
             if(line.substr(0, 2) == "v ") {
                 std::istringstream stream(line.substr(2));
@@ -25,21 +25,32 @@ namespace uvke {
                 std::string temp = line;
                 std::replace(temp.begin(), temp.end(), '/', ' ');
                 std::istringstream stream(temp.substr(2));
-                vec4u face;
-                unsigned int dump;
+                vec4u face = { 0, 0, 0, 0 };
+                unsigned int dump = 0;
 
-                stream >> face.x >> dump >> dump >> face.y >> dump >> dump >> face.z >> dump >> dump >> face.w >> dump >> dump;
-                --face.x;
-                --face.y;
-                --face.z;
-                --face.w;
+                if(std::count(line.begin(), line.end(), ' ') == 3) {
+                    stream >> face.x >> dump >> dump >> face.y >> dump >> dump >> face.z >> dump >> dump;
+                    --face.x;
+                    --face.y;
+                    --face.z;
 
-                m_indices.emplace_back(face.x);
-                m_indices.emplace_back(face.y);
-                m_indices.emplace_back(face.z);
-                m_indices.emplace_back(face.z);
-                m_indices.emplace_back(face.w);
-                m_indices.emplace_back(face.x);
+                    m_indices.emplace_back(face.x);
+                    m_indices.emplace_back(face.y);
+                    m_indices.emplace_back(face.z);
+                } else {
+                    stream >> face.x >> dump >> dump >> face.y >> dump >> dump >> face.z >> dump >> dump >> face.w >> dump >> dump;
+                    --face.x;
+                    --face.y;
+                    --face.z;
+                    --face.w;
+
+                    m_indices.emplace_back(face.x);
+                    m_indices.emplace_back(face.y);
+                    m_indices.emplace_back(face.z);
+                    m_indices.emplace_back(face.z);
+                    m_indices.emplace_back(face.w);
+                    m_indices.emplace_back(face.x);
+                }
             }
         }
 
