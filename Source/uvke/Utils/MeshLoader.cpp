@@ -8,79 +8,46 @@ namespace uvke {
         std::vector<vec3f> vertices = std::vector<vec3f>(0);
         std::vector<vec2f> texCoords = std::vector<vec2f>(0);
         std::string line;
-        std::ifstream file(filename.data());
-        std::vector<std::string> strings = std::vector<std::string>(0);
+        std::ifstream file(filename.data(), std::ios::in);
 
         while(std::getline(file, line)) {
-            if(line.empty()) {
-                strings = std::vector<std::string>(0);
-            }
+            if(line.substr(0, 2) == "v ") {
+                std::istringstream stream(line.substr(2));
+                vec3f vertex;
+                stream >> vertex.x >> vertex.y >> vertex.z;
+                vertices.emplace_back(vertex);
+            } else if(line.substr(0, 3) == "vt ") {
+                std::istringstream stream(line.substr(3));
+                vec2f coords;
+                stream >> coords.x >> coords.y;
+                texCoords.emplace_back(coords);
+            } else if(line.substr(0, 2) == "f ") {
+                std::string temp = line;
+                std::replace(temp.begin(), temp.end(), '/', ' ');
+                std::istringstream stream(temp.substr(2));
+                vec4u face;
+                unsigned int dump;
 
-            strings = std::vector<std::string>(1);
+                stream >> face.x >> dump >> dump >> face.y >> dump >> dump >> face.z >> dump >> dump >> face.w >> dump >> dump;
+                --face.x;
+                --face.y;
+                --face.z;
+                --face.w;
 
-            for(const char symbol : line) {
-                if(symbol == ' ') {
-                    if(!strings.back().empty()) {
-                        strings.emplace_back();
-                    }
-                } else {
-                    strings.back() += symbol;
-                }
-            }
-
-            if(!strings.empty() && strings.back().empty()) {
-                strings.pop_back();
-            }
-
-            if(!strings.empty()) {
-                if(strings[0] == "v") {
-                    vertices.emplace_back(vec3f { std::stof(strings[1]), std::stof(strings[2]), std::stof(strings[3]) });
-                } else if(strings[0] == "vt") {
-                    texCoords.emplace_back(vec2f { std::stof(strings[1]), std::stof(strings[2]) });
-                } else if(strings[0] == "f") {
-                    for(const char symbol : line) {
-                        if(symbol == '/') {
-                            if(!strings.back().empty()) {
-                                strings.emplace_back();
-                            }
-                        } else {
-                            strings.back() += symbol;
-                        }
-                    }
-
-                    if(!strings.empty() && strings.back().empty()) {
-                        strings.pop_back();
-                    }
-
-                    unsigned int faces = strings.size() - 1;
-                    if(faces == 3) {
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[1]) - 1));
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[2]) - 1));
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[3]) - 1));
-                    } else if(faces > 3) {
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[1]) - 1));
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[2]) - 1));
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[3]) - 1));
-
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[faces]) - 1));
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[faces - 1]) - 1));
-                        m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[1]) - 1));
-
-                        for(auto i = 0; i < faces - 4; ++i) {
-                            m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[1]) - 1));
-                            m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[i + 3]) - 1));
-                            m_indices.emplace_back(static_cast<unsigned int>(std::stof(strings[i + 4]) - 1));
-                        }
-                    }
-                }
+                m_indices.emplace_back(face.x);
+                m_indices.emplace_back(face.y);
+                m_indices.emplace_back(face.z);
+                m_indices.emplace_back(face.z);
+                m_indices.emplace_back(face.w);
+                m_indices.emplace_back(face.x);
             }
         }
 
         for(auto i = 0; i < vertices.size(); ++i) {
-            if(texCoords.empty()) {
-                m_vertices.emplace_back( Vertex { vertices[i], { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } });
-            } else {
+            if(texCoords[i].x && texCoords[i].y) {
                 m_vertices.emplace_back( Vertex { vertices[i], { 1.0f, 1.0f, 1.0f, 1.0f }, texCoords[i] });
+            } else {
+                m_vertices.emplace_back( Vertex { vertices[i], { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } });
             }
         }
     }

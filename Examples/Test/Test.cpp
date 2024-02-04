@@ -46,14 +46,14 @@ public:
 
         m_renderer->Push(&sprite1); */
 
-        uvke::MeshLoader meshLoader("Resource/Models/Teapot.obj");
+        uvke::MeshLoader meshLoader("Resource/Models/Monkey.obj");
 
         uvke::Sprite model;
         model.SetPosition({ 0.0f, 0.0f, 0.0f });
         model.SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
         model.SetVertices(meshLoader.GetVertices());
         model.SetIndices(meshLoader.GetIndices());
-        model.SetScale({ 5.0f, 5.0f, 5.0f });
+        // model.SetScale({ 5.0f, 5.0f, 5.0f });
 
         model.Create(m_renderer.get());
 
