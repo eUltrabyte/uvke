@@ -48,6 +48,7 @@ namespace uvke {
         virtual void SetFramebuffer(Framebuffer* framebuffer);
         virtual void SetCommandBuffer(CommandBuffer* commandBuffer);
         virtual void SetSyncManager(SyncManager* syncManager);
+        virtual void SetCamera(Camera* camera);
 
         virtual Base* GetBase();
         virtual Window* GetWindow();
@@ -63,6 +64,7 @@ namespace uvke {
         virtual Framebuffer* GetFramebuffer();
         virtual CommandBuffer* GetCommandBuffer();
         virtual SyncManager* GetSyncManager();
+        virtual Camera* GetCamera();
 
     private:
         std::unique_ptr<Base> m_base;

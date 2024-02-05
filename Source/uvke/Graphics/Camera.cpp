@@ -86,6 +86,18 @@ namespace uvke {
         m_ubo.projection = projection;
     }
 
+    void Camera::SetYaw(float yaw) {
+        m_yaw = yaw;
+    }
+    
+    void Camera::SetPitch(float pitch) {
+        m_pitch = pitch;
+    }
+        
+    void Camera::SetDirection(const vec3f& direction) {
+        m_direction = direction;
+    }
+
     UniformBufferObject& Camera::GetUBO() {
         return m_ubo;
     }

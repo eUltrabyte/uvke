@@ -192,12 +192,15 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME
 file(COPY Resource/ DESTINATION Resource/)
 
 if(UVKE_EXAMPLES)
-    add_subdirectory(Examples/Test)
-    file(COPY Resource/ DESTINATION Examples/Test/Resource/)
+    add_subdirectory(Examples/Windows)
+    file(COPY Resource/ DESTINATION Examples/Windows/Resource/)
 
     add_subdirectory(Examples/Example)
     file(COPY Resource/ DESTINATION Examples/Example/Resource/)
 
-    add_subdirectory(Examples/Windows)
-    file(COPY Resource/ DESTINATION Examples/Windows/Resource/)
+    add_subdirectory(Examples/Mesh)
+    file(COPY Resource/ DESTINATION Examples/Mesh/Resource/)
+
+    add_subdirectory(Examples/Test)
+    file(COPY Resource/ DESTINATION Examples/Test/Resource/)
 endif()

@@ -48,7 +48,7 @@ public:
 
         uvke::MeshLoader meshLoader("Resource/Models/Monkey.obj");
 
-        uvke::Sprite model;
+        uvke::Sprite model({ 0.0f, 0.0f }, "Resource/Textures/Monkey.png");
         model.SetPosition({ 0.0f, 0.0f, 0.0f });
         model.SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
         model.SetVertices(meshLoader.GetVertices());

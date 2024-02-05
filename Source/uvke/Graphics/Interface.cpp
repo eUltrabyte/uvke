@@ -73,11 +73,12 @@ namespace uvke {
         ImGui::Begin("Stats");
 
         ImGui::Text("Render Time - %.4fms", m_stats.renderTime);
-        ImGui::Text("FPS - %i", m_stats.fps);
-        ImGui::Text("Position - %f, %f, %f", m_stats.position.x, m_stats.position.y, m_stats.position.z);
+        ImGui::Text("Frame Per Second - %i", m_stats.fps);
+        ImGui::Text("Position - %f/%f/%f", m_stats.position.x, m_stats.position.y, m_stats.position.z);
         ImGui::Text("Yaw - %f", m_stats.yaw);
         ImGui::Text("Pitch - %f", m_stats.pitch);
-        ImGui::Text("Direction - %f, %f, %f", m_stats.direction.x, m_stats.direction.y, m_stats.direction.z);
+        ImGui::Text("Direction - %f/%f/%f", m_stats.direction.x, m_stats.direction.y, m_stats.direction.z);
+
 
         ImGui::End();
 
