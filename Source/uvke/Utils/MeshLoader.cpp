@@ -3,6 +3,7 @@
 namespace uvke {
     MeshLoader::MeshLoader(std::string_view filename) {
         m_vertices = std::vector<Vertex>(0);
+        m_texCoords = std::vector<vec2f>(0);
         m_indices = std::vector<unsigned int>(0);
 
         std::vector<vec3f> vertices = std::vector<vec3f>(0);
@@ -27,22 +28,29 @@ namespace uvke {
                 std::istringstream stream(temp.substr(2));
                 vec4u face = { 0, 0, 0, 0 };
                 unsigned int dump = 0;
+                vec4u coords = { 0, 0, 0, 0 };
 
                 if(std::count(line.begin(), line.end(), ' ') == 3) {
-                    stream >> face.x >> dump >> dump >> face.y >> dump >> dump >> face.z >> dump >> dump;
-                    --face.x;
-                    --face.y;
-                    --face.z;
+                    stream >> face.x >> coords.x >> dump >> face.y >> coords.y >> dump >> face.z >> coords.z >> dump;
+                    face = { face.x - 1, face.y - 1, face.z - 1, 0 };
+                    coords = { coords.x - 1, coords.y - 1, coords.z - 1, 0 };
+
+                    m_texCoords.emplace_back(texCoords[coords.x]);
+                    m_texCoords.emplace_back(texCoords[coords.y]);
+                    m_texCoords.emplace_back(texCoords[coords.z]);
 
                     m_indices.emplace_back(face.x);
                     m_indices.emplace_back(face.y);
                     m_indices.emplace_back(face.z);
                 } else {
-                    stream >> face.x >> dump >> dump >> face.y >> dump >> dump >> face.z >> dump >> dump >> face.w >> dump >> dump;
-                    --face.x;
-                    --face.y;
-                    --face.z;
-                    --face.w;
+                    stream >> face.x >> coords.x >> dump >> face.y >> coords.y >> dump >> face.z >> coords.z >> dump >> face.w >> coords.w >> dump;
+                    face = { face.x - 1, face.y - 1, face.z - 1, face.w - 1 };
+                    coords = { coords.x - 1, coords.y - 1, coords.z - 1, coords.w - 1 };
+
+                    m_texCoords.emplace_back(texCoords[coords.x]);
+                    m_texCoords.emplace_back(texCoords[coords.y]);
+                    m_texCoords.emplace_back(texCoords[coords.z]);
+                    m_texCoords.emplace_back(texCoords[coords.w]);
 
                     m_indices.emplace_back(face.x);
                     m_indices.emplace_back(face.y);
@@ -55,12 +63,16 @@ namespace uvke {
         }
 
         for(auto i = 0; i < vertices.size(); ++i) {
-            if(texCoords[i].x && texCoords[i].y) {
-                m_vertices.emplace_back( Vertex { vertices[i], { 1.0f, 1.0f, 1.0f, 1.0f }, texCoords[i] });
-            } else {
-                m_vertices.emplace_back( Vertex { vertices[i], { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } });
-            }
+            m_vertices.emplace_back( Vertex { vertices[i], { 1.0f, 1.0f, 1.0f, 1.0f }, m_texCoords[i] });
         }
+
+        std::reverse(m_indices.begin(), m_indices.end());
+
+        UVKE_LOG_ADDRESS("Mesh Loader Created");
+    }
+
+    MeshLoader::~MeshLoader() {
+        UVKE_LOG_ADDRESS("Mesh Loader Destroyed");
     }
 
     std::vector<Vertex> MeshLoader::GetVertices() {

@@ -1,6 +1,5 @@
-- interface should show render time as plot lines in imgui
 - add colors enum ( for sprites )
-- fix model loading ( it doesn't work properly, add mtl support )
+- fix model loading ( it doesn't work properly, add texcoords full support )
 - add light components
 - add scene class
 - job manager class ( job queue and job priorities )

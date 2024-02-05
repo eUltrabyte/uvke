@@ -9,13 +9,14 @@ namespace uvke {
     class UVKE_API MeshLoader {
     public:
         MeshLoader(std::string_view filename);
-        virtual ~MeshLoader() = default;
+        virtual ~MeshLoader();
 
         virtual std::vector<Vertex> GetVertices();
         virtual std::vector<unsigned int> GetIndices();
 
     private:
         std::vector<Vertex> m_vertices;
+        std::vector<vec2f> m_texCoords;
         std::vector<unsigned int> m_indices;
 
     };

@@ -8,6 +8,8 @@
 #include <GLFW/glfw3.h>
 
 #ifdef UVKE_SHARED_LIBRARY
+    #define SOKOL_DLL
+
     #ifdef UVKE_SHARED_BUILD
         #ifdef _MSC_VER
             #define UVKE_API __declspec(dllexport)
@@ -22,6 +24,7 @@
         #endif
     #endif
 #else
+    #define STB_IMAGE_STATIC
     #define UVKE_API
 #endif
 
@@ -64,9 +67,10 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
-#define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+
+#include <sokol/sokol_audio.h>
 
 #include "Logger.hpp"
 
