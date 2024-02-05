@@ -4,7 +4,7 @@
 [![Standard](https://img.shields.io/badge/c%2B%2B-20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
 [![License](https://img.shields.io/github/license/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke/blob/main/LICENSE)
 [![Pull Requests](https://img.shields.io/github/issues-pr/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke/pulls)
-[![Forks](https://img.shields.io/github/forks/eUltrabyte/uvke)](https://github.com/eUltrabyte/uvke)
+[![Forks](https://img.shields.io/github/forks/eUltrabyte/uvke?style=flat)](https://github.com/eUltrabyte/uvke)
 
 #### uvke ( Ultrabyte Vulkan Engine ) is open source framework for Vulkan based apps development written in C++ 20.
 
@@ -19,11 +19,13 @@ Main goal of uvke is to make using vulkan simple. I want to use it for myself bu
 
 [imgui](https://github.com/ocornut/imgui) - Bloat-free graphical user interface library for C++. It outputs optimized vertex buffers that you can render anytime in your 3D-pipeline-enabled application. It is fast, portable, renderer agnostic, and self-contained (no external dependencies).
 
+[sokol_audio](https://github.com/floooh/sokol/blob/master/sokol_audio.h) - Minimal buffer-streaming audio playback.
+
 ### Installation
 ```bash
 git clone https://github.com/eUltrabyte/uvke.git
-mkdir Build && cd Build
-cmake ..
+cd uvke && mkdir Build
+cd Build && cmake ..
 ```
 
 ### Bugs
@@ -31,6 +33,7 @@ Bugs are reported to [issue tracker](https://github.com/eUltrabyte/uvke/issues)
 #### Report template look like this
 ```
 Operating System:
+CPU:
 GPU:
 Branch:
 Short description:
