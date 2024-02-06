@@ -1,6 +1,5 @@
 # Blender v2.93.6 OBJ File: ''
 # www.blender.org
-mtllib Monkey.mtl
 o Monkey
 v 0.437500 0.164062 0.765625
 v -0.437500 0.164062 0.765625
