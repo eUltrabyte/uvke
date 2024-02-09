@@ -1,5 +1,3 @@
-#include <uvke/Graphics/Renderer.hpp>
-#include <uvke/Graphics/Sprite.hpp>
 #include <uvke/Core/App.hpp>
 
 class Example : public uvke::App {

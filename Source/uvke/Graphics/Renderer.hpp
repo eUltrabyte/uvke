@@ -24,7 +24,6 @@
 #include "Camera.hpp"
 #include "Component.hpp"
 #include "RenderableComponent.hpp"
-#include "../Utils/MeshLoader.hpp"
 
 namespace uvke {
     class UVKE_API Renderer {

@@ -2,6 +2,7 @@
 - fix model loading ( it doesn't work properly, add texcoords full support )
 - add light components
 - add scene class
+- change perspective projection to reverse-z infinite projection
 - job manager class ( job queue and job priorities )
 - add multi threading support
 - add audio support

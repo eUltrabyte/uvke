@@ -4,6 +4,9 @@
 
 #include "../uvke.hpp"
 #include "../Window/WindowManager.hpp"
+#include "../Graphics/Renderer.hpp"
+#include "../Graphics/Mesh.hpp"
+#include "../Graphics/Sprite.hpp"
 
 namespace uvke {
     class UVKE_API App {

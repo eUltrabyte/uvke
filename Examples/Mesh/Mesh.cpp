@@ -1,5 +1,3 @@
-#include <uvke/Graphics/Renderer.hpp>
-#include <uvke/Graphics/Sprite.hpp>
 #include <uvke/Core/App.hpp>
 
 class Mesh : public uvke::App {
@@ -26,11 +24,10 @@ public:
 
         uvke::MeshLoader meshLoader("Resource/Models/Monkey.obj");
 
-        uvke::Sprite model;
+        uvke::Mesh model;
         model.SetPosition({ 0.0f, 0.0f, 0.0f });
         model.SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
-        model.SetVertices(meshLoader.GetVertices());
-        model.SetIndices(meshLoader.GetIndices());
+        model.SetMesh(&meshLoader);
 
         model.Create(m_renderer.get());
 
