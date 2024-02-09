@@ -95,6 +95,8 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Camera.cpp
     Source/uvke/Graphics/Component.hpp
     Source/uvke/Graphics/RenderableComponent.hpp
+    Source/uvke/Graphics/Mesh.hpp
+    Source/uvke/Graphics/Mesh.cpp
     Source/uvke/Graphics/Sprite.hpp
     Source/uvke/Graphics/Sprite.cpp
 )

@@ -1,5 +1,3 @@
-#include <uvke/Graphics/Renderer.hpp>
-#include <uvke/Graphics/Sprite.hpp>
 #include <uvke/Core/App.hpp>
 
 class Test : public uvke::App {
@@ -46,14 +44,12 @@ public:
 
         m_renderer->Push(&sprite1); */
 
-        uvke::MeshLoader meshLoader("Resource/Models/Monkey.obj");
+        uvke::MeshLoader meshLoader("Resource/Models/Cube.obj");
 
-        uvke::Sprite model({ 0.0f, 0.0f }, "Resource/Textures/Monkey.png");
+        uvke::Mesh model({ 0.0f, 0.0f, 0.0f }, "Resource/Textures/Cube.png");
         model.SetPosition({ 0.0f, 0.0f, 0.0f });
         model.SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
-        model.SetVertices(meshLoader.GetVertices());
-        model.SetIndices(meshLoader.GetIndices());
-        // model.SetScale({ 5.0f, 5.0f, 5.0f });
+        model.SetMesh(&meshLoader);
 
         model.Create(m_renderer.get());
 
