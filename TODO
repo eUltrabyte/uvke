@@ -1,4 +1,5 @@
 - add colors enum ( for sprites )
+- add setdata function to texture which only needs renderer and info about texture
 - fix model loading ( it doesn't work properly, add texcoords full support )
 - add light components
 - add scene class
