@@ -11,6 +11,7 @@
 namespace uvke {
     class UVKE_API Sprite : public RenderableComponent {
     public:
+        Sprite(const vec4f& color = { 1.0f, 1.0f, 1.0f, 1.0f });
         Sprite(const vec2f& size = { 1.0f, 1.0f }, std::string_view filename = "");
         virtual ~Sprite();
 
