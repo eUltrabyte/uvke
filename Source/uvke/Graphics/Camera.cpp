@@ -15,6 +15,7 @@ namespace uvke {
             case Projection::Perspectivic: {
                 m_ubo.projection = Perspective<float>(Radians(45.0f), size.x / size.y, 0.1f, 1000.0f);
                 m_ubo.projection.data[1][1] *= -1;
+                // m_ubo.projection = InfinitePerspective<float>(-size.x, size.x, size.y, -size.y, -150.0f);
             } break;
 
             case Projection::Frustumic: {

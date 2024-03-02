@@ -11,6 +11,8 @@ namespace uvke {
         MeshLoader(std::string_view filename);
         virtual ~MeshLoader();
 
+        virtual void Load(std::string_view filename);
+
         virtual std::vector<Vertex> GetVertices();
         virtual std::vector<unsigned int> GetIndices();
 
