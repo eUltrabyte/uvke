@@ -1,3 +1,4 @@
+![uvke icon](https://github.com/eUltrabyte/uvke/blob/dev/Resource/Textures/uvke-icon.png?raw=true "uvke icon")
 ![uvke logo](https://github.com/eUltrabyte/uvke/blob/dev/Resource/Textures/uvke.png?raw=true "uvke logo")
 
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
