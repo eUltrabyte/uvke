@@ -12,7 +12,7 @@ namespace uvke {
                     file << "[ uvke ] [ debug ] " << message << std::endl;
                 #endif
 
-                std::cout << "\x1b[36m[ uvke ] \x1b[35m[ debug ] \x1b[37m" << message << "\x1b[0m\n";
+                std::cout << "\x1b[38;5;82m[ uvke ] \x1b[38;5;39m[ debug ] \x1b[37m" << message << "\x1b[0m\n";
             } break;
 
             case Severity::Trace: {
@@ -20,7 +20,7 @@ namespace uvke {
                     file << "[ uvke ] [ trace ] " << message << std::endl;
                 #endif
 
-                std::cout << "\x1b[36m[ uvke ] \x1b[32m[ trace ] \x1b[37m" << message << "\x1b[0m\n";
+                std::cout << "\x1b[38;5;82m[ uvke ] \x1b[38;5;70m[ trace ] \x1b[37m" << message << "\x1b[0m\n";
             } break;
 
             case Severity::Fatal: {
@@ -28,7 +28,7 @@ namespace uvke {
                     file << "[ uvke ] [ fatal ] " << message << std::endl;
                 #endif
 
-                std::cerr << "\x1b[36m[ uvke ] \x1b[31m[ fatal ] \x1b[37m" << message << "\x1b[0m\n";
+                std::cerr << "\x1b[38;5;82m[ uvke ] \x1b[38;5;124m[ fatal ] \x1b[37m" << message << "\x1b[0m\n";
             } break;
 
             default: {
@@ -36,7 +36,7 @@ namespace uvke {
                     file << "[ uvke ] [ debug ] " << message << std::endl;
                 #endif
                 
-                std::cout << "\x1b[36m[ uvke ] \x1b[35m[ debug ] \x1b[37m" << message << "\x1b[0m\n";
+                std::cout << "\x1b[38;5;82m[ uvke ] \x1b[38;5;39m[ debug ] \x1b[37m" << message << "\x1b[0m\n";
             } break;
         }
     }
