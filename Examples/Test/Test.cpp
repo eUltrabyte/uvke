@@ -1,4 +1,3 @@
-#include "uvke/Utils/Vec4.hpp"
 #include <uvke/Core/App.hpp>
 
 class Test : public uvke::App {
@@ -55,6 +54,17 @@ public:
         model.Create(m_renderer.get());
 
         m_renderer->Push(&model);
+
+        uvke::Sprite triangle;
+        triangle.SetVertices({ { { -1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
+                               { { 0.0f, -1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
+                               { { 1.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } } });
+        triangle.SetIndices({ 0, 1, 2 });
+        triangle.SetPosition({ 0.0f, 0.0f, 10.0f });
+
+        triangle.Create(m_renderer.get());
+
+        m_renderer->Push(&triangle);
 
         while(m_isRunning) {
             Update();

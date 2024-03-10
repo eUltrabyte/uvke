@@ -76,12 +76,11 @@ namespace uvke {
             }
 
             std::reverse(m_texCoords.begin(), m_texCoords.end());
+            std::reverse(m_indices.begin(), m_indices.end());
 
-            for(auto i = 0; i < vertices.size(); ++i) {
+            for(auto i = 0; i < m_indices.size(); ++i) {
                 m_vertices.emplace_back( Vertex { vertices[i], { 1.0f, 1.0f, 1.0f, 1.0f }, m_texCoords[i] });
             }
-
-            std::reverse(m_indices.begin(), m_indices.end());
 
             UVKE_LOG("Mesh Loader Successfully Loaded Mesh - " + std::string(filename.data()));
         } else {
