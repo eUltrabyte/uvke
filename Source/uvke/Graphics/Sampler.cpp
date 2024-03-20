@@ -1,7 +1,7 @@
 #include "Sampler.hpp"
 
 namespace uvke {
-    Sampler::Sampler(Base* base)
+    Sampler::Sampler(Base* base, VkFilter filter)
         : m_base(base) {
         {
             VkPhysicalDeviceFeatures physicalDeviceFeatures { };
@@ -14,18 +14,18 @@ namespace uvke {
             samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
             samplerCreateInfo.pNext = nullptr;
             samplerCreateInfo.flags = 0;
-            samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
-            samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
+            samplerCreateInfo.magFilter = filter;
+            samplerCreateInfo.minFilter = filter;
             samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
             samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
             samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
             if(physicalDeviceFeatures.samplerAnisotropy) {
-              samplerCreateInfo.anisotropyEnable = VK_TRUE;
-              samplerCreateInfo.maxAnisotropy = physicalDeviceProperties.limits.maxSamplerAnisotropy;
+                samplerCreateInfo.anisotropyEnable = VK_TRUE;
+                samplerCreateInfo.maxAnisotropy = physicalDeviceProperties.limits.maxSamplerAnisotropy;
             } else {
-              samplerCreateInfo.anisotropyEnable = VK_FALSE;
-              samplerCreateInfo.maxAnisotropy = 1.0f;
+                samplerCreateInfo.anisotropyEnable = VK_FALSE;
+                samplerCreateInfo.maxAnisotropy = 1.0f;
             }
 
             samplerCreateInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;

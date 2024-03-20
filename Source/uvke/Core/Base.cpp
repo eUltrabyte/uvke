@@ -51,7 +51,7 @@ namespace uvke {
                 debugUtilsMessengerCreateInfo.pUserData = nullptr;
 
                 instanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugUtilsMessengerCreateInfo;
-            #elif
+            #else
                 instanceCreateInfo.pNext = nullptr;
             #endif
 

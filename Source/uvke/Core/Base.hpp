@@ -111,7 +111,7 @@ namespace uvke {
 
         #ifdef UVKE_DEBUG
             VkDebugUtilsMessengerEXT m_debugUtilsMessenger;
-        #endif UVKE_DEBUG
+        #endif
 
         VkPhysicalDevice m_physicalDevice;
         VkDevice m_device;
