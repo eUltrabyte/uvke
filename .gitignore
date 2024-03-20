@@ -5,6 +5,8 @@
 .fleet/
 .cache/
 
+vcpkg_installed/
+
 Build/
 build/
 Bin/

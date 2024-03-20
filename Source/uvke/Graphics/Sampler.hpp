@@ -9,7 +9,7 @@
 namespace uvke {
     class UVKE_API Sampler {
     public:
-        Sampler(Base* base = nullptr);
+        Sampler(Base* base = nullptr, VkFilter filter = VK_FILTER_LINEAR);
         virtual ~Sampler();
 
         virtual void SetBase(Base* base);

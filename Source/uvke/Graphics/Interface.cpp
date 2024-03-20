@@ -49,16 +49,14 @@ namespace uvke {
 
         ImGui_ImplVulkan_Init(&imguiVulkanInitInfo, renderPass);
 
-        VkCommandBuffer fontsCommandBuffer = commandBuffer->Begin();
-        ImGui_ImplVulkan_CreateFontsTexture(fontsCommandBuffer);
-        commandBuffer->End(fontsCommandBuffer, surface->GetQueue(0));
-
-        ImGui_ImplVulkan_DestroyFontUploadObjects();
+        ImGui_ImplVulkan_CreateFontsTexture();
 
         UVKE_LOG_ADDRESS("Interface Created");
     }
 
     Interface::~Interface() {
+        ImGui_ImplVulkan_DestroyFontsTexture();
+        
         vkDestroyDescriptorPool(m_base->GetDevice(), m_descriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
 

@@ -2,11 +2,12 @@
 
 namespace uvke {
     MeshLoader::MeshLoader(std::string_view filename) {
-        UVKE_LOG_ADDRESS("Mesh Loader Created");
         Load(filename);
+        UVKE_LOG_ADDRESS("Mesh Loader Created");
     }
 
     MeshLoader::~MeshLoader() {
+        Unload();
         UVKE_LOG_ADDRESS("Mesh Loader Destroyed");
     }
 
@@ -70,7 +71,7 @@ namespace uvke {
                         m_indices.emplace_back(face.w);
                         m_indices.emplace_back(face.x);
                     } else {
-                        UVKE_LOG("Non-Triangular Faces In Mesh - " + std::string(filename.data()));
+                        UVKE_LOG("Mesh Loader Non-Triangular Faces In Mesh - " + std::string(filename.data()));
                     }
                 }
             }
@@ -78,7 +79,7 @@ namespace uvke {
             std::reverse(m_texCoords.begin(), m_texCoords.end());
             std::reverse(m_indices.begin(), m_indices.end());
 
-            for(auto i = 0; i < m_indices.size(); ++i) {
+            for(auto i = 0; i < vertices.size(); ++i) {
                 m_vertices.emplace_back( Vertex { vertices[i], { 1.0f, 1.0f, 1.0f, 1.0f }, m_texCoords[i] });
             }
 
@@ -86,6 +87,12 @@ namespace uvke {
         } else {
             UVKE_LOG("Mesh Loader Cannot Load Mesh - " + std::string(filename.data()));
         }
+    }
+
+    void MeshLoader::Unload() {
+        m_vertices.clear();
+        m_texCoords.clear();
+        m_indices.clear();
     }
 
     std::vector<Vertex> MeshLoader::GetVertices() {
