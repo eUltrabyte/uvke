@@ -1,5 +1,5 @@
 - generally simplify many functions usage
-- fix model loading ( it doesn't work properly, add texcoords full support )
+- add vertex deduplication
 - add light components
 - add scene class
 - fix reverse-z infinite projection
@@ -8,8 +8,9 @@
 - add audio support
 - asset manager class
 - own file format for textures, audio, etc
-- reimplement stb_image with own library
-- reimplement audio with own library
-- reimplement imgui with own library
-- reimplement windows with own library
-- add handler for ( vulkan ) api calls
+- reimplement tinyobjloader with own uvke-like library
+- reimplement stb_image with own uvke-like library
+- reimplement sokol_audio with own uvke-like library
+- reimplement imgui with own uvke-like library
+- reimplement glfw with own uvke-like library
+- add uvke-like handler for ( vulkan ) api calls

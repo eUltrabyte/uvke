@@ -13,22 +13,19 @@ find_package(Vulkan REQUIRED)
 find_package(imgui REQUIRED)
 
 if(WIN32)
-    set(UVKE_LIBRARIES
-        glfw
-        Vulkan::Vulkan
-        imgui::imgui
-    )
+    set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui)
 else()
-    find_package(X11 REQUIRED)
+    execute_process("echo $XDG_SESSION_TYPE" OUTPUT_VARIABLE UVKE_DISPLAY_SERVER)
+    if("${UVKE_DISPLAY_SERVER}" EQUALS "wayland")
+        find_package(Wayland REQUIRED)
+        find_package(xkbcommon REQUIRED)
+        
+        set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui wayland xkbcommon)
+    else()
+        find_package(X11 REQUIRED)
 
-    set(UVKE_LIBRARIES
-        glfw
-        Vulkan::Vulkan
-        imgui::imgui
-        X11::X11
-        X11::Xau
-        dl
-    )
+        set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui X11::X11 X11::Xau dl)
+    endif()
 endif()
 
 set(UVKE_CORE_SOURCE
