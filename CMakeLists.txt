@@ -191,13 +191,13 @@ if(UVKE_COMPILE_SHADERS)
     endif()
 
     file(GLOB_RECURSE UVKE_GLSL_SOURCE
-        "Resource/Shaders/*.frag"
-        "Resource/Shaders/*.vert"
+        "Resource/Shaders/Source/*.frag"
+        "Resource/Shaders/Source/*.vert"
     )
 
     foreach(UVKE_GLSL_FILE ${UVKE_GLSL_SOURCE})
         get_filename_component(FILE_NAME ${UVKE_GLSL_FILE} NAME)
-        set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/Shaders/${FILE_NAME}.spv")
+        set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/Shaders/Compiled/${FILE_NAME}.spv")
         add_custom_command(OUTPUT ${SPIRV} COMMAND ${GLSL_VALIDATOR} -V ${UVKE_GLSL_FILE} -o ${SPIRV} DEPENDS ${UVKE_GLSL_FILE})
         list(APPEND SPIRV_BINARY_FILES ${SPIRV})
     endforeach(UVKE_GLSL_FILE)

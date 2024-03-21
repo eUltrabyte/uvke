@@ -3,35 +3,35 @@
 namespace uvke {
     Mesh::Mesh(const vec3f& size, std::string_view filename) {
         m_vertices = std::vector<Vertex> {
-            { { -size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { -size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
 
-            { { size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { -size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { -size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
 
-            { { size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
 
-            { { size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { -size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { -size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
 
-            { { size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { -size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { -size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+            { { size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
 
-            { { -size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { -size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { -size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } }
+            { { -size.x, -size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, size.y, size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } }
         };
 
         m_indices = std::vector<unsigned int> {
@@ -133,7 +133,7 @@ namespace uvke {
     void Mesh::SetVertices(const std::vector<Vertex>& vertices) {
         m_vertices = vertices;
     }
-    
+
     void Mesh::SetIndices(const std::vector<unsigned int>& indices) {
         m_indices = indices;
     }

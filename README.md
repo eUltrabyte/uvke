@@ -16,11 +16,13 @@ Main goal of uvke is to make using vulkan simple. I want to use it for myself bu
 
 [Vulkan SDK](https://lunarg.com/vulkan-sdk/) - Vulkan is a new generation graphics and compute API that provides high-efficiency, cross-platform access to modern graphics processing units, which are used in a wide variety of devices from PCs and consoles to mobile phones and embedded platforms.
 
-[stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) - Image loading/decoding from file/memory: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
-
 [imgui](https://github.com/ocornut/imgui) - Bloat-free graphical user interface library for C++. It outputs optimized vertex buffers that you can render anytime in your 3D-pipeline-enabled application. It is fast, portable, renderer agnostic, and self-contained (no external dependencies).
 
+[stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) - Image loading/decoding from file/memory: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
+
 [sokol_audio](https://github.com/floooh/sokol/blob/master/sokol_audio.h) - Minimal buffer-streaming audio playback.
+
+[tinyobjloader](https://github.com/tinyobjloader/tinyobjloader/blob/release/tiny_obj_loader.h) - tiny but powerful single file wavefront obj loader written in C++03. No dependency except for C++ STL. It can parse over 10M polygons with moderate memory and time.
 
 ### Installation
 ```bash
