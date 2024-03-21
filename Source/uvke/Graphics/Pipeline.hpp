@@ -27,6 +27,7 @@ namespace uvke {
         Pipeline(Base* base = nullptr, Surface* surface = nullptr, VertexBuffer* vertexBuffer = nullptr, Descriptor* descriptor = nullptr);
         virtual ~Pipeline();
 
+        virtual void Create();
         virtual void Recreate();
         virtual void Render(Framebuffer* framebuffer, CommandBuffer* commandBuffer, unsigned int frame, unsigned int index, std::vector<Component*> components, Interface* interfaces);
 

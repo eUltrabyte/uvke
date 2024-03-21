@@ -2,7 +2,7 @@
 - add vertex deduplication
 - add light components
 - add scene class
-- fix reverse-z infinite projection
+- add text rendering
 - job manager class ( job queue and job priorities )
 - add multi threading support
 - add audio support
@@ -12,5 +12,5 @@
 - reimplement stb_image with own uvke-like library
 - reimplement sokol_audio with own uvke-like library
 - reimplement imgui with own uvke-like library
-- reimplement glfw with own uvke-like library
+- reimplement glfw with own uvke-like library ( with features like custom titlebar )
 - add uvke-like handler for ( vulkan ) api calls
