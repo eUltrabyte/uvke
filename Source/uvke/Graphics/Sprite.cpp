@@ -3,10 +3,10 @@
 namespace uvke {
     Sprite::Sprite(const vec4f& color) {
         m_vertices = std::vector<Vertex> {
-            { { -1.0f, -1.0f, 0.0f }, color, { 1.0f, 0.0f } },
-            { { 1.0f, -1.0f, 0.0f }, color, { 0.0f, 0.0f } },
-            { { 1.0f, 1.0f, 0.0f }, color, { 0.0f, 1.0f } },
-            { { -1.0f, 1.0f, 0.0f }, color, { 1.0f, 1.0f } }
+            { { -1.0f, -1.0f, 0.0f }, color, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { 1.0f, -1.0f, 0.0f }, color, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { 1.0f, 1.0f, 0.0f }, color, { 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -1.0f, 1.0f, 0.0f }, color, { 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } }
         };
 
         m_indices = std::vector<unsigned int> {
@@ -21,10 +21,10 @@ namespace uvke {
 
     Sprite::Sprite(const vec2f& size, std::string_view filename) {
         m_vertices = std::vector<Vertex> {
-            { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-            { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-            { { size.x, size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-            { { -size.x, size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } }
+            { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { size.x, size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } },
+            { { -size.x, size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f } }
         };
 
         m_indices = std::vector<unsigned int> {

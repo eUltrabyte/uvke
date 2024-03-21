@@ -33,19 +33,26 @@ namespace uvke {
                 Vertex vertex { };
 
                 vertex.position = {
-                    attributes.vertices[3 * index.vertex_index + 0],
+                    attributes.vertices[3 * index.vertex_index],
                     attributes.vertices[3 * index.vertex_index + 1],
                     attributes.vertices[3 * index.vertex_index + 2]
                 };
 
                 vertex.texCoord = {
-                    attributes.texcoords[2 * index.texcoord_index + 0],
+                    attributes.texcoords[2 * index.texcoord_index],
                     1.0f - attributes.texcoords[2 * index.texcoord_index + 1]
                 };
 
                 vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+                vertex.normal = {
+                    attributes.normals[3 * index.normal_index],
+                    attributes.normals[3 * index.normal_index + 1],
+                    attributes.normals[3 * index.normal_index + 2]
+                };
+
                 m_vertices.emplace_back(vertex);
+
                 m_indices.emplace_back(m_indices.size());
             }
         }

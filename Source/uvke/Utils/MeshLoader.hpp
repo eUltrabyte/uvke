@@ -19,7 +19,6 @@ namespace uvke {
 
     private:
         std::vector<Vertex> m_vertices;
-        std::vector<vec2f> m_texCoords;
         std::vector<unsigned int> m_indices;
 
     };
