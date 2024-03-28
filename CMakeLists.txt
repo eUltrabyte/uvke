@@ -15,7 +15,7 @@ find_package(imgui REQUIRED)
 if(WIN32)
     set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui)
 else()
-    execute_process("echo $XDG_SESSION_TYPE" OUTPUT_VARIABLE UVKE_DISPLAY_SERVER)
+    execute_process(COMMAND "echo $XDG_SESSION_TYPE" OUTPUT_VARIABLE UVKE_DISPLAY_SERVER)
     if("${UVKE_DISPLAY_SERVER}" EQUALS "wayland")
         find_package(Wayland REQUIRED)
         find_package(xkbcommon REQUIRED)
@@ -122,8 +122,8 @@ set(UVKE_SOURCE
 option(UVKE_LOGFILE "uvke saves logs to file" ON)
 option(UVKE_SHARED_LIBRARY "uvke build using shared libraries" OFF)
 option(UVKE_SHARED_BUILD "uvke build shared libraries files" OFF)
-option(UVKE_EXAMPLES "uvke build examples" ON)
 option(UVKE_COMPILE_SHADERS "uvke compile shaders" ON)
+option(UVKE_EXAMPLES "uvke build examples" ON)
 
 if(UVKE_LOGFILE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_LOGFILE")
@@ -167,9 +167,14 @@ target_link_libraries(${PROJECT_NAME}-Graphics PUBLIC ${UVKE_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Window ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics)
 
-if(UVKE_EXAMPLES)
+if(UVKE_COMPILE_SHADERS)
     file(COPY Resource/ DESTINATION Resource/)
 
+    add_subdirectory(Resource/Shaders)
+    add_dependencies(${PROJECT_NAME} uvke-Shaders)
+endif()
+
+if(UVKE_EXAMPLES)
     add_subdirectory(Examples/Windows)
     file(COPY Resource/ DESTINATION Examples/Windows/Resource/)
 
@@ -182,27 +187,3 @@ if(UVKE_EXAMPLES)
     add_subdirectory(Examples/Test)
     file(COPY Resource/ DESTINATION Examples/Test/Resource/)
 endif()
-
-if(UVKE_COMPILE_SHADERS)
-    if(WIN32)
-        set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe")
-    else()
-        set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/bin/glslangValidator")
-    endif()
-
-    file(GLOB_RECURSE UVKE_GLSL_SOURCE
-        "Resource/Shaders/Source/*.frag"
-        "Resource/Shaders/Source/*.vert"
-    )
-
-    foreach(UVKE_GLSL_FILE ${UVKE_GLSL_SOURCE})
-        get_filename_component(FILE_NAME ${UVKE_GLSL_FILE} NAME)
-        set(SPIRV "${PROJECT_SOURCE_DIR}/Resource/Shaders/Compiled/${FILE_NAME}.spv")
-        add_custom_command(OUTPUT ${SPIRV} COMMAND ${GLSL_VALIDATOR} -V ${UVKE_GLSL_FILE} -o ${SPIRV} DEPENDS ${UVKE_GLSL_FILE})
-        list(APPEND SPIRV_BINARY_FILES ${SPIRV})
-    endforeach(UVKE_GLSL_FILE)
-
-    add_custom_target(${PROJECT_NAME}-Shaders DEPENDS ${SPIRV_BINARY_FILES})
-endif()
-
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-Shaders)

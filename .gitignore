@@ -22,3 +22,4 @@ cmake-build-release/
 justfile
 CMakeSettings.json
 log.txt
+Resource/Shaders/*.spv
