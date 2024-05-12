@@ -17,6 +17,7 @@ namespace uvke {
     void MeshLoader::Load(std::string_view filename) {
         m_vertices = std::vector<Vertex>(0);
         m_indices = std::vector<unsigned int>(0);
+        m_uniqueVertices = { };
 
         tinyobj::attrib_t attributes;
         std::vector<tinyobj::shape_t> shapes;
@@ -51,9 +52,12 @@ namespace uvke {
                     attributes.normals[3 * index.normal_index + 2]
                 };
 
-                m_vertices.emplace_back(vertex);
+                if(m_uniqueVertices.count(vertex) == 0) {
+                    m_uniqueVertices[vertex] = static_cast<unsigned int>(m_vertices.size());
+                    m_vertices.emplace_back(vertex);
+                }
 
-                m_indices.emplace_back(m_indices.size());
+                m_indices.emplace_back(m_uniqueVertices[vertex]);
             }
         }
 
@@ -63,6 +67,7 @@ namespace uvke {
     void MeshLoader::Unload() {
         m_vertices.clear();
         m_indices.clear();
+        m_uniqueVertices.clear();
     }
 
     std::vector<Vertex> MeshLoader::GetVertices() {

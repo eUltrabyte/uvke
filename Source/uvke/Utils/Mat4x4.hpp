@@ -400,14 +400,15 @@ namespace uvke {
     }
 
     template<typename T>
-    inline constexpr mat4x4<T> InfinitePerspective(const T& left, const T& right, const T& bottom, const T& top, const T& zNear) {
+    inline constexpr mat4x4<T> InfinitePerspective(const T& fov, const T& aspect, const T& zNear) {
+        T half = 1 / Tan<T>(fov);
+
         mat4x4<T> result;
-        result.data[0][0] = 2 * (1 / (right - left));
-        result.data[1][1] = 2 * (1 / (bottom - top));
-        result.data[2][0] = (right + left) * (1 / (right - left));
-        result.data[2][1] = (bottom + top) * (1 / (bottom - top));
-        result.data[2][3] = -1;
-        result.data[3][2] = zNear;
+        result.data[0][0] = 1 / aspect * half;
+        result.data[1][1] = -(1 / half);
+        result.data[2][2] = 1;
+        result.data[2][3] = 1;
+        result.data[3][2] = -(2 * zNear);
 
         return result;
     }

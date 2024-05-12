@@ -391,6 +391,8 @@ namespace uvke {
                 return vec4<T>(x /= static_cast<T>(value.x), y /= static_cast<T>(value.y), z /= static_cast<T>(value.z), w /= static_cast<T>(value.w));
             #endif
         }
+
+        bool operator==(const vec4<T>&) const = default;
     };
 
     using vec4f = vec4<float>;

@@ -12,5 +12,6 @@ const vec4 sunColor = vec4(1.0, 0.0, 0.0, 1.0);
 const vec3 sunDirection = normalize(vec3(1.0, 1.0, -1.0));
 
 void main() {
-    outColor =  sunColor * max(0.0, dot(fragNormal, -sunDirection)) * fragColor * vec4(texture(texSampler, fragTexCoord).rgba);
+    outColor = sunColor * max(0.0, dot(fragNormal, -sunDirection)) * fragColor * vec4(texture(texSampler, fragTexCoord).rgba);
+    outColor = vec4(outColor.r, outColor.g, outColor.b, vec4(fragColor * texture(texSampler, fragTexCoord)).a);
 }

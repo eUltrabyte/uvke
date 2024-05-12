@@ -12,6 +12,8 @@ namespace uvke {
         vec4f color = { 0.0f, 0.0f, 0.0f, 0.0f };
         vec2f texCoord = { 0.0f, 0.0f };
         vec3f normal = { 0.0f, 0.0f, 0.0f };
+
+        bool operator==(const Vertex&) const = default;
     };
 
     class UVKE_API VertexBuffer {
@@ -42,5 +44,29 @@ namespace uvke {
 
     };
 };
+
+namespace std {
+    template<typename T>
+	struct hash<uvke::vec2<T>> {
+		size_t operator()(uvke::vec2<T> const& vec) const;
+	};
+
+    template<typename T>
+	struct hash<uvke::vec3<T>> {
+		size_t operator()(uvke::vec3<T> const& vec) const;
+	};
+
+    template<typename T>
+	struct hash<uvke::vec4<T>> {
+		size_t operator()(uvke::vec4<T> const& vec) const;
+	};
+
+    template<>
+    struct hash<uvke::Vertex> {
+        size_t operator()(uvke::Vertex const& vertex) const {
+            return ((hash<uvke::vec3f>()(vertex.position) ^ (hash<uvke::vec4f>()(vertex.color) << 1)) >> 1) ^ (hash<uvke::vec2f>()(vertex.texCoord) << 1);
+        }
+    };
+}
 
 #endif

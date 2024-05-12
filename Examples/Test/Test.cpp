@@ -44,9 +44,9 @@ public:
 
         m_renderer->Push(&sprite1); */
 
-        uvke::MeshLoader meshLoader("Resource/Models/Cube.obj");
+        uvke::MeshLoader meshLoader("Resource/Models/Monkey.obj");
 
-        uvke::Mesh model({ 0.0f, 0.0f, 0.0f }, "Resource/Textures/Cube.png");
+        uvke::Mesh model({ 0.0f, 0.0f, 0.0f }, "Resource/Textures/Monkey.png");
         model.SetPosition({ 0.0f, 0.0f, 0.0f });
         model.SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
         model.SetMesh(&meshLoader);
