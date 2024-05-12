@@ -20,6 +20,7 @@ namespace uvke {
     private:
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;
+        std::unordered_map<Vertex, unsigned int> m_uniqueVertices;
 
     };
 };

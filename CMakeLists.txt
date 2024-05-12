@@ -13,15 +13,21 @@ find_package(Vulkan REQUIRED)
 find_package(imgui REQUIRED)
 
 if(WIN32)
+    message("-- uvke uses winapi")
+
     set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui)
 else()
     execute_process(COMMAND "echo $XDG_SESSION_TYPE" OUTPUT_VARIABLE UVKE_DISPLAY_SERVER)
-    if("${UVKE_DISPLAY_SERVER}" EQUALS "wayland")
+    if(${UVKE_DISPLAY_SERVER} MATCHES "wayland")
+        message("-- uvke uses wayland")
+
         find_package(Wayland REQUIRED)
         find_package(xkbcommon REQUIRED)
         
         set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui wayland xkbcommon)
     else()
+        message("-- uvke uses x11")
+
         find_package(X11 REQUIRED)
 
         set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui X11::X11 X11::Xau dl)
@@ -168,6 +174,8 @@ target_link_libraries(${PROJECT_NAME}-Graphics PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Window ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics)
 
 if(UVKE_COMPILE_SHADERS)
+    message("-- uvke will compile shaders")
+
     file(COPY Resource/ DESTINATION Resource/)
 
     add_subdirectory(Resource/Shaders)
@@ -175,6 +183,8 @@ if(UVKE_COMPILE_SHADERS)
 endif()
 
 if(UVKE_EXAMPLES)
+    message("-- uvke will compile examples")
+
     add_subdirectory(Examples/Windows)
     file(COPY Resource/ DESTINATION Examples/Windows/Resource/)
 

@@ -1,5 +1,4 @@
 - generally simplify many functions usage
-- add vertex deduplication
 - add light components
 - add scene class
 - add text rendering

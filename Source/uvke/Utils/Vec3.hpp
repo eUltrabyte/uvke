@@ -167,6 +167,8 @@ namespace uvke {
         vec3<T> operator/=(const vec3<U>& value) {
             return vec3<T>(x /= static_cast<T>(value.x), y /= static_cast<T>(value.y), z /= static_cast<T>(value.z));
         }
+
+        bool operator==(const vec3<T>&) const = default;
     };
 
     using vec3f = vec3<float>;

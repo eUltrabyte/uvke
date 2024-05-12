@@ -167,6 +167,8 @@ namespace uvke {
         vec2<T> operator/=(const vec2<U>& value) {
             return vec2<T>(x /= static_cast<T>(value.x), y /= static_cast<T>(value.y));
         }
+
+        bool operator==(const vec2<T>&) const = default;
     };
 
     using vec2f = vec2<float>;

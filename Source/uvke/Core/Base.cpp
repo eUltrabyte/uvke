@@ -8,7 +8,7 @@ namespace uvke {
             appInfo.pNext = nullptr;
             appInfo.applicationVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
             appInfo.pApplicationName = name.data();
-            appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 2, 0);
+            appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 3, 0);
             appInfo.pEngineName = "uvke";
             appInfo.apiVersion = Core::GetVulkanVersion();
 
@@ -110,6 +110,8 @@ namespace uvke {
         }
 
         FindDepthFormat(VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+
+        UVKE_LOG("Sample Count - x" + std::to_string(m_sampleCount));
 
         UVKE_LOG_ADDRESS("Base Created");
     }
