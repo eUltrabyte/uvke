@@ -108,35 +108,3 @@ namespace uvke {
         return m_bufferMemory;
     }
 };
-
-namespace std {
-    template<>
-    size_t hash<uvke::vec2f>::operator()(uvke::vec2f const& vec) const {
-        size_t seed = 0;
-        hash<float> hasher;
-        uvke::CombineHash(seed, hasher(vec.x));
-        uvke::CombineHash(seed, hasher(vec.y));
-        return seed;
-    }
-    
-    template<>
-    size_t hash<uvke::vec3f>::operator()(uvke::vec3f const& vec) const {
-        size_t seed = 0;
-        hash<float> hasher;
-        uvke::CombineHash(seed, hasher(vec.x));
-        uvke::CombineHash(seed, hasher(vec.y));
-        uvke::CombineHash(seed, hasher(vec.z));
-        return seed;
-    }
-
-    template<>
-    size_t hash<uvke::vec4f>::operator()(uvke::vec4f const& vec) const {
-        size_t seed = 0;
-        hash<float> hasher;
-        uvke::CombineHash(seed, hasher(vec.x));
-        uvke::CombineHash(seed, hasher(vec.y));
-        uvke::CombineHash(seed, hasher(vec.z));
-        uvke::CombineHash(seed, hasher(vec.w));
-        return seed;
-    }
-}
