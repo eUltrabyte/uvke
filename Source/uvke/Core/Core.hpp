@@ -8,8 +8,6 @@
 #include <GLFW/glfw3.h>
 
 #ifdef UVKE_SHARED_LIBRARY
-    #define SOKOL_DLL
-
     #ifdef UVKE_SHARED_BUILD
         #ifdef _MSC_VER
             #define UVKE_API __declspec(dllexport)
@@ -66,6 +64,8 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+
+#include <portaudio.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>

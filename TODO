@@ -1,3 +1,4 @@
+- add quaternions
 - generally simplify many functions usage
 - add light components
 - add scene class
@@ -9,7 +10,7 @@
 - own file format for textures, audio, etc
 - reimplement tinyobjloader with own uvke-like library
 - reimplement stb_image with own uvke-like library
-- reimplement sokol_audio with own uvke-like library
+- reimplement portaudio with own uvke-like library
 - reimplement imgui with own uvke-like library
 - reimplement glfw with own uvke-like library ( with features like custom titlebar )
 - add uvke-like handler for ( vulkan ) api calls

@@ -11,6 +11,7 @@ include_directories(Thirdparty)
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(imgui REQUIRED)
+find_package(portaudio REQUIRED)
 
 if(WIN32)
     message("-- uvke uses winapi")
@@ -24,13 +25,13 @@ else()
         find_package(Wayland REQUIRED)
         find_package(xkbcommon REQUIRED)
         
-        set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui wayland xkbcommon)
+        set(UVKE_LIBRARIES ${UVKE_LIBRARIES} wayland xkbcommon)
     else()
         message("-- uvke uses x11")
 
         find_package(X11 REQUIRED)
 
-        set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui X11::X11 X11::Xau dl)
+        set(UVKE_LIBRARIES ${UVKE_LIBRARIES} X11::X11 X11::Xau dl)
     endif()
 endif()
 
@@ -136,6 +137,8 @@ if(UVKE_LOGFILE)
 endif()
 
 if(UVKE_SHARED_LIBRARY)
+    set(UVKE_LIBRARIES ${UVKE_LIBRARIES} portaudio)
+
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_SHARED_LIBRARY")
 
     if(UVKE_SHARED_BUILD)
@@ -149,6 +152,8 @@ if(UVKE_SHARED_LIBRARY)
 
     add_library(${PROJECT_NAME} SHARED ${UVKE_SOURCE})
 else()
+    set(UVKE_LIBRARIES ${UVKE_LIBRARIES} portaudio_static)
+
     add_library(${PROJECT_NAME}-Core STATIC ${UVKE_CORE_SOURCE})
     add_library(${PROJECT_NAME}-Window STATIC ${UVKE_WINDOW_SOURCE})
     add_library(${PROJECT_NAME}-Utils STATIC ${UVKE_UTILS_SOURCE})
