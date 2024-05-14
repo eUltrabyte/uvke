@@ -46,19 +46,40 @@ namespace uvke {
 };
 
 namespace std {
-    template<typename T>
-	struct hash<uvke::vec2<T>> {
-		size_t operator()(uvke::vec2<T> const& vec) const;
+    template<>
+	struct hash<uvke::vec2f> {
+		size_t operator()(uvke::vec2f const& vec) const {
+			size_t seed = 0;
+			hash<float> hasher;
+			uvke::CombineHash(seed, hasher(vec.x));
+			uvke::CombineHash(seed, hasher(vec.y));
+			return seed;
+		}
 	};
 
-    template<typename T>
-	struct hash<uvke::vec3<T>> {
-		size_t operator()(uvke::vec3<T> const& vec) const;
+    template<>
+	struct hash<uvke::vec3f> {
+		size_t operator()(uvke::vec3f const& vec) const {
+			size_t seed = 0;
+			hash<float> hasher;
+			uvke::CombineHash(seed, hasher(vec.x));
+			uvke::CombineHash(seed, hasher(vec.y));
+			uvke::CombineHash(seed, hasher(vec.z));
+			return seed;
+		}
 	};
 
-    template<typename T>
-	struct hash<uvke::vec4<T>> {
-		size_t operator()(uvke::vec4<T> const& vec) const;
+    template<>
+	struct hash<uvke::vec4f> {
+		size_t operator()(uvke::vec4f const& vec) const {
+			size_t seed = 0;
+			hash<float> hasher;
+			uvke::CombineHash(seed, hasher(vec.x));
+			uvke::CombineHash(seed, hasher(vec.y));
+			uvke::CombineHash(seed, hasher(vec.z));
+			uvke::CombineHash(seed, hasher(vec.w));
+			return seed;
+		}
 	};
 
     template<>

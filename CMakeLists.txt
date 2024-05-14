@@ -13,10 +13,10 @@ find_package(Vulkan REQUIRED)
 find_package(imgui REQUIRED)
 find_package(portaudio REQUIRED)
 
+set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui)
+
 if(WIN32)
     message("-- uvke uses winapi")
-
-    set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui)
 else()
     execute_process(COMMAND "echo $XDG_SESSION_TYPE" OUTPUT_VARIABLE UVKE_DISPLAY_SERVER)
     if(${UVKE_DISPLAY_SERVER} MATCHES "wayland")
@@ -31,7 +31,7 @@ else()
 
         find_package(X11 REQUIRED)
 
-        set(UVKE_LIBRARIES ${UVKE_LIBRARIES} X11::X11 X11::Xau dl)
+	set(UVKE_LIBRARIES ${UVKE_LIBRARIES} X11::X11 X11::Xau dl)
     endif()
 endif()
 
