@@ -105,12 +105,18 @@ set(UVKE_GRAPHICS_SOURCE
     Source/uvke/Graphics/Sprite.cpp
 )
 
+set(UVKE_AUDIO_SOURCE
+    Source/uvke/Audio/AudioManager.hpp
+    Source/uvke/Audio/AudioManager.cpp
+)
+
 set(UVKE_UTILS_SOURCE
     Source/uvke/Utils/Utils.hpp
     Source/uvke/Utils/Vec2.hpp
     Source/uvke/Utils/Vec3.hpp
     Source/uvke/Utils/Vec4.hpp
     Source/uvke/Utils/Mat4x4.hpp
+    Source/uvke/Utils/Quaternion.hpp
     Source/uvke/Utils/Clock.hpp
     Source/uvke/Utils/Clock.cpp
     Source/uvke/Utils/File.hpp
@@ -149,6 +155,7 @@ if(UVKE_SHARED_LIBRARY)
     add_library(${PROJECT_NAME}-Window SHARED ${UVKE_WINDOW_SOURCE})
     add_library(${PROJECT_NAME}-Utils SHARED ${UVKE_UTILS_SOURCE})
     add_library(${PROJECT_NAME}-Graphics SHARED ${UVKE_GRAPHICS_SOURCE})
+    add_library(${PROJECT_NAME}-Audio SHARED ${UVKE_AUDIO_SOURCE})
 
     add_library(${PROJECT_NAME} SHARED ${UVKE_SOURCE})
 else()
@@ -158,6 +165,7 @@ else()
     add_library(${PROJECT_NAME}-Window STATIC ${UVKE_WINDOW_SOURCE})
     add_library(${PROJECT_NAME}-Utils STATIC ${UVKE_UTILS_SOURCE})
     add_library(${PROJECT_NAME}-Graphics STATIC ${UVKE_GRAPHICS_SOURCE})
+    add_library(${PROJECT_NAME}-Audio STATIC ${UVKE_AUDIO_SOURCE})
 
     add_library(${PROJECT_NAME} STATIC ${UVKE_SOURCE})
 endif()
@@ -168,6 +176,7 @@ target_compile_definitions(${PROJECT_NAME}-Core PUBLIC $<$<CONFIG:Debug>:UVKE_DE
 target_compile_definitions(${PROJECT_NAME}-Window PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME}-Utils PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 target_compile_definitions(${PROJECT_NAME}-Graphics PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
+target_compile_definitions(${PROJECT_NAME}-Audio PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
@@ -175,8 +184,9 @@ target_link_libraries(${PROJECT_NAME}-Core PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}-Window PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}-Utils PUBLIC ${UVKE_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}-Graphics PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-Audio PUBLIC ${UVKE_LIBRARIES})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Window ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}-Core ${PROJECT_NAME}-Window ${PROJECT_NAME}-Utils ${PROJECT_NAME}-Graphics ${PROJECT_NAME}-Audio)
 
 if(UVKE_COMPILE_SHADERS)
     message("-- uvke will compile shaders")
