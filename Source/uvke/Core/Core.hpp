@@ -33,19 +33,20 @@
     #else
         #error "uvke Doesn't Support 32-bit Platform"
     #endif
-#elif __linux__
+#elif defined(__linux__)
     #define UVKE_PLATFORM_LINUX
-    // todo
-#elif __ANDROID__
+    #include <unistd.h>
+#elif defined(__ANDROID__)
     #define UVKE_PLATFORM_ANDROID
+    // todo
+#elif defined(__EMSCRIPTEN__)
+    #define UVKE_PLATFORM_EMSCRIPTEN
     // todo
 #else
     #error "uvke Doesn't Support This Platform"
 #endif
 
-#ifdef __SSE__
-    #define UVKE_MATH_USE_SIMD
-#elif __AVX__
+#if defined(__SSE__) || defined(__AVX__)
     #define UVKE_MATH_USE_SIMD
 #endif
 

@@ -1,5 +1,5 @@
 - use quaternions instead of matrix in rotation operations
-- improve modular usage of uvke libraries
+- fix modules to work separately
 - generally simplify many functions usage
 - add light components
 - add scene class
