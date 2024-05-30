@@ -1,4 +1,5 @@
-- add quaternions
+- use quaternions instead of matrix in rotation operations
+- fix modules to work separately
 - generally simplify many functions usage
 - add light components
 - add scene class

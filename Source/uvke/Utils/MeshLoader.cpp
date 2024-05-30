@@ -24,6 +24,7 @@ namespace uvke {
         std::vector<tinyobj::material_t> materials;
         std::pair<std::string, std::string> error;
         if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &error.first, &error.second, filename.data())) {
+            UVKE_LOG("Mesh Loader Error - " + error.first + " - " + error.second);
             UVKE_ASSERT(-1);
         } else {
             UVKE_LOG("Successfully Loaded Mesh - " + std::string(filename.data()));
