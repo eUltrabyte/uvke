@@ -4,7 +4,7 @@
 
 #include "../uvkepch.hpp"
 
-#define GLFW_INCLUDE_VULKAN
+#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
 #ifdef UVKE_SHARED_LIBRARY
@@ -61,12 +61,6 @@
         };
     };
 #endif
-
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_vulkan.h>
-
-#include <portaudio.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>

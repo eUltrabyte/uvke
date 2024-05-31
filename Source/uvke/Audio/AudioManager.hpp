@@ -5,6 +5,8 @@
 #include "../uvke.hpp"
 #include "../Core/Base.hpp"
 
+#include <portaudio.h>
+
 namespace uvke {
     class UVKE_API AudioManager {
     public:

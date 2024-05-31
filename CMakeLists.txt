@@ -10,10 +10,8 @@ include_directories(Thirdparty)
 
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
-find_package(imgui REQUIRED)
-find_package(portaudio REQUIRED)
 
-set(UVKE_LIBRARIES glfw Vulkan::Vulkan imgui::imgui)
+set(UVKE_LIBRARIES glfw Vulkan::Vulkan)
 
 if(WIN32)
     message("-- uvke uses winapi")
@@ -56,8 +54,6 @@ if(UVKE_LOGFILE)
 endif()
 
 if(UVKE_SHARED_LIBRARY)
-    set(UVKE_LIBRARIES ${UVKE_LIBRARIES} portaudio)
-
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_SHARED_LIBRARY")
 
     if(UVKE_SHARED_BUILD)
@@ -66,8 +62,6 @@ if(UVKE_SHARED_LIBRARY)
 
     add_library(${PROJECT_NAME} SHARED ${UVKE_SOURCE})
 else()
-    set(UVKE_LIBRARIES ${UVKE_LIBRARIES} portaudio_static)
-
     add_library(${PROJECT_NAME} STATIC ${UVKE_SOURCE})
 endif()
 
