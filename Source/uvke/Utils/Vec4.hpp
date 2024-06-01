@@ -4,6 +4,7 @@
 
 #include "../uvkepch.hpp"
 #include "../Core/Core.hpp"
+#include "Utils.hpp"
 
 namespace uvke {
     template<typename T>

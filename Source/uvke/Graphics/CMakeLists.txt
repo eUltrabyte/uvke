@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.17)
 project(uvke-Graphics)
 
+find_package(imgui REQUIRED)
+
 set(UVKE_GRAPHICS_SOURCE
     Shader.hpp
     Shader.cpp
@@ -58,4 +60,4 @@ endif()
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:UVKE_DEBUG> $<$<CONFIG:RelWithDebInfo>:UVKE_DEBUG>)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${UVKE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC imgui::imgui)

@@ -8,6 +8,10 @@
 #include "Surface.hpp"
 #include "CommandBuffer.hpp"
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
+
 namespace uvke {
     struct UVKE_API Stats {
     public:
