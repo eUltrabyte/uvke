@@ -46,22 +46,6 @@
     #error "uvke Doesn't Support This Platform"
 #endif
 
-#if defined(__SSE__) || defined(__AVX__)
-    #define UVKE_MATH_USE_SIMD
-#endif
-
-#ifdef UVKE_MATH_USE_SIMD
-    #include <x86intrin.h>
-
-    namespace uvke {
-        namespace simd {
-            #ifdef UVKE_MATH_USE_SIMD
-                using vec4 = __m128;
-            #endif
-        };
-    };
-#endif
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 

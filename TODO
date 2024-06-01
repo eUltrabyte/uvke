@@ -1,7 +1,6 @@
 - use quaternions instead of matrix in rotation operations
 - fix modules to work separately
 - generally simplify many functions usage
-- fix avx and simd support
 - add light components
 - add scene class
 - add text rendering

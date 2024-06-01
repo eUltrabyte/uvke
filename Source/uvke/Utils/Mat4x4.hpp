@@ -4,6 +4,7 @@
 
 #include "../uvkepch.hpp"
 #include "../Core/Core.hpp"
+#include "Utils.hpp"
 #include "Vec3.hpp"
 
 namespace uvke {
