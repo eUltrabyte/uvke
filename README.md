@@ -20,7 +20,7 @@ Main goal of uvke is to make using vulkan simple. I want to use it for myself bu
 
 [stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) - Image loading/decoding from file/memory: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
 
-[sokol_audio](https://github.com/floooh/sokol/blob/master/sokol_audio.h) - Minimal buffer-streaming audio playback.
+[portaudio](https://github.com/PortAudio/portaudio) - Portable audio I/O library designed for cross-platform support of audio. It uses either a callback mechanism to request audio processing, or blocking read/write calls to buffer data between the native audio subsystem and the client.
 
 [tinyobjloader](https://github.com/tinyobjloader/tinyobjloader/blob/release/tiny_obj_loader.h) - tiny but powerful single file wavefront obj loader written in C++03. No dependency except for C++ STL. It can parse over 10M polygons with moderate memory and time.
 
