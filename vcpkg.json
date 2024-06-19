@@ -14,7 +14,10 @@
         "vulkan-binding"
       ]
     },
-    "portaudio"
+    "portaudio",
+    "libx11",
+    "xcb",
+    "wayland"
   ],
   "builtin-baseline": "9765877106f7c179995e8010bb7427a865a6bd1d"
 }

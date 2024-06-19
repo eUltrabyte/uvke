@@ -16,20 +16,22 @@ set(UVKE_LIBRARIES glfw Vulkan::Vulkan)
 if(WIN32)
     message("-- uvke uses winapi")
 else()
+    find_package(ECM REQUIRED NO_MODULE)
+    list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+
     execute_process(COMMAND "echo $XDG_SESSION_TYPE" OUTPUT_VARIABLE UVKE_DISPLAY_SERVER)
     if(${UVKE_DISPLAY_SERVER} MATCHES "wayland")
         message("-- uvke uses wayland")
 
         find_package(Wayland REQUIRED)
-        find_package(xkbcommon REQUIRED)
         
-        set(UVKE_LIBRARIES ${UVKE_LIBRARIES} wayland xkbcommon)
+        set(UVKE_LIBRARIES ${UVKE_LIBRARIES} Wayland::Server Wayland::Client Wayland::Cursor)
     else()
         message("-- uvke uses x11")
 
         find_package(X11 REQUIRED)
 
-	set(UVKE_LIBRARIES ${UVKE_LIBRARIES} X11::X11 X11::Xau dl)
+	    set(UVKE_LIBRARIES ${UVKE_LIBRARIES} X11::X11 X11::Xau dl)
     endif()
 endif()
 

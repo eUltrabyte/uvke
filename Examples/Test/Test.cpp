@@ -75,7 +75,7 @@ public:
     virtual void Update() override {
         m_window->Update();
 
-        switch(m_event.GetType()) {
+        /* switch(m_event.GetType()) {
             case uvke::EventType::Closed: {
                 m_window->Close(); Shutdown();
             } break;
@@ -87,9 +87,9 @@ public:
             } break;
 
             default: break;
-        }
+        } */
 
-        /* switch(m_event.GetType()) {
+        switch(m_event.GetType()) {
             case uvke::EventType::Closed: { UVKE_LOG("Event - Closed"); } break;
             case uvke::EventType::Resized: { UVKE_LOG("Event - Resized - " + std::to_string(m_event.GetSize().x) + "/" + std::to_string(m_event.GetSize().y)); } break;
             case uvke::EventType::Focused: { UVKE_LOG("Event - Focused - " + std::to_string(m_event.GetFocused())); } break;
@@ -102,7 +102,7 @@ public:
             case uvke::EventType::ButtonPressed: { UVKE_LOG("Event - ButtonPressed - " + std::to_string(m_event.GetMouse().x) + "/" + std::to_string(m_event.GetMouse().y)); } break;
             case uvke::EventType::ButtonReleased: { UVKE_LOG("Event - ButtonReleased - " + std::to_string(m_event.GetMouse().x) + "/" + std::to_string(m_event.GetMouse().y)); } break;
             default: break;
-        } */
+        }
 
         m_window->PollEvents(m_event);
 
