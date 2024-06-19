@@ -1,5 +1,7 @@
 - use quaternions instead of matrix in rotation operations
 - fix modules to work separately
+- fix on linux ( strange flickering effect )
+- remove 60 fps cap on linux
 - generally simplify many functions usage
 - add glslang compilation to shader class
 - add light components
