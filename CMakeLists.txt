@@ -127,6 +127,9 @@ if(UVKE_EXAMPLES)
     add_subdirectory(Examples/Mesh)
     file(COPY Resource/ DESTINATION Examples/Mesh/Resource/)
 
+    add_subdirectory(Examples/Image)
+    file(COPY Resource/ DESTINATION Examples/Image/Resource/)
+
     add_subdirectory(Examples/Test)
     file(COPY Resource/ DESTINATION Examples/Test/Resource/)
 endif()

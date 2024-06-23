@@ -7,6 +7,7 @@
 #include "../Graphics/Renderer.hpp"
 #include "../Graphics/Mesh.hpp"
 #include "../Graphics/Sprite.hpp"
+#include "../Audio/AudioManager.hpp"
 
 namespace uvke {
     class UVKE_API App {
