@@ -47,7 +47,7 @@ namespace uvke {
         }
     }
 
-    template<typename T>
+    /* template<typename T>
     inline constexpr float Rsqrt(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke rsqrt type is not arithmetic as expected");
         float current = value;
@@ -62,7 +62,7 @@ namespace uvke {
     inline constexpr float Sqrt(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke sqrt type is not arithmetic as expected");
         return 1.0f / Rsqrt<T>(value);
-    }
+    } */
 
     template<typename T>
     inline constexpr float Sin(const T& value) {
@@ -145,11 +145,9 @@ namespace uvke {
         return radians * 180.0f / priv::PI;
     }
 
-    template<typename T, typename U, typename O>
-    inline constexpr float Lerp(const T& x, const U& y, const O& fraction) {
-        static_assert(std::is_arithmetic_v<T>, "uvke lerp <T> type is not arithmetic as expected");
-        static_assert(std::is_arithmetic_v<U>, "uvke lerp <U> type is not arithmetic as expected");
-        static_assert(std::is_arithmetic_v<O>, "uvke lerp <O> type is not arithmetic as expected");
+    template<typename T>
+    inline constexpr float Lerp(const T& x, const T& y, const T& fraction) {
+        static_assert(std::is_arithmetic_v<T>, "uvke lerp type is not arithmetic as expected");
         return x + (static_cast<T>(y) - x) * static_cast<T>(fraction);
     }
 
@@ -180,6 +178,16 @@ namespace uvke {
 		seed ^= hash;
         return;
 	}
+
+    template<typename T>
+    inline constexpr float Rsqrt(const T& value) {
+        return 1.0f / std::sqrt(value);
+    }
+
+    template<typename T>
+    inline constexpr float Sqrt(const T& value) {
+        return std::sqrt(value);
+    }
 };
 
 #endif

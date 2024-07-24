@@ -3,7 +3,7 @@
 class Test : public uvke::App {
 public:
     Test()
-        : m_window(std::make_unique<uvke::Window>(uvke::WindowProps("uvke Test", { 1280, 720 }, uvke::Style::Default))), m_base(std::make_unique<uvke::Base>("uvke App")), m_renderer(std::make_unique<uvke::Renderer>(m_base.get(), m_window.get())), m_audioManager(std::make_unique<uvke::AudioManager>()) {
+        : m_window(std::make_unique<uvke::Window>(uvke::WindowProps("uvke Test", { 1280, 720 }, uvke::Style::Default))), m_base(std::make_unique<uvke::Base>("uvke App")), m_renderer(std::make_unique<uvke::Renderer>(m_base.get(), m_window.get())), m_audioManager(std::make_unique<uvke::AudioManager>()), m_shouldClose(false) {
     }
 
     virtual ~Test() {
@@ -61,22 +61,8 @@ public:
     virtual void Update() override {
         m_window->Update();
 
-        /* switch(m_event.GetType()) {
-            case uvke::EventType::Closed: {
-                m_window->Close(); Shutdown();
-            } break;
-
-            case uvke::EventType::KeyReleased: {
-                if(m_event.GetKey().x == GLFW_KEY_ESCAPE) {
-                    m_window->ChangeCursorVisibility(uvke::CursorType::Shown);
-                }
-            } break;
-
-            default: break;
-        } */
-
         switch(m_event.GetType()) {
-            case uvke::EventType::Closed: { UVKE_LOG("Event - Closed"); } break;
+            case uvke::EventType::Closed: { UVKE_LOG("Event - Closed"); if(m_shouldClose) { m_window->Close(); Shutdown(); } else { m_shouldClose = true; } } break;
             case uvke::EventType::Resized: { UVKE_LOG("Event - Resized - " + std::to_string(m_event.GetSize().x) + "/" + std::to_string(m_event.GetSize().y)); } break;
             case uvke::EventType::Focused: { UVKE_LOG("Event - Focused - " + std::to_string(m_event.GetFocused())); } break;
             case uvke::EventType::Unfocused: { UVKE_LOG("Event - Unfocused - " + std::to_string(m_event.GetFocused())); } break;
@@ -109,6 +95,7 @@ private:
     std::unique_ptr<uvke::Base> m_base;
     std::unique_ptr<uvke::Renderer> m_renderer;
     std::unique_ptr<uvke::AudioManager> m_audioManager;
+    bool m_shouldClose;
 
 };
 
