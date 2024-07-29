@@ -47,22 +47,22 @@ namespace uvke {
         }
     }
 
-    /* template<typename T>
+    template<typename T>
     inline constexpr float Rsqrt(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke rsqrt type is not arithmetic as expected");
         float current = value;
-        long x = *(long*)&current;
-        x = 0x5f3759df - (x >> 1);
-        current = *(float*)&x;
-        current = current * (1.5f - ((value * 0.5f) * current * current));
-        return current;
+        unsigned int i = 0;
+        std::memcpy(&i, &current, sizeof(float));
+        i = 0x5f3759df - ( i >> 1 );
+        std::memcpy(&current, &i, sizeof(float));
+        return current * (1.5f - (value * 0.5f * current * current));
     }
 
     template<typename T>
     inline constexpr float Sqrt(const T& value) {
         static_assert(std::is_arithmetic_v<T>, "uvke sqrt type is not arithmetic as expected");
-        return 1.0f / Rsqrt<T>(value);
-    } */
+        return 1.0f / Rsqrt(value);
+    }
 
     template<typename T>
     inline constexpr float Sin(const T& value) {
@@ -178,16 +178,6 @@ namespace uvke {
 		seed ^= hash;
         return;
 	}
-
-    template<typename T>
-    inline constexpr float Rsqrt(const T& value) {
-        return 1.0f / std::sqrt(value);
-    }
-
-    template<typename T>
-    inline constexpr float Sqrt(const T& value) {
-        return std::sqrt(value);
-    }
 };
 
 #endif
