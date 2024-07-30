@@ -25,10 +25,20 @@ Main goal of uvke is to make using vulkan simple. I want to use it for myself bu
 [tinyobjloader](https://github.com/tinyobjloader/tinyobjloader/blob/release/tiny_obj_loader.h) - tiny but powerful single file wavefront obj loader written in C++03. No dependency except for C++ STL. It can parse over 10M polygons with moderate memory and time.
 
 ### Installation
+To compile uvke you need C++ compiler and some libraries. You can install libraries with vcpkg.
+Working compilers with uvke are Visual Studio 16, g++13 or Clang18, also newer versions of compilers should work.
+Firstly, you need to clone the repository.
 ```bash
 git clone https://github.com/eUltrabyte/uvke.git
-cd uvke && mkdir Build
-cd Build && cmake ..
+```
+Secondly, make build directory and use cmake to generate project files.
+```bash
+mkdir Build && cd Build
+cmake ..
+```
+Lastly, you should compile without any complications.
+```bash
+cmake --build .
 ```
 
 ### Bugs
