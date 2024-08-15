@@ -5,8 +5,9 @@
   "homepage": "https://github.com/eUltrabyte/uvke",
   "license": "MIT",
   "dependencies": [
-    "vulkan",
     "glfw3",
+    "vulkan",
+    "glslang",
     {
       "name": "imgui",
       "features": [

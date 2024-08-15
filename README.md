@@ -27,6 +27,7 @@ Main goal of uvke is to make using vulkan simple. I want to use it for myself bu
 ### Installation
 To compile uvke you need C++ compiler and some libraries. You can install libraries with vcpkg.
 Working compilers with uvke are Visual Studio 16, g++13 or Clang18, also newer versions of compilers should work.
+
 Firstly, you need to clone the repository.
 ```bash
 git clone https://github.com/eUltrabyte/uvke.git

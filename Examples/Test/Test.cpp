@@ -20,6 +20,8 @@ public:
     virtual void Run() override {
         m_isRunning = true;
 
+        m_audioManager->Play();
+
         m_window->ChangeCursorVisibility(uvke::CursorType::Disabled);
 
         /* uvke::Sprite sprite({ 0.4f, 0.3f }, "Resource/Textures/uvke.png");
@@ -61,7 +63,7 @@ public:
     virtual void Update() override {
         m_window->Update();
 
-        switch(m_event.GetType()) {
+        /* switch(m_event.GetType()) {
             case uvke::EventType::Closed: { UVKE_LOG("Event - Closed"); if(m_shouldClose) { m_window->Close(); Shutdown(); } else { m_shouldClose = true; } } break;
             case uvke::EventType::Resized: { UVKE_LOG("Event - Resized - " + std::to_string(m_event.GetSize().x) + "/" + std::to_string(m_event.GetSize().y)); } break;
             case uvke::EventType::Focused: { UVKE_LOG("Event - Focused - " + std::to_string(m_event.GetFocused())); } break;
@@ -73,6 +75,12 @@ public:
             case uvke::EventType::MouseMoved: { UVKE_LOG("Event - MouseMoved - " + std::to_string(m_event.GetPosition().x) + "/" + std::to_string(m_event.GetPosition().y)); } break;
             case uvke::EventType::ButtonPressed: { UVKE_LOG("Event - ButtonPressed - " + std::to_string(m_event.GetMouse().x) + "/" + std::to_string(m_event.GetMouse().y)); } break;
             case uvke::EventType::ButtonReleased: { UVKE_LOG("Event - ButtonReleased - " + std::to_string(m_event.GetMouse().x) + "/" + std::to_string(m_event.GetMouse().y)); } break;
+            default: break;
+        } */
+
+        switch(m_event.GetType()) {
+            case uvke::EventType::Closed: { if(m_shouldClose) { m_window->Close(); Shutdown(); } else { m_shouldClose = true; } } break;
+            case uvke::EventType::KeyReleased: { if(m_event.GetKey().x == GLFW_KEY_ESCAPE) { m_window->Close(); Shutdown(); } } break;
             default: break;
         }
 
