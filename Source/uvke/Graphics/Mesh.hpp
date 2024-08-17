@@ -29,6 +29,7 @@ namespace uvke {
         virtual std::vector<Vertex>& GetVertices();
         virtual std::vector<unsigned int>& GetIndices();
         virtual Texture* GetTexture();
+        virtual mat4x4f& GetModel();
 
     private:
         mat4x4f m_model;

@@ -154,4 +154,8 @@ namespace uvke {
     Texture* Mesh::GetTexture() {
         return m_texture.get();
     }
+
+    mat4x4f& Mesh::GetModel() {
+        return m_model;
+    }
 };

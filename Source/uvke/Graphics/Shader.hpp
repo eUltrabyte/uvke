@@ -9,7 +9,6 @@ namespace uvke {
     class UVKE_API Shader {
     public:
         Shader(Base* base = nullptr, std::vector<char> vertexCode = std::vector<char>(0), std::vector<char> fragmentCode = std::vector<char>(0));
-        Shader(Base* base = nullptr, File vertexFile = File(0), File fragmentFile = File(0));
         virtual ~Shader();
 
         virtual void SetBase(Base* base);

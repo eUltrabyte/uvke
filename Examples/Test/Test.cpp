@@ -20,7 +20,7 @@ public:
     virtual void Run() override {
         m_isRunning = true;
 
-        m_audioManager->Play();
+        // m_audioManager->Play();
 
         m_window->ChangeCursorVisibility(uvke::CursorType::Disabled);
 
@@ -34,14 +34,14 @@ public:
 
         uvke::MeshLoader meshLoader("Resource/Models/Monkey.obj");
 
-        uvke::Mesh model({ 0.0f, 0.0f, 0.0f }, "Resource/Textures/Monkey.png");
-        model.SetPosition({ 0.0f, 0.0f, 0.0f });
-        model.SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
-        model.SetMesh(&meshLoader);
+        m_model = std::make_unique<uvke::Mesh>(uvke::vec3f { 0.0f, 0.0f, 0.0f }, "Resource/Textures/Monkey.png");
+        m_model->SetPosition({ 0.0f, 0.0f, 0.0f });
+        m_model->SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
+        m_model->SetMesh(&meshLoader);
 
-        model.Create(m_renderer.get());
+        m_model->Create(m_renderer.get());
 
-        m_renderer->Push(&model);
+        m_renderer->Push(m_model.get());
 
         uvke::Sprite triangle;
         triangle.SetVertices({ { { -1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
@@ -62,6 +62,8 @@ public:
 
     virtual void Update() override {
         m_window->Update();
+
+        // m_model->GetModel() = uvke::Rotate<float>(m_model->GetModel(), uvke::vec3f(1.0f, 0.0f, 0.0f), 0.1f);
 
         /* switch(m_event.GetType()) {
             case uvke::EventType::Closed: { UVKE_LOG("Event - Closed"); if(m_shouldClose) { m_window->Close(); Shutdown(); } else { m_shouldClose = true; } } break;
@@ -104,6 +106,7 @@ private:
     std::unique_ptr<uvke::Renderer> m_renderer;
     std::unique_ptr<uvke::AudioManager> m_audioManager;
     bool m_shouldClose;
+    std::unique_ptr<uvke::Mesh> m_model;
 
 };
 

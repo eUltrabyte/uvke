@@ -9,17 +9,17 @@ namespace uvke {
     public:
         File() = default;
         File(std::string_view filename);
-        File(const std::vector<char>& data);
-        File(std::string_view filename, const std::vector<char>& data);
+        File(const std::vector<std::string>& data);
+        File(std::string_view filename, const std::vector<std::string>& data);
         virtual ~File() = default;
 
-        static void Save(std::string_view filename, const std::vector<char>& data) {
+        static void SaveBytes(std::string_view filename, const std::vector<char>& data) {
             std::ofstream file(filename.data());
             file.write(data.data(), data.size());
             file.close();
         }
 
-        static std::vector<char> Load(std::string_view filename) {
+        static std::vector<char> LoadBytes(std::string_view filename) {
             std::ifstream file(filename.data(), std::ios::ate | std::ios::binary);
             if(file.is_open()) {
                 size_t size = (size_t)file.tellg();
@@ -33,12 +33,15 @@ namespace uvke {
             }
         }
 
-        std::vector<char> GetData() {
+        virtual void Save(std::string_view filename);
+        virtual void Load(std::string_view filename);
+
+        std::vector<std::string> GetData() {
             return m_data;
         }
 
     private:
-        std::vector<char> m_data;
+        std::vector<std::string> m_data;
 
     };
 };
