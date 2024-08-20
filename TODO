@@ -1,6 +1,5 @@
 - use quaternions instead of matrix in rotation operations
 - fix modules to work separately
-- show gpu info in gui
 - fix rotation
 - generally simplify many functions usage
 - add glslang compilation to shader class

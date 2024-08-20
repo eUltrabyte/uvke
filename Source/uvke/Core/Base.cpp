@@ -179,6 +179,10 @@ namespace uvke {
         return m_physicalDevice;
     }
 
+    VkPhysicalDeviceProperties& Base::GetPhysicalDeviceProperties() {
+        return m_physicalDeviceProperties;
+    }
+
     VkDevice& Base::GetDevice() {
         return m_device;
     }
