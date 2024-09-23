@@ -192,6 +192,90 @@ namespace uvke {
             #endif
         }
 
+        mat4x4<T> operator+=(const mat4x4<T>& value) {
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value.data[i][0], value.data[i][1], value.data[i][2], value.data[i][3] };
+                    simd::vec4 result = _mm_add_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
+                }
+
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] += value.data[x][y];
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
+        }
+
+        mat4x4<T> operator-=(const mat4x4<T>& value) {
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value.data[i][0], value.data[i][1], value.data[i][2], value.data[i][3] };
+                    simd::vec4 result = _mm_sub_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
+                }
+
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] -= value.data[x][y];
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
+        }
+
+        mat4x4<T> operator*=(const mat4x4<T>& value) {
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value.data[i][0], value.data[i][1], value.data[i][2], value.data[i][3] };
+                    simd::vec4 result = _mm_mul_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
+                }
+
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] *= value.data[x][y];
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
+        }
+
+        mat4x4<T> operator/=(const mat4x4<T>& value) {
+            #ifdef UVKE_MATH_USE_SIMD
+                for(int i = 0; i < data.size(); ++i) {
+                    simd::vec4 p = { data[i][0], data[i][1], data[i][2], data[i][3], };
+                    simd::vec4 r = { value.data[i][0], value.data[i][1], value.data[i][2], value.data[i][3] };
+                    simd::vec4 result = _mm_div_ps(p, r);
+                    data[i] = std::array<T, 4> { result[0], result[1], result[2], result[3] };
+                }
+
+                return mat4x4<T>(data);
+            #else
+                for(int x = 0; x < data.size(); ++x) {
+                    for(int y = 0; y < data[x].size(); ++y) {
+                        data[x][y] /= value.data[x][y];
+                    }
+                }
+
+                return mat4x4<T>(data);
+            #endif
+        }
+
         template<typename U>
         mat4x4<T> operator+=(const U& value) {
             #ifdef UVKE_MATH_USE_SIMD
@@ -484,28 +568,27 @@ namespace uvke {
         T cosinus = Cos<T>(angle);
         T sinus = Sin<T>(angle);
         vec3<T> axis = Normalize<T>(direction);
-        vec3<T> calculation = vec3<T>(1 - cosinus * direction.x, 1 - cosinus * direction.y, 1 - cosinus * direction.z);
 
         mat4x4<T> result;
-        result.data[0][0] = cosinus + calculation.x * axis.x;
-        result.data[0][1] = calculation.x * axis.y + sinus * axis.z;
-        result.data[0][2] = calculation.x * axis.z - sinus * axis.y;
-        result.data[0][3] = 1;
+        result.data[0][0] = cosinus + (static_cast<T>(1) - cosinus) * axis.x * axis.x;
+        result.data[0][1] = (static_cast<T>(1) - cosinus) * axis.x * axis.y + sinus * axis.z;
+        result.data[0][2] = (static_cast<T>(1) - cosinus) * axis.x * axis.z - sinus * axis.y;
+        result.data[0][3] = static_cast<T>(0);
 
-        result.data[1][0] = calculation.y * axis.x - sinus * axis.z;
-        result.data[1][1] = cosinus + calculation.y * axis.y;
-        result.data[1][2] = calculation.y * axis.z + sinus * axis.x;
-        result.data[1][3] = 1;
+        result.data[1][0] = (static_cast<T>(1) - cosinus) * axis.y * axis.x - sinus * axis.z;
+        result.data[1][1] = cosinus + (static_cast<T>(1) - cosinus) * axis.y * axis.y;
+        result.data[1][2] = (static_cast<T>(1) - cosinus) * axis.y * axis.z + sinus * axis.x;
+        result.data[1][3] = static_cast<T>(0);
 
-        result.data[2][0] = calculation.z * axis.x + sinus * axis.y;
-        result.data[2][1] = calculation.z * axis.y - sinus * axis.x;
-        result.data[2][2] = cosinus + calculation.z * axis.z;
-        result.data[2][3] = 1;
+        result.data[2][0] = (static_cast<T>(1) - cosinus) * axis.z * axis.x + sinus * axis.y;
+        result.data[2][1] = (static_cast<T>(1) - cosinus) * axis.z * axis.y - sinus * axis.x;
+        result.data[2][2] = cosinus + (static_cast<T>(1) - cosinus) * axis.z * axis.z;
+        result.data[2][3] = static_cast<T>(0);
 
-        result.data[3][0] = 1;
-        result.data[3][1] = 1;
-        result.data[3][2] = 1;
-        result.data[3][3] = 1;
+        result.data[3][0] = static_cast<T>(0);
+        result.data[3][1] = static_cast<T>(0);
+        result.data[3][2] = static_cast<T>(0);
+        result.data[3][3] = static_cast<T>(1);
 
         result *= matrix;
         return result;

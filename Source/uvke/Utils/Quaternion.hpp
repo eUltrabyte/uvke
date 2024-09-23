@@ -1,6 +1,4 @@
 #pragma once
-#include <setjmp.h>
-#include <wincrypt.h>
 #ifndef UVKE_QUATERNION_HEADER
 #define UVKE_QUATERNION_HEADER
 

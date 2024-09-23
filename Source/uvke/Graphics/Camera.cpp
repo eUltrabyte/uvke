@@ -31,27 +31,27 @@ namespace uvke {
 
     void Camera::Move(Window* window, float speed, float sensitivity) {
         int factor;
-        if(window->GetKey(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        if(window->GetKey(Keys::LeftControl) == KeyAction::Press) {
             factor = 2;
         } else {
             factor = 1;
         }
 
-        if(window->GetKey(GLFW_KEY_W) == GLFW_PRESS) {
+        if(window->GetKey(Keys::W) == KeyAction::Press) {
             m_position += m_front * speed * factor;
-        } else if(window->GetKey(GLFW_KEY_S) == GLFW_PRESS) {
+        } else if(window->GetKey(Keys::S) == KeyAction::Press) {
             m_position -= m_front * speed * factor;
         }
 
-        if(window->GetKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
+        if(window->GetKey(Keys::Space) == KeyAction::Press) {
             m_position -= m_up * speed * factor;
-        } else if(window->GetKey(GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        } else if(window->GetKey(Keys::LeftShift) == KeyAction::Press) {
             m_position += m_up * speed * factor;
         }
 
-        if(window->GetKey(GLFW_KEY_A) == GLFW_PRESS) {
+        if(window->GetKey(Keys::A) == KeyAction::Press) {
             m_position -= Normalize<float>(CrossProduct<float>(m_front, m_up)) * speed;
-        } else if(window->GetKey(GLFW_KEY_D) == GLFW_PRESS) {
+        } else if(window->GetKey(Keys::D) == KeyAction::Press) {
             m_position += Normalize<float>(CrossProduct<float>(m_front, m_up)) * speed;
         }
 

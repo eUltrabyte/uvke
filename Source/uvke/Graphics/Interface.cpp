@@ -144,6 +144,8 @@ namespace uvke {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        ImGui::SetNextWindowPos(ImVec2(10.00f, 10.00f));
+
         ImGui::Begin("Stats");
 
         ImGui::Text("Render Time - %.4fms", m_stats.renderTime);

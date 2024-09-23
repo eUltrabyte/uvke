@@ -4,6 +4,7 @@
 
 #include "../uvke.hpp"
 #include "Event.hpp"
+#include "Keys.hpp"
 
 namespace uvke {
     enum UVKE_API Style {
