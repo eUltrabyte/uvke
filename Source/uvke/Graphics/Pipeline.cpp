@@ -3,8 +3,8 @@
 namespace uvke {
     Pipeline::Pipeline(Base* base, Surface* surface, VertexBuffer* vertexBuffer, Descriptor* descriptor)
         : m_base(base), m_surface(surface), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
-        m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Shaders/Rendering.vert.spv"), File::Load("Resource/Shaders/Rendering.frag.spv"));
-        // m_shader = std::make_shared<Shader>(m_base, File::Load("Resource/Shaders/Lightless.vert.spv"), File::Load("Resource/Shaders/Lightless.frag.spv"));
+        m_shader = std::make_shared<Shader>(m_base, File::LoadBytes("Resource/Shaders/Rendering.vert.spv"), File::LoadBytes("Resource/Shaders/Rendering.frag.spv"));
+        // m_shader = std::make_shared<Shader>(m_base, File::LoadBytes("Resource/Shaders/Lightless.vert.spv"), File::LoadBytes("Resource/Shaders/Lightless.frag.spv"));
 
         {
             VkPipelineCacheCreateInfo pipelineCacheCreateInfo { };

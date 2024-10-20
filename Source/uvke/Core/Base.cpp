@@ -8,7 +8,7 @@ namespace uvke {
             appInfo.pNext = nullptr;
             appInfo.applicationVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
             appInfo.pApplicationName = name.data();
-            appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 3, 0);
+            appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 0, 5);
             appInfo.pEngineName = "uvke";
             appInfo.apiVersion = Core::GetVulkanVersion();
 
@@ -177,6 +177,10 @@ namespace uvke {
 
     VkPhysicalDevice& Base::GetPhysicalDevice() {
         return m_physicalDevice;
+    }
+
+    VkPhysicalDeviceProperties& Base::GetPhysicalDeviceProperties() {
+        return m_physicalDeviceProperties;
     }
 
     VkDevice& Base::GetDevice() {

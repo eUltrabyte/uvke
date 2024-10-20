@@ -5,13 +5,16 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 
 include_directories(Thirdparty)
 
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
+find_package(glm REQUIRED)
+find_package(glslang REQUIRED)
 
-set(UVKE_LIBRARIES glfw Vulkan::Vulkan)
+set(UVKE_LIBRARIES glfw Vulkan::Vulkan glm::glm glslang::glslang glslang::glslang-default-resource-limits glslang::SPIRV glslang::SPVRemapper)
 
 if(WIN32)
     message("-- uvke uses winapi")
@@ -126,6 +129,9 @@ if(UVKE_EXAMPLES)
 
     add_subdirectory(Examples/Mesh)
     file(COPY Resource/ DESTINATION Examples/Mesh/Resource/)
+
+    add_subdirectory(Examples/Image)
+    file(COPY Resource/ DESTINATION Examples/Image/Resource/)
 
     add_subdirectory(Examples/Test)
     file(COPY Resource/ DESTINATION Examples/Test/Resource/)

@@ -1,7 +1,7 @@
 #include "Mesh.hpp"
 
 namespace uvke {
-    Mesh::Mesh(const vec3f& size, std::string_view filename) {
+    Mesh::Mesh(const glm::vec3& size, std::string_view filename) {
         m_vertices = std::vector<Vertex> {
             { { -size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
             { { size.x, -size.y, -size.z }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
@@ -45,7 +45,7 @@ namespace uvke {
 
         m_filename = filename;
 
-        m_model = Identity<float>();
+        m_model = glm::mat4(1.0f);
 
         UVKE_LOG_ADDRESS("Mesh Setup");
     }
@@ -64,7 +64,7 @@ namespace uvke {
         std::unique_ptr<StagingBuffer> m_stagingBuffer;
 
         if(m_filename.empty()) {
-            m_texture = std::make_unique<Texture>(renderer->GetBase(), vec2i { 1, 1 });
+            m_texture = std::make_unique<Texture>(renderer->GetBase(), glm::ivec2(1, 1));
 
             unsigned int* imageData = new unsigned int[m_texture->GetSize().x * m_texture->GetSize().y];
             for(auto i = 0; i < m_texture->GetSize().x * m_texture->GetSize().y; ++i) {
@@ -75,7 +75,7 @@ namespace uvke {
             m_stagingBuffer->Map(imageData);
             m_texture->Allocate();
         } else {
-            m_texture = std::make_unique<Texture>(renderer->GetBase(), vec2i { 0, 0 }, m_filename);
+            m_texture = std::make_unique<Texture>(renderer->GetBase(), glm::ivec2(0, 0), m_filename);
             
             m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetImage()->GetSize().x * m_texture->GetImage()->GetSize().y * 4));
             m_stagingBuffer->Map(m_texture->GetPixels());
@@ -118,16 +118,16 @@ namespace uvke {
         vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
     }
 
-    void Mesh::SetPosition(const vec3f& position) {
-        m_model = Translate<float>(m_model, vec3f(position.x, position.y, position.z));
+    void Mesh::SetPosition(const glm::vec3& position) {
+        m_model = glm::translate(m_model, position);
     }
 
-    void Mesh::SetScale(const vec3f& scale) {
-        m_model = Scale<float>(m_model, vec3f(scale.x, scale.y, scale.z));
+    void Mesh::SetScale(const glm::vec3& scale) {
+        m_model = glm::scale(m_model, scale);
     }
 
-    void Mesh::SetRotation(float angle, const vec3f& direction) {
-        m_model = Rotate<float>(m_model, direction, Radians<float>(angle));
+    void Mesh::SetRotation(float angle, const glm::vec3& direction) {
+        m_model = glm::rotate(m_model, glm::radians(angle), direction);
     }
 
     void Mesh::SetVertices(const std::vector<Vertex>& vertices) {
@@ -153,5 +153,9 @@ namespace uvke {
 
     Texture* Mesh::GetTexture() {
         return m_texture.get();
+    }
+
+    glm::mat4& Mesh::GetModel() {
+        return m_model;
     }
 };

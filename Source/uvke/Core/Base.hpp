@@ -18,6 +18,7 @@ namespace uvke {
 
         virtual VkInstance& GetInstance();
         virtual VkPhysicalDevice& GetPhysicalDevice();
+        virtual VkPhysicalDeviceProperties& GetPhysicalDeviceProperties();
         virtual VkDevice& GetDevice();
         virtual VkFormat GetDepthFormat();
         virtual unsigned int GetQueueFamily();
@@ -46,6 +47,7 @@ namespace uvke {
                 if(physicalDevicesProperties[i].deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && physicalDevicesFeatures[i].geometryShader == VK_TRUE) {
                     UVKE_LOG("GPU - " + std::string(physicalDevicesProperties[i].deviceName));
                     m_sampleCount = GetUsableSampleCount(physicalDevicesProperties[i].limits.framebufferColorSampleCounts & physicalDevicesProperties[i].limits.framebufferDepthSampleCounts);
+                    m_physicalDeviceProperties = physicalDevicesProperties[i];
                     return physicalDevices[i];
                 }
             }
@@ -114,6 +116,7 @@ namespace uvke {
         #endif
 
         VkPhysicalDevice m_physicalDevice;
+        VkPhysicalDeviceProperties m_physicalDeviceProperties;
         VkDevice m_device;
         VkFormat m_depthFormat;
         unsigned int m_queueFamilyIndex;

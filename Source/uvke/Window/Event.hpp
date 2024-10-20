@@ -25,29 +25,29 @@ namespace uvke {
         virtual ~Event() = default;
 
         virtual void SetType(const EventType& type);
-        virtual void SetSize(const vec2i& size);
+        virtual void SetSize(const glm::ivec2& size);
         virtual void SetFocused(const bool& focused);
-        virtual void SetKey(const vec3i& key);
-        virtual void SetScroll(const vec2d& scroll);
-        virtual void SetPosition(const vec2d& position);
-        virtual void SetMouse(const vec2i& mouse);
+        virtual void SetKey(const glm::ivec3& key);
+        virtual void SetScroll(const glm::dvec2& scroll);
+        virtual void SetPosition(const glm::dvec2& position);
+        virtual void SetMouse(const glm::ivec2& mouse);
 
         virtual EventType& GetType();
-        virtual vec2i& GetSize();
+        virtual glm::ivec2& GetSize();
         virtual bool& GetFocused();
-        virtual vec3i& GetKey();
-        virtual vec2d& GetScroll();
-        virtual vec2d& GetPosition();
-        virtual vec2i& GetMouse();
+        virtual glm::ivec3& GetKey();
+        virtual glm::dvec2& GetScroll();
+        virtual glm::dvec2& GetPosition();
+        virtual glm::ivec2& GetMouse();
 
     private:
         EventType m_type;
-        vec2i m_size;
+        glm::ivec2 m_size;
         bool m_focused;
-        vec3i m_key;
-        vec2d m_scroll;
-        vec2d m_position;
-        vec2i m_mouse;
+        glm::ivec3 m_key;
+        glm::dvec2 m_scroll;
+        glm::dvec2 m_position;
+        glm::ivec2 m_mouse;
 
     };
 };

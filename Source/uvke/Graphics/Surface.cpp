@@ -36,6 +36,8 @@ namespace uvke {
         m_surfaceFormat = GetSuitableSurfaceFormat();
         m_presentMode = GetSuitablePresentMode();
 
+        UVKE_LOG("Present Mode - " + std::to_string(m_presentMode));
+
         UVKE_LOG("Queue Family Index - " + std::to_string(m_queueFamilyIndex));
 
         VkBool32 presentSupport = false;

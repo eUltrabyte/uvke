@@ -6,7 +6,7 @@ namespace uvke {
         m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
 
         {
-            m_image = std::make_shared<Image>(m_base, vec2i(m_surface->GetExtent().width, m_surface->GetExtent().height), m_surface->GetFormat().format, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, m_base->GetSampleCount());
+            m_image = std::make_shared<Image>(m_base, glm::ivec2(m_surface->GetExtent().width, m_surface->GetExtent().height), m_surface->GetFormat().format, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, m_base->GetSampleCount());
 
             m_image->Allocate(m_surface->GetFormat().format);
         }
@@ -59,7 +59,7 @@ namespace uvke {
         m_framebuffers = std::vector<VkFramebuffer>(m_swapchain->GetImageViews().size());
 
         {
-            m_image = std::make_shared<Image>(m_base, vec2i(m_surface->GetExtent().width, m_surface->GetExtent().height), m_surface->GetFormat().format, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, m_base->GetSampleCount());
+            m_image = std::make_shared<Image>(m_base, glm::ivec2(m_surface->GetExtent().width, m_surface->GetExtent().height), m_surface->GetFormat().format, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, m_base->GetSampleCount());
 
             m_image->Allocate(m_surface->GetFormat().format);
         }

@@ -83,7 +83,7 @@ namespace uvke {
     }
 
     void Window::Update() {
-        vec2i size(0, 0);
+        glm::ivec2 size(0, 0);
         glfwGetFramebufferSize(m_window, &size.x, &size.y);
         if(m_windowProps->size.x != size.x || m_windowProps->size.y != size.y) {
             m_windowProps->size = size;
@@ -195,9 +195,9 @@ namespace uvke {
         return glfwGetMouseButton(m_window, button);
     }
 
-    vec2d Window::GetMouse() {
+    glm::dvec2 Window::GetMouse() {
         double x = 0, y = 0;
         glfwGetCursorPos(m_window, &x, &y);
-        return vec2d(x, y);
+        return glm::dvec2(x, y);
     }
 };

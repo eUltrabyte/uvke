@@ -1,12 +1,14 @@
 {
   "name": "uvke",
-  "version": "1.3.0",
+  "version": "1.0.5",
   "description": "uvke ( Ultrabyte Vulkan Engine ) is open source vulkan based rendering engine written in C++20.",
   "homepage": "https://github.com/eUltrabyte/uvke",
   "license": "MIT",
   "dependencies": [
-    "vulkan",
     "glfw3",
+    "vulkan",
+    "glm",
+    "glslang",
     {
       "name": "imgui",
       "features": [

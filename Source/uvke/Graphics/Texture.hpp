@@ -11,7 +11,7 @@
 namespace uvke {
     class UVKE_API Texture {
     public:
-        Texture(Base* base = nullptr, const vec2i& size = { 0, 0 }, std::string_view filename = "");
+        Texture(Base* base = nullptr, const glm::ivec2& size = { 0, 0 }, std::string_view filename = "");
         virtual ~Texture();
 
         virtual void Allocate();
@@ -19,10 +19,10 @@ namespace uvke {
         virtual void CopyFromBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer source);
         virtual void CopyToBuffer(CommandBuffer* commandBuffer, VkQueue queue, VkBuffer destination);
 
-        virtual void SetData(CommandBuffer* commandBuffer, VkQueue queue, const vec2u& size, void* data);
+        virtual void SetData(CommandBuffer* commandBuffer, VkQueue queue, const glm::uvec2& size, void* data);
         virtual void SetBase(Base* base);
 
-        virtual vec2u& GetSize();
+        virtual glm::uvec2& GetSize();
         virtual int& GetChannel();
         virtual unsigned char* GetPixels();
         virtual Image* GetImage();

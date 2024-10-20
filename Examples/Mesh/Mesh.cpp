@@ -48,7 +48,7 @@ public:
             } break;
 
             case uvke::EventType::KeyReleased: {
-                if(m_event.GetKey().x == GLFW_KEY_ESCAPE) {
+                if(m_event.GetKey().x == uvke::Keys::Escape) {
                     m_window->ChangeCursorVisibility(uvke::CursorType::Shown);
                 }
             } break;

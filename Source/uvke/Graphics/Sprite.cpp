@@ -1,7 +1,7 @@
 #include "Sprite.hpp"
 
 namespace uvke {
-    Sprite::Sprite(const vec4f& color) {
+    Sprite::Sprite(const glm::vec4& color) {
         m_vertices = std::vector<Vertex> {
             { { -1.0f, -1.0f, 0.0f }, color, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
             { { 1.0f, -1.0f, 0.0f }, color, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
@@ -14,12 +14,12 @@ namespace uvke {
         };
 
         m_filename = "";
-        m_model = Identity<float>();
+        m_model = glm::mat4(1.0f);
 
         UVKE_LOG_ADDRESS("Sprite Setup");
     }
 
-    Sprite::Sprite(const vec2f& size, std::string_view filename) {
+    Sprite::Sprite(const glm::vec2& size, std::string_view filename) {
         m_vertices = std::vector<Vertex> {
             { { -size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
             { { size.x, -size.y, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
@@ -32,7 +32,7 @@ namespace uvke {
         };
 
         m_filename = filename;
-        m_model = Identity<float>();
+        m_model = glm::mat4(1.0f);
 
         UVKE_LOG_ADDRESS("Sprite Setup");
     }
@@ -51,7 +51,7 @@ namespace uvke {
         std::unique_ptr<StagingBuffer> m_stagingBuffer;
 
         if(m_filename.empty()) {
-            m_texture = std::make_unique<Texture>(renderer->GetBase(), vec2i { 1, 1 });
+            m_texture = std::make_unique<Texture>(renderer->GetBase(), glm::ivec2(1, 1));
 
             unsigned int* imageData = new unsigned int[m_texture->GetSize().x * m_texture->GetSize().y];
             for(auto i = 0; i < m_texture->GetSize().x * m_texture->GetSize().y; ++i) {
@@ -62,7 +62,7 @@ namespace uvke {
             m_stagingBuffer->Map(imageData);
             m_texture->Allocate();
         } else {
-            m_texture = std::make_unique<Texture>(renderer->GetBase(), vec2i { 0, 0 }, m_filename);
+            m_texture = std::make_unique<Texture>(renderer->GetBase(), glm::ivec2(0, 0), m_filename);
             
             m_stagingBuffer = std::make_unique<StagingBuffer>(renderer->GetBase(), static_cast<unsigned int>(m_texture->GetImage()->GetSize().x * m_texture->GetImage()->GetSize().y * 4));
             m_stagingBuffer->Map(m_texture->GetPixels());
@@ -105,16 +105,16 @@ namespace uvke {
         vkCmdDrawIndexed(commandBuffer, m_indexBuffer->GetIndices().size(), 1, 0, 0, 0);
     }
 
-    void Sprite::SetPosition(const vec3f& position) {
-        m_model = Translate<float>(m_model, vec3f(position.x, position.y, position.z));
+    void Sprite::SetPosition(const glm::vec3& position) {
+        m_model = glm::translate(m_model, position);
     }
 
-    void Sprite::SetScale(const vec3f& scale) {
-        m_model = Scale<float>(m_model, vec3f(scale.x, scale.y, scale.z));
+    void Sprite::SetScale(const glm::vec3& scale) {
+        m_model = glm::scale(m_model, scale);
     }
 
-    void Sprite::SetRotation(float angle, const vec3f& direction) {
-        m_model = Rotate<float>(m_model, direction, Radians<float>(angle));
+    void Sprite::SetRotation(float angle, const glm::vec3& direction) {
+        m_model = glm::rotate(m_model, glm::radians(angle), direction);
     }
 
     void Sprite::SetVertices(const std::vector<Vertex>& vertices) {
@@ -135,5 +135,9 @@ namespace uvke {
 
     Texture* Sprite::GetTexture() {
         return m_texture.get();
+    }
+
+    glm::mat4& Sprite::GetModel() {
+        return m_model;
     }
 };

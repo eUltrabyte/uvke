@@ -11,9 +11,9 @@
 
 namespace uvke {
     struct UniformBufferObject {
-        mat4x4f model;
-        mat4x4f view;
-        mat4x4f projection;
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 projection;
     };
 
     class UVKE_API UniformBuffer {
