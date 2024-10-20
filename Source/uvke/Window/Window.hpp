@@ -24,10 +24,10 @@ namespace uvke {
     struct UVKE_API WindowProps {
     public:
         std::string title;
-        vec2u size;
+        glm::uvec2 size;
         unsigned style;
 
-        WindowProps(std::string_view title = "uvke Window", const vec2u& size = vec2u(1280, 720), unsigned style = Style::Default) : title(title), size(size), style(style) {  }
+        WindowProps(std::string_view title = "uvke Window", const glm::uvec2& size = glm::uvec2(1280, 720), unsigned style = Style::Default) : title(title), size(size), style(style) {  }
         ~WindowProps() = default;
     };
 
@@ -52,7 +52,7 @@ namespace uvke {
         virtual Event& GetEvent();
         virtual int GetKey(int key);
         virtual int GetButton(int button);
-        virtual vec2d GetMouse();
+        virtual glm::dvec2 GetMouse();
     
     private:
         std::shared_ptr<WindowProps> m_windowProps;

@@ -3,11 +3,6 @@ project(uvke-Utils)
 
 set(UVKE_UTILS_SOURCE
     Utils.hpp
-    Vec2.hpp
-    Vec3.hpp
-    Vec4.hpp
-    Mat4x4.hpp
-    Quaternion.hpp
     Clock.hpp
     Clock.cpp
     File.hpp
@@ -37,14 +32,10 @@ if(UVKE_USE_SSE2)
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
     endif()
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_MATH_USE_SIMD")
 elseif(UVKE_USE_SSE)
     if(MSVC)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:sse")
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
     endif()
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUVKE_MATH_USE_SIMD")
 endif()

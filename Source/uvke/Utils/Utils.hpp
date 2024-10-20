@@ -4,18 +4,6 @@
 
 #include "../uvkepch.hpp"
 
-#ifdef UVKE_MATH_USE_SIMD
-    #include <immintrin.h>
-
-    namespace uvke {
-        namespace simd {
-            #ifdef UVKE_MATH_USE_SIMD
-                using vec4 = __m128;
-            #endif
-        };
-    };
-#endif
-
 namespace uvke {
     namespace priv {
         inline static const float PI = 3.141592653f;

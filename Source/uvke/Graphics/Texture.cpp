@@ -1,9 +1,9 @@
 #include "Texture.hpp"
 
 namespace uvke {
-    Texture::Texture(Base* base, const vec2i& size, std::string_view filename)
+    Texture::Texture(Base* base, const glm::ivec2& size, std::string_view filename)
         : m_base(base) {
-        vec2i imageSize = size;
+        glm::ivec2 imageSize = size;
         m_pixels = stbi_load(filename.data(), &imageSize.x, &imageSize.y, &m_channel, STBI_rgb_alpha);
             
         m_image = std::make_unique<Image>(m_base, imageSize);
@@ -37,7 +37,7 @@ namespace uvke {
         m_image->CopyToBuffer(commandBuffer, queue, destination);
     }
 
-    void Texture::SetData(CommandBuffer* commandBuffer, VkQueue queue, const vec2u& size, void* data) {
+    void Texture::SetData(CommandBuffer* commandBuffer, VkQueue queue, const glm::uvec2& size, void* data) {
         m_image->SetData(commandBuffer, queue, size, data);
     }
     
@@ -45,7 +45,7 @@ namespace uvke {
         m_base = base;
     }
 
-    vec2u& Texture::GetSize() {
+    glm::uvec2& Texture::GetSize() {
         return m_image->GetSize();
     }
     

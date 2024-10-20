@@ -41,6 +41,7 @@ Lastly, you should compile without any complications.
 ```bash
 cmake --build .
 ```
+To run all of the examples, you need resources, like graphics and music files.
 
 ### Bugs
 Bugs are reported to [issue tracker](https://github.com/eUltrabyte/uvke/issues)

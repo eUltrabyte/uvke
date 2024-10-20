@@ -8,7 +8,7 @@ namespace uvke {
             appInfo.pNext = nullptr;
             appInfo.applicationVersion = VK_MAKE_API_VERSION(1, 1, 0, 0);
             appInfo.pApplicationName = name.data();
-            appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 0, 4);
+            appInfo.engineVersion = VK_MAKE_API_VERSION(1, 1, 0, 5);
             appInfo.pEngineName = "uvke";
             appInfo.apiVersion = Core::GetVulkanVersion();
 

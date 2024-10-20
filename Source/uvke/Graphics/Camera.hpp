@@ -16,34 +16,34 @@ namespace uvke {
 
     class UVKE_API Camera {
     public:
-        Camera(const Projection& projection = Projection::Orthographic, const vec2f& size = { 1.0f, 1.0f });
+        Camera(const Projection& projection = Projection::Orthographic, const glm::vec2& size = glm::vec2(1.0f, 1.0f));
         virtual ~Camera();
 
         virtual void Move(Window* window, float speed, float sensitivity);
 
-        virtual void SetModel(const mat4x4f& model);
-        virtual void SetView(const mat4x4f& view);
-        virtual void SetProjection(const mat4x4f& projection);
+        virtual void SetModel(const glm::mat4& model);
+        virtual void SetView(const glm::mat4& view);
+        virtual void SetProjection(const glm::mat4& projection);
         virtual void SetYaw(float yaw);
         virtual void SetPitch(float pitch);
-        virtual void SetDirection(const vec3f& direction);
+        virtual void SetDirection(const glm::vec3& direction);
 
         virtual UniformBufferObject& GetUBO();
-        virtual vec3f& GetPosition();
+        virtual glm::vec3& GetPosition();
         virtual float& GetYaw();
         virtual float& GetPitch();
-        virtual vec3f& GetDirection();
+        virtual glm::vec3& GetDirection();
 
     private:
         UniformBufferObject m_ubo;
-        vec3f m_position;
-        vec3f m_front;
-        vec3f m_up;
+        glm::vec3 m_position;
+        glm::vec3 m_front;
+        glm::vec3 m_up;
         float m_yaw;
         float m_pitch;
-        vec3f m_direction;
+        glm::vec3 m_direction;
         bool m_firstMouseMove;
-        vec2d m_lastMousePosition;
+        glm::dvec2 m_lastMousePosition;
 
     };
 };

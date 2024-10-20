@@ -1,7 +1,4 @@
-- use quaternions instead of matrix in rotation operations
-- fix rotation
 - generally simplify many functions usage
-- add glslang compilation to shader class
 - add saving pipeline and shader cache to speedup initialization
 - add light components
 - add scene class
@@ -11,9 +8,3 @@
 - add audio support
 - asset manager class
 - own file format for textures, audio, etc
-- reimplement tinyobjloader with own uvke-like library
-- reimplement stb_image with own uvke-like library
-- reimplement portaudio with own uvke-like library
-- reimplement imgui with own uvke-like library
-- reimplement glfw with own uvke-like library ( with features like custom titlebar )
-- add uvke-like handler for ( vulkan ) api calls

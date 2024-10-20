@@ -39,7 +39,7 @@ namespace uvke {
         m_presentation = std::make_unique<Presentation>(m_base.get(), m_swapchain.get(), m_syncManager.get());
 
         // m_camera = std::make_unique<Camera>();
-        m_camera = std::make_unique<Camera>(Projection::Perspectivic, vec2f(m_window->GetWindowProps()->size.x, m_window->GetWindowProps()->size.y));
+        m_camera = std::make_unique<Camera>(Projection::Perspectivic, glm::vec2(m_window->GetWindowProps()->size.x, m_window->GetWindowProps()->size.y));
 
         UVKE_LOG_ADDRESS("Renderer Created");
     }

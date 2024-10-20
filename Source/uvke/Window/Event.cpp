@@ -7,7 +7,7 @@ namespace uvke {
         m_type = type;
     }
 
-    void Event::SetSize(const vec2i& size) {
+    void Event::SetSize(const glm::ivec2& size) {
         m_size = size;
     }
     
@@ -15,19 +15,19 @@ namespace uvke {
         m_focused = focused;
     }
     
-    void Event::SetKey(const vec3i& key) {
+    void Event::SetKey(const glm::ivec3& key) {
         m_key = key;   
     }
     
-    void Event::SetScroll(const vec2d& scroll) {
+    void Event::SetScroll(const glm::dvec2& scroll) {
         m_scroll = scroll;
     }
     
-    void Event::SetPosition(const vec2d& position) {
+    void Event::SetPosition(const glm::dvec2& position) {
         m_position = position;
     }
     
-    void Event::SetMouse(const vec2i& mouse) {
+    void Event::SetMouse(const glm::ivec2& mouse) {
         m_mouse = mouse;
     }
         
@@ -35,7 +35,7 @@ namespace uvke {
         return m_type;
     }
         
-    vec2i& Event::GetSize() {
+    glm::ivec2& Event::GetSize() {
         return m_size;
     }
         
@@ -43,19 +43,19 @@ namespace uvke {
         return m_focused;
     }
         
-    vec3i& Event::GetKey() {
+    glm::ivec3& Event::GetKey() {
         return m_key;
     }
         
-    vec2d& Event::GetScroll() {
+    glm::dvec2& Event::GetScroll() {
         return m_scroll;
     }
         
-    vec2d& Event::GetPosition() {
+    glm::dvec2& Event::GetPosition() {
         return m_position;
     }
     
-    vec2i& Event::GetMouse() {
+    glm::ivec2& Event::GetMouse() {
         return m_mouse;
     }
 };

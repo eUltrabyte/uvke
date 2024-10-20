@@ -23,10 +23,6 @@
 #define UVKE_STRINGIFY(x) #x
 
 #include "Utils/Utils.hpp"
-#include "Utils/Vec2.hpp"
-#include "Utils/Vec3.hpp"
-#include "Utils/Vec4.hpp"
-#include "Utils/Mat4x4.hpp"
 #include "Utils/Clock.hpp"
 #include "Utils/File.hpp"
 #include "Utils/Random.hpp"

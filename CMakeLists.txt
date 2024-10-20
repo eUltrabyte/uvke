@@ -11,9 +11,10 @@ include_directories(Thirdparty)
 
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
+find_package(glm REQUIRED)
 find_package(glslang REQUIRED)
 
-set(UVKE_LIBRARIES glfw Vulkan::Vulkan glslang::glslang glslang::glslang-default-resource-limits glslang::SPIRV glslang::SPVRemapper)
+set(UVKE_LIBRARIES glfw Vulkan::Vulkan glm::glm glslang::glslang glslang::glslang-default-resource-limits glslang::SPIRV glslang::SPVRemapper)
 
 if(WIN32)
     message("-- uvke uses winapi")

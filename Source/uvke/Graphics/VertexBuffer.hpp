@@ -8,10 +8,10 @@
 
 namespace uvke {
     struct UVKE_API Vertex {
-        vec3f position = { 0.0f, 0.0f, 0.0f };
-        vec4f color = { 0.0f, 0.0f, 0.0f, 0.0f };
-        vec2f texCoord = { 0.0f, 0.0f };
-        vec3f normal = { 0.0f, 0.0f, 0.0f };
+        glm::vec3 position = { 0.0f, 0.0f, 0.0f };
+        glm::vec4 color = { 0.0f, 0.0f, 0.0f, 0.0f };
+        glm::vec2 texCoord = { 0.0f, 0.0f };
+        glm::vec3 normal = { 0.0f, 0.0f, 0.0f };
 
         bool operator==(const Vertex&) const = default;
     };
@@ -47,45 +47,9 @@ namespace uvke {
 
 namespace std {
     template<>
-	struct hash<uvke::vec2f> {
-		size_t operator()(uvke::vec2f const& vec) const {
-			size_t seed = 0;
-			hash<float> hasher;
-			uvke::CombineHash(seed, hasher(vec.x));
-			uvke::CombineHash(seed, hasher(vec.y));
-			return seed;
-		}
-	};
-
-    template<>
-	struct hash<uvke::vec3f> {
-		size_t operator()(uvke::vec3f const& vec) const {
-			size_t seed = 0;
-			hash<float> hasher;
-			uvke::CombineHash(seed, hasher(vec.x));
-			uvke::CombineHash(seed, hasher(vec.y));
-			uvke::CombineHash(seed, hasher(vec.z));
-			return seed;
-		}
-	};
-
-    template<>
-	struct hash<uvke::vec4f> {
-		size_t operator()(uvke::vec4f const& vec) const {
-			size_t seed = 0;
-			hash<float> hasher;
-			uvke::CombineHash(seed, hasher(vec.x));
-			uvke::CombineHash(seed, hasher(vec.y));
-			uvke::CombineHash(seed, hasher(vec.z));
-			uvke::CombineHash(seed, hasher(vec.w));
-			return seed;
-		}
-	};
-
-    template<>
     struct hash<uvke::Vertex> {
         size_t operator()(uvke::Vertex const& vertex) const {
-            return ((hash<uvke::vec3f>()(vertex.position) ^ (hash<uvke::vec4f>()(vertex.color) << 1)) >> 1) ^ (hash<uvke::vec2f>()(vertex.texCoord) << 1);
+            return ((hash<glm::vec3>()(vertex.position) ^ (hash<glm::vec4>()(vertex.color) << 1)) >> 1) ^ (hash<glm::vec2>()(vertex.texCoord) << 1);
         }
     };
 }

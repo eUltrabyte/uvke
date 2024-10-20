@@ -96,10 +96,10 @@ namespace uvke {
         m_isRecreated = false;
         window->Update();
 
-        vec2i size(window->GetWindowProps()->size.x, window->GetWindowProps()->size.y);
+        glm::ivec2 size(window->GetWindowProps()->size.x, window->GetWindowProps()->size.y);
         for(; size.x == 0 || size.y == 0 ;) {
             window->Update();
-            size = vec2i(window->GetWindowProps()->size.x, window->GetWindowProps()->size.y);
+            size = glm::ivec2(window->GetWindowProps()->size.x, window->GetWindowProps()->size.y);
             m_surface->SetSwapExtent(window);
             window->Wait();
         }

@@ -1,7 +1,7 @@
 #include "Image.hpp"
 
 namespace uvke {
-    Image::Image(Base* base, const vec2i& size, VkFormat format, VkImageUsageFlags usage, VkSampleCountFlagBits sampleCount)
+    Image::Image(Base* base, const glm::ivec2& size, VkFormat format, VkImageUsageFlags usage, VkSampleCountFlagBits sampleCount)
         : m_base(base) {
         m_size = { static_cast<unsigned int>(size.x), static_cast<unsigned int>(size.y) };
 
@@ -169,7 +169,7 @@ namespace uvke {
         commandBuffer->End(buffer, queue);
     }
 
-    void Image::SetData(CommandBuffer* commandBuffer, VkQueue queue, const vec2u& size, void* data) {
+    void Image::SetData(CommandBuffer* commandBuffer, VkQueue queue, const glm::uvec2& size, void* data) {
         m_size = size;
         unsigned int imageSize = m_size.x * m_size.y * 4;
         std::unique_ptr<StagingBuffer> stagingBuffer = std::make_unique<StagingBuffer>(m_base, imageSize);
@@ -236,7 +236,7 @@ namespace uvke {
         m_base = base;
     }
     
-    vec2u& Image::GetSize() {
+    glm::uvec2& Image::GetSize() {
         return m_size;
     }
     

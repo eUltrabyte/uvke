@@ -17,10 +17,10 @@ namespace uvke {
     public:
         float renderTime = 0.0f;
         int fps = 0;
-        vec3f position = vec3f(0.0f, 0.0f, 0.0f);
+        glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
         float yaw = 0.0f;
         float pitch = 0.0f;
-        vec3f direction = vec3f(0.0f, 0.0f, 0.0f);
+        glm::vec3 direction = glm::vec3(0.0f, 0.0f, 0.0f);
     };
 
     class UVKE_API Interface {

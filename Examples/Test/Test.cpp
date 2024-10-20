@@ -34,7 +34,7 @@ public:
 
         uvke::MeshLoader meshLoader("Resource/Models/Monkey.obj");
 
-        m_model = std::make_unique<uvke::Mesh>(uvke::vec3f { 0.0f, 0.0f, 0.0f }, "Resource/Textures/Monkey.png");
+        m_model = std::make_unique<uvke::Mesh>(glm::vec3(0.0f, 0.0f, 0.0f), "Resource/Textures/Monkey.png");
         m_model->SetPosition({ 0.0f, 0.0f, 0.0f });
         m_model->SetRotation(180.0f, { 1.0f, 0.0f, 0.0f });
         m_model->SetMesh(&meshLoader);
@@ -63,7 +63,7 @@ public:
     virtual void Update() override {
         m_window->Update();
 
-        // _model->GetModel() = uvke::Rotate<float>(m_model->GetModel(), uvke::vec3f(0.0f, 1.0f, 0.0f), uvke::Radians<float>(10.0f));
+        m_model->SetRotation(10.0f);
 
         /* switch(m_event.GetType()) {
             case uvke::EventType::Closed: { UVKE_LOG("Event - Closed"); if(m_shouldClose) { m_window->Close(); Shutdown(); } else { m_shouldClose = true; } } break;
