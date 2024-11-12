@@ -16,7 +16,7 @@ Main goal of uvke is to make using vulkan simple. I want to use it for myself bu
 
 [Vulkan SDK](https://lunarg.com/vulkan-sdk/) - Vulkan is a new generation graphics and compute API that provides high-efficiency, cross-platform access to modern graphics processing units, which are used in a wide variety of devices from PCs and consoles to mobile phones and embedded platforms.
 
-[glm](https://github.com/g-truc/glm) - is a header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specifications.
+[glm](https://github.com/g-truc/glm) - Open source, header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specifications.
 
 [imgui](https://github.com/ocornut/imgui) - Bloat-free graphical user interface library for C++. It outputs optimized vertex buffers that you can render anytime in your 3D-pipeline-enabled application. It is fast, portable, renderer agnostic, and self-contained (no external dependencies).
 

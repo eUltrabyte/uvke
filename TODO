@@ -1,5 +1,3 @@
-- generally simplify many functions usage
-- add saving pipeline and shader cache to speedup initialization
 - add light components
 - add scene class
 - add text rendering

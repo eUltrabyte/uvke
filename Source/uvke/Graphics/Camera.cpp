@@ -12,7 +12,8 @@ namespace uvke {
             } break;
 
             case Projection::Perspectivic: {
-                m_ubo.projection = glm::perspective(Radians(90.0f), size.x / size.y, 0.1f, 1000.0f);
+                float x = 1.0f / Tan<float>(Radians<float>(90.0f) / 2.0f);
+                m_ubo.projection = glm::mat4(x / (size.x / size.y), 0.0f,  0.0f,  0.0f, 0.0f, x,  0.0f,  0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.1f,  0.0f);
             } break;
 
             case Projection::Frustumic: {

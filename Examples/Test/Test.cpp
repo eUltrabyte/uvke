@@ -54,6 +54,11 @@ public:
 
         m_renderer->Push(&triangle);
 
+        uvke::Light light;
+        light.Create(m_renderer.get());
+        
+        m_renderer->Push(&light);
+
         while(m_isRunning) {
             Update();
             Render();

@@ -13,6 +13,7 @@
 #include "Interface.hpp"
 #include "Component.hpp"
 #include "RenderableComponent.hpp"
+#include "LightComponent.hpp"
 
 namespace uvke {
     struct UVKE_API ObjectPushConstant {

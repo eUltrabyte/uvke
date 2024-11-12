@@ -3,8 +3,7 @@
 namespace uvke {
     Pipeline::Pipeline(Base* base, Surface* surface, VertexBuffer* vertexBuffer, Descriptor* descriptor)
         : m_base(base), m_surface(surface), m_vertexBuffer(vertexBuffer), m_descriptor(descriptor) {
-        m_shader = std::make_shared<Shader>(m_base, File::LoadBytes("Resource/Shaders/Rendering.vert.spv"), File::LoadBytes("Resource/Shaders/Rendering.frag.spv"));
-        // m_shader = std::make_shared<Shader>(m_base, File::LoadBytes("Resource/Shaders/Lightless.vert.spv"), File::LoadBytes("Resource/Shaders/Lightless.frag.spv"));
+        m_shader = std::make_shared<Shader>(m_base, File::LoadBytes("Resource/Shaders/Lightless.vert.spv"), File::LoadBytes("Resource/Shaders/Lightless.frag.spv"));
 
         {
             VkPipelineCacheCreateInfo pipelineCacheCreateInfo { };
@@ -83,8 +82,8 @@ namespace uvke {
             viewport.y = 0.0f;
             viewport.width = m_surface->GetExtent().width;
             viewport.height = m_surface->GetExtent().height;
-            viewport.minDepth = 0.0f;
-            viewport.maxDepth = 1.0f;
+            viewport.minDepth = 1.0f;
+            viewport.maxDepth = 0.0f;
 
             VkRect2D scissor { };
             scissor.offset = { 0, 0 };
@@ -287,6 +286,20 @@ namespace uvke {
     }
 
     void Pipeline::Render(Framebuffer* framebuffer, CommandBuffer* commandBuffer, unsigned int frame, unsigned int index, std::vector<Component*> components, Interface* interfaces) {
+        static bool isLightless = true;
+        for(auto i = 0; i < components.size(); ++i) {
+            if(const auto lightComponent = dynamic_cast<LightComponent*>(components[i])) {
+                if(isLightless) {
+                    m_shader.reset();
+                    m_shader = std::make_shared<Shader>(m_base, File::LoadBytes("Resource/Shaders/Rendering.vert.spv"), File::LoadBytes("Resource/Shaders/Rendering.frag.spv"));
+                    Recreate();
+                    isLightless = false;
+                    UVKE_LOG("Using lights");
+                    break;
+                }
+            }
+        }
+        
         vkResetCommandBuffer(commandBuffer->GetCommandBuffer(frame), 0);
 
         VkCommandBufferBeginInfo commandBufferBeginInfo { };
@@ -324,8 +337,8 @@ namespace uvke {
                 viewport.y = 0.0f;
                 viewport.width = m_surface->GetExtent().width;
                 viewport.height = m_surface->GetExtent().height;
-                viewport.minDepth = 0.0f;
-                viewport.maxDepth = 1.0f;
+                viewport.minDepth = 1.0f;
+                viewport.maxDepth = 0.0f;
 
                 vkCmdSetViewport(commandBuffer->GetCommandBuffer(frame), 0, 1, &viewport);
 
@@ -336,6 +349,10 @@ namespace uvke {
                 vkCmdSetScissor(commandBuffer->GetCommandBuffer(frame), 0, 1, &scissor);
 
                 renderableComponent->Render(commandBuffer->GetCommandBuffer(frame), m_pipelineLayout, frame);
+            } else if(const auto lightComponent = dynamic_cast<LightComponent*>(components[i])) {
+                if(!isLightless) {
+                    UVKE_LOG(std::to_string(static_cast<int>(lightComponent->GetType())));
+                }
             }
         }
 

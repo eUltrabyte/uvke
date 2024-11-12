@@ -46,6 +46,9 @@ set(UVKE_GRAPHICS_SOURCE
     Camera.cpp
     Component.hpp
     RenderableComponent.hpp
+    LightComponent.hpp
+    Light.hpp
+    Light.cpp
     Mesh.hpp
     Mesh.cpp
     Sprite.hpp
